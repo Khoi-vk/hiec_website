@@ -74,15 +74,6 @@ export function LoginForm() {
           Nút đăng nhập được mở khi tất cả trường hợp lệ.
         </p>
       ) : null}
-
-      <div className="relative py-1 text-center">
-        <span className="relative z-10 bg-card px-3 text-xs uppercase tracking-widest text-muted-foreground">
-          hoặc
-        </span>
-        <span className="absolute left-0 top-1/2 h-px w-full bg-border" />
-      </div>
-
-      
     </form>
   );
 }
