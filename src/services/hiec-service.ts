@@ -116,10 +116,11 @@ export const trafficData = [
 ];
 
 export const socialLinks = [
-  { label: "Facebook", href: "https://facebook.com" },
-  { label: "TikTok", href: "https://tiktok.com" },
-  { label: "Instagram", href: "https://instagram.com" },
+  { label: "Facebook", href: "https://www.facebook.com/hiec.vn" },
+  { label: "TikTok", href: "https://www.tiktok.com/@hiec.hust" },
+  { label: "Instagram", href: "https://www.instagram.com/hiec.in.here/" },
 ];
+
 
 export const contactInfo = {
   email: "contact@hiec.vn",

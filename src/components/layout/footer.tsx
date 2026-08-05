@@ -9,9 +9,9 @@ import { Facebook, Instagram, Mail, MapPin, Music2, Phone, Sparkles } from "luci
 import { contactInfo } from "@/services/hiec-service";
 // Define social media links and their corresponding icons
 const socials = [
-  { label: "Facebook", href: "https://facebook.com", icon: Facebook },
-  { label: "TikTok", href: "https://tiktok.com", icon: Music2 },
-  { label: "Instagram", href: "https://instagram.com", icon: Instagram },
+  { label: "Facebook", href: "https://www.facebook.com/hiec.vn", icon: Facebook },
+  { label: "TikTok", href: "https://www.tiktok.com/@hiec.hust", icon: Music2 },
+  { label: "Instagram", href: "https://www.instagram.com/hiec.in.here/", icon: Instagram },
 ];
 
 export function Footer() {
@@ -48,7 +48,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Column 2: Quick navigation links to different pages */}
+        {/* Column 2: Quick navigation links to different pages */}    // sẽ sửa điều hướng sau
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
             Điều hướng
