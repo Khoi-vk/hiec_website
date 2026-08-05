@@ -1,3 +1,9 @@
+/* 
+FieldError - Component hiển thị lỗi xác thực (validation error) theo thời gian thực.
+   - Hiển thị lỗi validation bên dưới field input
+   - Tự động ẩn khi không có lỗi
+   - Dùng chung cho mọi form (auth, profile,...)
+*/
 import { AlertCircle } from "lucide-react";
 
 /** Realtime validation error shown directly beneath a field. */
