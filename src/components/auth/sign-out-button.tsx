@@ -1,3 +1,9 @@
+/*
+SignOutButton - Component React dùng để hiển thị nút "Đăng xuất" và một hộp thoại xác nhận trước khi thực sự đăng xuất, có chức năng:
+  - Khi bấm, mở modal xác nhận đăng xuất
+  - Nếu xác nhận: xoá trạng thái đăng nhập, thông báo thành công, chuyển hướng về trang chủ
+  - Tương ứng với yêu cầu Docs-BA-3 "Sign Out" --> vibe code từ file chị Duyên.
+*/
 import * as React from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
