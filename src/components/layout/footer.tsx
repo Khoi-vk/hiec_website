@@ -47,8 +47,8 @@ export function Footer() {
             ))}
           </div>
         </div>
-
-        {/* Column 2: Quick navigation links to different pages */}    // sẽ sửa điều hướng sau
+            
+        {/* Column 2: Quick navigation links to different pages */}   
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
             Điều hướng
