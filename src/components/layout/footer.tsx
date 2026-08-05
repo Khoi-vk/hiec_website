@@ -1,8 +1,13 @@
+?/**Day la component tao ra phan chan trang (Footer) cua website,
+ thuong nam o phan duoi cung cua cac trang. 
+ No chua thong tin gioi thieu ve cau lac bo (HIEC Club), 
+ cac lien ket mang xa hoi, danh sach dieu huong nhanh den cac trang chinh,
+  thong tin lien he (email, dien thoai, dia chi) va nam ban quyen. */
 import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Mail, MapPin, Music2, Phone, Sparkles } from "lucide-react";
 
 import { contactInfo } from "@/services/hiec-service";
-
+// Define social media links and their corresponding icons
 const socials = [
   { label: "Facebook", href: "https://facebook.com", icon: Facebook },
   { label: "TikTok", href: "https://tiktok.com", icon: Music2 },
@@ -11,8 +16,10 @@ const socials = [
 
 export function Footer() {
   return (
+    // Footer container with anchor link id and background styling
     <footer id="lien-he" className="border-t border-border/60 bg-gradient-surface">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 md:grid-cols-3">
+        {/* Column 1: Organization brand info, description, and social media icons */}
         <div>
           <div className="flex items-center gap-2">
             <span className="grid size-9 place-items-center rounded-xl bg-gradient-brand text-primary-foreground">
@@ -25,6 +32,7 @@ export function Footer() {
             có tác động thật.
           </p>
           <div className="mt-5 flex gap-2">
+            {/* Map through social items to render social buttons */}
             {socials.map((s) => (
               <a
                 key={s.label}
@@ -40,6 +48,7 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Column 2: Quick navigation links to different pages */}
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
             Điều hướng
@@ -68,6 +77,7 @@ export function Footer() {
           </ul>
         </div>
 
+        {/* Column 3: Contact information (email, phone, address) */}
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
             Liên hệ nhanh
@@ -92,6 +102,7 @@ export function Footer() {
           </ul>
         </div>
       </div>
+      {/* Bottom copyright notice bar with dynamic current year */}
       <div className="border-t border-border/60 py-5 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} HIEC Club. All rights reserved.
       </div>
