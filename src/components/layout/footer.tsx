@@ -1,4 +1,4 @@
-?/**Day la component tao ra phan chan trang (Footer) cua website,
+/**Day la component tao ra phan chan trang (Footer) cua website,
  thuong nam o phan duoi cung cua cac trang. 
  No chua thong tin gioi thieu ve cau lac bo (HIEC Club), 
  cac lien ket mang xa hoi, danh sach dieu huong nhanh den cac trang chinh,
