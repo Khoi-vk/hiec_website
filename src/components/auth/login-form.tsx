@@ -1,3 +1,13 @@
+/*
+LoginForm - một form đăng nhập xây dựng cho web, có các chức năng:
+  - Nhập email/số điện thoại và mật khẩu
+  - Xác thực dữ liệu ngay khi gõ (validation bằng Zod)
+  - Hiển thị lỗi chi tiết cho từng trường
+  - Gọi đăng nhập giả lập (qua signIn của store auth)
+  - Hiển thị thông báo thành công qua toast
+  - Điều hướng đến trang phù hợp với vai trò của người dùng (admin dashboard hoặc profile)
+  - Có link quên mật khẩu và nút đăng nhập bằng Google (cũng ở dạng giả lập). --> Đăng nhập bằng Google này mình không dùng nhưng mà tớ chưa bỏ, sợ bỏ xong web ko chạy được :v
+*/
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
