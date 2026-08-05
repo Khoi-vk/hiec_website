@@ -1,3 +1,11 @@
+/*
+AuthShell – Component khung cho các trang xác thực (đăng nhập).
+Props:
+  - title: Tiêu đề chính
+  - subtitle: Mô tả phụ
+  - children: Nội dung form bên trong
+  - footer: (tùy chọn) Nội dung chân trang
+*/
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
