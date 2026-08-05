@@ -13,50 +13,16 @@ const phoneRegex = /^\d{10,15}$/;
 
 export const passwordSchema = z
   .string()
-  .min(1, "Vui lòng nhập mật khẩu")
-  .min(6, PASSWORD_MESSAGE)
-  .regex(/[A-Z]/, PASSWORD_MESSAGE)
-  .regex(/\d/, PASSWORD_MESSAGE)
-  .regex(/[^A-Za-z0-9]/, PASSWORD_MESSAGE);
+  .min(1);
 
-/** Email hợp lệ hoặc số điện thoại 10–15 số */
-export const identifierSchema = z
-  .string()
-  .min(1, "Vui lòng nhập email hoặc số điện thoại")
-  .refine((value) => emailRegex.test(value) || phoneRegex.test(value.replace(/[\s.+-]/g, "")), {
-    message: "Định dạng email hoặc số điện thoại không hợp lệ",
-  });
+
 
 export const loginSchema = z.object({
-  identifier: identifierSchema,
   password: passwordSchema,
 });
 export type LoginValues = z.infer<typeof loginSchema>;
 
 
-export type SignUpValues = z.infer<typeof signUpSchema>;
-
-/** Forgot password — step 1: email / phone */
-export const forgotIdentifierSchema = z.object({
-  identifier: identifierSchema,
-});
-export type ForgotIdentifierValues = z.infer<typeof forgotIdentifierSchema>;
-
-/** Forgot password — step 2: 6 digit OTP */
-
-export type OtpValues = z.infer<typeof otpSchema>;
-
-/** Forgot password — step 3: new password */
-export const resetPasswordSchema = z
-  .object({
-    password: passwordSchema,
-    confirmPassword: z.string().min(1, "Vui lòng nhập lại mật khẩu"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Mật khẩu nhập lại không khớp",
-  });
-export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
 
 export const changePasswordSchema = z
   .object({
