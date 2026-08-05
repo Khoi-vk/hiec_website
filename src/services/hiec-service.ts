@@ -126,5 +126,5 @@ export const contactInfo = {
   email: "hiec.hust@gmail.com",
   phone: "0336873705",
   messenger: "https://m.me/hiec.vn",
-  address: "Đại học Bách khoa Hà Nội, 1 Đ. Đại Cồ Việt",
+  address: "Đại học Bách khoa Hà Nội, 1 Đ. Đại Cồ Việt", 
 };
