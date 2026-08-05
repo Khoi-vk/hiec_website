@@ -32,7 +32,7 @@ export function LoginForm() {
   } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     mode: "onChange",
-    defaultValues: { identifier: "", password: "" },
+    defaultValues: { password: "" },
   });
 
   const onSubmit = (values: LoginValues) => {

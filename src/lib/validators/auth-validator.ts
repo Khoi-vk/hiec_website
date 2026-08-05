@@ -13,7 +13,7 @@ const phoneRegex = /^\d{10,15}$/;
 
 export const passwordSchema = z
   .string()
-  .min(1);
+  .min(1, "Nhớ số điện thoại sếp An không?");
 
 
 
