@@ -123,8 +123,8 @@ export const socialLinks = [
 
 
 export const contactInfo = {
-  email: "contact@hiec.vn",
-  phone: "0912345678",
+  email: "hiec.hust@gmail.com",
+  phone: "0336873705",
   messenger: "https://m.me/hiec.vn",
-  address: "Toà nhà A1, Đại học HIEC, TP. Hồ Chí Minh",
+  address: "Đại học Bách khoa Hà Nội, 1 Đ. Đại Cồ Việt",
 };
