@@ -1,3 +1,12 @@
+/*
+PasswordInput - hiển thị một ô nhập mật khẩu có nút bật/tắt hiển thị mật khẩu (con mắt).
+   - Mặc định mật khẩu bị ẩn (type="password")
+   - Người dùng có thể nhấn nút để chuyển đổi qua lại giữa ẩn và hiện
+   - Hỗ trợ đầy đủ các props của Input (placeholder, value, onChange, ...)
+   - Sử dụng React.forwardRef để có thể truyền ref từ component cha
+   - Đảm bảo accessibility với aria-label cập nhật theo trạng thái
+   - Yêu cầu nghiệp vụ: Docs-BA-3 --> này khả năng vibe code từ file của chị Duyên.
+*/
 import * as React from "react";
 import { Eye, EyeOff } from "lucide-react";
 
