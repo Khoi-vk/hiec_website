@@ -69,11 +69,7 @@ export function LoginForm() {
         Sign In
       </Button>
 
-      {!isValid && Object.keys(touchedFields).length > 0 ? (
-        <p className="text-center text-xs text-muted-foreground">
-          Nút đăng nhập được mở khi tất cả trường hợp lệ.
-        </p>
-      ) : null}
+      
     </form>
   );
 }
