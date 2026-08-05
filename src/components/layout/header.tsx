@@ -1,3 +1,9 @@
+/**
+ Day la component tao ra thanh dau trang (Header) cua website, 
+ luôn được ghim cố định ở phía trên cùng màn hình khi người dùng cuộn trang.
+  Nó chứa logo thương hiệu, thanh thực đơn điều hướng chính (menu), 
+  nút chuyển đổi giao diện di động (responsive mobile menu) và các nút tài khoản (Đăng nhập, Hồ sơ, Đăng ký tham gia)
+ */
 import * as React from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, Sparkles, X } from "lucide-react";
@@ -5,7 +11,7 @@ import { Menu, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
-
+// Define the navigation items array containing labels, paths, and optional section hashes
 const navItems = [
   { label: "Trang chủ", to: "/", hash: undefined },
   { label: "Giới thiệu", to: "/", hash: "gioi-thieu" },
@@ -15,13 +21,18 @@ const navItems = [
 ] as const;
 
 export function Header() {
+  // State to manage mobile menu open/close status
   const [open, setOpen] = React.useState(false);
+  // Get current authenticated user details from auth store
   const { user } = useAuth();
+  // Get current active route pathname from router state
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
+    // Sticky header container fixed at the top with background blur effect
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
+        {/* Brand logo and home link */}
         <Link to="/" className="flex items-center gap-2">
           <span className="grid size-9 place-items-center rounded-xl bg-gradient-brand text-primary-foreground shadow-glow">
             <Sparkles className="size-4" />
@@ -30,7 +41,7 @@ export function Header() {
             HIEC<span className="text-primary">.vn</span>
           </span>
         </Link>
-
+        {/* Desktop navigation menu items */}
         <nav className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
             <Link
@@ -47,6 +58,7 @@ export function Header() {
           ))}
         </nav>
 
+        {/* Desktop user action buttons (Profile / Login / Signup) */}
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <Button asChild variant="outline" size="sm">
@@ -61,7 +73,7 @@ export function Header() {
             <Link to="/signup">Tham gia HIEC</Link>
           </Button>
         </div>
-
+        {/* Mobile menu toggle button */}
         <Button
           variant="ghost"
           size="icon"
@@ -72,6 +84,8 @@ export function Header() {
           {open ? <X /> : <Menu />}
         </Button>
       </div>
+
+      {/* Collapsible mobile navigation menu drawer */}
 
       {open ? (
         <div className="border-t border-border/60 bg-background md:hidden">
