@@ -22,15 +22,7 @@ function LoginPage() {
   return (
     <AuthShell
       title="Sign in"
-      subtitle="Đăng nhập bằng email/số điện thoại hoặc tài khoản Google của bạn."
-      footer={
-        <>
-          Chưa có tài khoản?{" "}
-          <Link to="/signup" className="font-semibold underline underline-offset-4">
-            Đăng ký ngay
-          </Link>
-        </>
-      }
+      
     >
       <LoginForm />
     </AuthShell>
