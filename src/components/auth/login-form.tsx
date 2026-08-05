@@ -54,6 +54,9 @@ export function LoginForm() {
           aria-invalid={!!errors.password}
           {...register("password")}
         />
+        <p className="text-sm text-red-500 mt-1">
+        Nhớ số điện thoại sếp An không?
+      </p>
         <FieldError message={errors.password?.message} />
       </div>
 

@@ -5,15 +5,12 @@ import { z } from "zod";
  * Messages are kept in Vietnamese exactly as specified in the BA document.
  */
 
-export const PASSWORD_MESSAGE =
-  "Nhớ số điện thoại sếp An không?";
-
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const phoneRegex = /^\d{10,15}$/;
 
 export const passwordSchema = z
   .string()
-  .min(1, "Nhớ số điện thoại sếp An không?");
+  .min(1);
 
 
 
