@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/auth/field-error";
-import { GoogleButton } from "@/components/auth/google-button";
 import { PasswordInput } from "@/components/auth/password-input";
 import { loginSchema, type LoginValues } from "@/lib/validators/auth-validator";
 import { useAuth } from "@/store/auth-store";
@@ -44,17 +43,7 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-      <div className="space-y-2">
-        <Label htmlFor="identifier">Email / Số điện thoại</Label>
-        <Input
-          id="identifier"
-          placeholder="ban@hiec.vn hoặc 0912345678"
-          autoComplete="username"
-          aria-invalid={!!errors.identifier}
-          {...register("identifier")}
-        />
-        <FieldError message={errors.identifier?.message} />
-      </div>
+      
 
       <div className="space-y-2">
         <Label htmlFor="password">Mật khẩu</Label>
@@ -68,14 +57,7 @@ export function LoginForm() {
         <FieldError message={errors.password?.message} />
       </div>
 
-      <div className="flex justify-end">
-        <Link
-          to="/forgot-password"
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-        >
-          Quên mật khẩu?
-        </Link>
-      </div>
+      
 
       <Button
         type="submit"
@@ -100,14 +82,7 @@ export function LoginForm() {
         <span className="absolute left-0 top-1/2 h-px w-full bg-border" />
       </div>
 
-      <GoogleButton
-        label="Sign in with Google"
-        onClick={() => {
-          const user = signIn("member@gmail.com", { provider: "google" });
-          toast.success("Đăng nhập Google thành công", { description: user.email });
-          navigate({ to: "/profile" });
-        }}
-      />
+      
     </form>
   );
 }
