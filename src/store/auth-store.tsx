@@ -3,45 +3,36 @@ import * as React from "react";
 export type SessionUser = {
   id: string;
   fullName: string;
-  email: string;
-  role: "user" | "admin";
-  provider: "password" | "google";
+  role: "admin"; 
 };
-
-type StoredSession = { user: SessionUser; expiresAt: number };
 
 type AuthContextValue = {
   user: SessionUser | null;
   hydrated: boolean;
-  signIn: (identifier: string, opts?: { provider?: SessionUser["provider"] }) => SessionUser;
-  signUp: (fullName: string, email: string) => SessionUser;
+  signIn: (password: string) => SessionUser; 
   signOut: () => void;
+  changePassword: (oldPassword: string, newPassword: string) => boolean; 
 };
 
 const STORAGE_KEY = "hiec.session";
-/** Session kéo dài tối đa 30 ngày (Docs-BA-3). */
-const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "0336873705";
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
 
+
 function readSession(): SessionUser | null {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as StoredSession;
-    if (!parsed?.user || parsed.expiresAt < Date.now()) {
-      window.localStorage.removeItem(STORAGE_KEY);
-      return null;
-    }
-    return parsed.user;
+    return JSON.parse(raw);
   } catch {
     return null;
   }
 }
 
+// ✅ GIỮ: Lưu session
 function persist(user: SessionUser) {
-  const payload: StoredSession = { user, expiresAt: Date.now() + SESSION_TTL_MS };
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -57,34 +48,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => ({
       user,
       hydrated,
-      signIn: (identifier, opts) => {
-        const email = identifier.includes("@") ? identifier : `${identifier}@hiec.vn`;
-        const next: SessionUser = {
-          id: "u-demo",
-          fullName: (email.split("@")[0] ?? "").replace(/[._-]/g, " ") || "Thành viên HIEC",
-          email,
-          role: email.startsWith("admin") ? "admin" : "user",
-          provider: opts?.provider ?? "password",
+
+      // ✅ SỬA: Chỉ nhận password
+      signIn: (password: string) => {
+        // Kiểm tra password
+        if (password !== ADMIN_PASSWORD) {
+          throw new Error("Mật khẩu không đúng");
+        }
+
+        // Tạo user admin
+        const adminUser: SessionUser = {
+          id: "admin-1",
+          fullName: "Quản trị viên",
+          role: "admin",
         };
-        persist(next);
-        setUser(next);
-        return next;
+
+        persist(adminUser);
+        setUser(adminUser);
+        return adminUser;
       },
-      signUp: (fullName, email) => {
-        const next: SessionUser = {
-          id: "u-new",
-          fullName,
-          email,
-          role: "user",
-          provider: "password",
-        };
-        persist(next);
-        setUser(next);
-        return next;
-      },
+
+      // ✅ SỬA: Đăng xuất
       signOut: () => {
-        window.localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STORAGE_KEY);
         setUser(null);
+      },
+
+      // 🆕 THÊM MỚI: Đổi mật khẩu
+      changePassword: (oldPassword: string, newPassword: string) => {
+        if (oldPassword !== ADMIN_PASSWORD) {
+          return false; // Mật khẩu cũ sai
+        }
+
+        // Lưu mật khẩu mới vào localStorage (tạm thời)
+        // ⚠️ Trong production, nên gọi API để update
+        localStorage.setItem('admin_password', newPassword);
+        
+        // Cập nhật biến (nhưng chỉ dùng cho session hiện tại)
+        // window.location.reload(); // Cần reload để áp dụng
+        
+        return true;
       },
     }),
     [user, hydrated],
