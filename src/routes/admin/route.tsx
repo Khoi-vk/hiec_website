@@ -1,31 +1,23 @@
-<<<<<<< HEAD
 /**
  * Layout chính cho khu vực Admin.
  * Chứa logic bảo mật: Chỉ cho phép người dùng có quyền 'admin' truy cập.
  */
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-=======
-import { createFileRoute, Outlet } from "@tanstack/react-router";
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
 
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import { useAuth } from "@/store/auth-store";
 
 export const Route = createFileRoute("/admin")({
-<<<<<<< HEAD
   // SỬA: Thêm "vọng gác" bảo mật trước khi tải trang
   beforeLoad: ({ context }) => {
     // Lưu ý: Trong TanStack Start, session thường được kiểm tra ở đây.
     // Ở bản demo này, chúng ta sẽ kiểm tra trong component, 
     // nhưng lệnh redirect này là chuẩn để ngăn chặn truy cập trái phép.
   },
-=======
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
   component: AdminLayout,
 });
 
 function AdminLayout() {
-<<<<<<< HEAD
   const { user, hydrated } = useAuth();
 
   // Chờ cho đến khi store xác thực được tải xong từ localStorage
@@ -64,29 +56,9 @@ function AdminLayout() {
 
         {/* Nội dung thay đổi của từng trang admin con (Dashboard, Posts, v.v.) */}
         <main className="flex-1 p-6 overflow-y-auto">
-=======
-  const { user } = useAuth();
-
-  return (
-    <div className="flex min-h-screen w-full bg-muted/40">
-      <AdminSidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between border-b border-border bg-background px-6">
-          <p className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-            Bảng điều khiển HIEC
-          </p>
-          <p className="text-sm text-muted-foreground">{user?.email ?? "admin@hiec.vn"}</p>
-        </header>
-        <main className="flex-1 p-6">
-          {/* Required: nested admin routes render here. */}
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
           <Outlet />
         </main>
       </div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603

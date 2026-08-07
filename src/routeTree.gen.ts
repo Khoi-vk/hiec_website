@@ -11,17 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
-<<<<<<< HEAD
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as TestSupabaseRouteImport } from './routes/test-supabase'
-=======
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as ProjectsRouteImport } from './routes/projects'
-import { Route as SignupRouteImport } from './routes/signup'
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminPostsRouteImport } from './routes/admin/posts'
@@ -38,41 +30,19 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-<<<<<<< HEAD
-=======
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-<<<<<<< HEAD
-=======
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
   getParentRoute: () => rootRouteImport,
 } as any)
-<<<<<<< HEAD
 const TestSupabaseRoute = TestSupabaseRouteImport.update({
   id: '/test-supabase',
   path: '/test-supabase',
-=======
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -104,17 +74,9 @@ const AdminStaticContentRoute = AdminStaticContentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
-<<<<<<< HEAD
   '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/test-supabase': typeof TestSupabaseRoute
-=======
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
-  '/projects': typeof ProjectsRoute
-  '/signup': typeof SignupRoute
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -123,17 +85,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-<<<<<<< HEAD
   '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/test-supabase': typeof TestSupabaseRoute
-=======
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
-  '/projects': typeof ProjectsRoute
-  '/signup': typeof SignupRoute
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -144,17 +98,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
-<<<<<<< HEAD
   '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/test-supabase': typeof TestSupabaseRoute
-=======
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
-  '/projects': typeof ProjectsRoute
-  '/signup': typeof SignupRoute
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -166,17 +112,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-<<<<<<< HEAD
     | '/login'
     | '/projects'
     | '/test-supabase'
-=======
-    | '/forgot-password'
-    | '/login'
-    | '/profile'
-    | '/projects'
-    | '/signup'
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
     | '/admin/dashboard'
     | '/admin/posts'
     | '/admin/settings'
@@ -185,17 +123,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-<<<<<<< HEAD
     | '/login'
     | '/projects'
     | '/test-supabase'
-=======
-    | '/forgot-password'
-    | '/login'
-    | '/profile'
-    | '/projects'
-    | '/signup'
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
     | '/admin/dashboard'
     | '/admin/posts'
     | '/admin/settings'
@@ -205,17 +135,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
-<<<<<<< HEAD
     | '/login'
     | '/projects'
     | '/test-supabase'
-=======
-    | '/forgot-password'
-    | '/login'
-    | '/profile'
-    | '/projects'
-    | '/signup'
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
     | '/admin/dashboard'
     | '/admin/posts'
     | '/admin/settings'
@@ -226,17 +148,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
-<<<<<<< HEAD
   LoginRoute: typeof LoginRoute
   ProjectsRoute: typeof ProjectsRoute
   TestSupabaseRoute: typeof TestSupabaseRoute
-=======
-  ForgotPasswordRoute: typeof ForgotPasswordRoute
-  LoginRoute: typeof LoginRoute
-  ProfileRoute: typeof ProfileRoute
-  ProjectsRoute: typeof ProjectsRoute
-  SignupRoute: typeof SignupRoute
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
 }
 
 declare module '@tanstack/react-router' {
@@ -255,16 +169,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-<<<<<<< HEAD
-=======
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
     '/login': {
       id: '/login'
       path: '/login'
@@ -272,16 +176,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-<<<<<<< HEAD
-=======
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
     '/projects': {
       id: '/projects'
       path: '/projects'
@@ -289,19 +183,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
-<<<<<<< HEAD
     '/test-supabase': {
       id: '/test-supabase'
       path: '/test-supabase'
       fullPath: '/test-supabase'
       preLoaderRoute: typeof TestSupabaseRouteImport
-=======
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -365,17 +251,9 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
-<<<<<<< HEAD
   LoginRoute: LoginRoute,
   ProjectsRoute: ProjectsRoute,
   TestSupabaseRoute: TestSupabaseRoute,
-=======
-  ForgotPasswordRoute: ForgotPasswordRoute,
-  LoginRoute: LoginRoute,
-  ProfileRoute: ProfileRoute,
-  ProjectsRoute: ProjectsRoute,
-  SignupRoute: SignupRoute,
->>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

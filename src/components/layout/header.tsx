@@ -1,17 +1,16 @@
 /**
- Day la component tao ra thanh dau trang (Header) cua website, 
- luôn được ghim cố định ở phía trên cùng màn hình khi người dùng cuộn trang.
-  Nó chứa logo thương hiệu, thanh thực đơn điều hướng chính (menu), 
-  nút chuyển đổi giao diện di động (responsive mobile menu) và các nút tài khoản (Đăng nhập, Hồ sơ, Đăng ký tham gia)
+ * Component Header - Thanh điều hướng chính của người dùng.
+ * Đã cập nhật Logo đồng bộ với hệ thống.
  */
 import * as React from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, Sparkles, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
-// Define the navigation items array containing labels, paths, and optional section hashes
+import { HiecLogo } from "@/components/ui/hiec-logo"; // Import Logo mới
+
 const navItems = [
   { label: "Trang chủ", to: "/", hash: undefined },
   { label: "Giới thiệu", to: "/", hash: "gioi-thieu" },
@@ -21,27 +20,20 @@ const navItems = [
 ] as const;
 
 export function Header() {
-  // State to manage mobile menu open/close status
   const [open, setOpen] = React.useState(false);
-  // Get current authenticated user details from auth store
   const { user } = useAuth();
-  // Get current active route pathname from router state
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    // Sticky header container fixed at the top with background blur effect
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
-        {/* Brand logo and home link */}
-        <Link to="/" className="flex items-center gap-2">
-          <span className="grid size-9 place-items-center rounded-xl bg-gradient-brand text-primary-foreground shadow-glow">
-            <Sparkles className="size-4" />
-          </span>
-          <span className="font-display text-lg font-bold tracking-tight">
-            HIEC<span className="text-primary">.vn</span>
-          </span>
+        
+        {/* SỬA: Sử dụng HiecLogo dùng chung */}
+        <Link to="/" className="hover:opacity-80 transition-opacity">
+          <HiecLogo />
         </Link>
-        {/* Desktop navigation menu items */}
+
+        {/* Desktop navigation */}
         <nav className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
             <Link
@@ -58,7 +50,7 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Desktop user action buttons (Profile / Login / Signup) */}
+        {/* Action buttons */}
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <Button asChild variant="outline" size="sm">
@@ -73,20 +65,19 @@ export function Header() {
             <Link to="/signup">Tham gia HIEC</Link>
           </Button>
         </div>
-        {/* Mobile menu toggle button */}
+
+        {/* Mobile menu toggle */}
         <Button
           variant="ghost"
           size="icon"
           className="md:hidden"
-          aria-label="Mở menu"
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X /> : <Menu />}
         </Button>
       </div>
 
-      {/* Collapsible mobile navigation menu drawer */}
-
+      {/* Mobile drawer */}
       {open ? (
         <div className="border-t border-border/60 bg-background md:hidden">
           <nav className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
@@ -101,18 +92,6 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            <div className="mt-2 flex gap-2">
-              <Button asChild variant="outline" size="sm" className="flex-1">
-                <Link to={user ? "/profile" : "/login"} onClick={() => setOpen(false)}>
-                  {user ? "Hồ sơ" : "Đăng nhập"}
-                </Link>
-              </Button>
-              <Button asChild variant="shimmer" size="sm" className="flex-1">
-                <Link to="/signup" onClick={() => setOpen(false)}>
-                  Tham gia
-                </Link>
-              </Button>
-            </div>
           </nav>
         </div>
       ) : null}
