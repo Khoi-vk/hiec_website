@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/store/auth-store";
+<<<<<<< HEAD
 import { Button } from "@/components/ui/button";
 
 /**
@@ -33,11 +34,32 @@ function NotFoundComponent() {
         <Button asChild variant="shimmer" size="lg">
           <Link to="/">Quay lại Trang chủ</Link>
         </Button>
+=======
+
+function NotFoundComponent() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-7xl font-bold text-foreground">404</h1>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The page you're looking for doesn't exist or has been moved.
+        </p>
+        <div className="mt-6">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Go home
+          </Link>
+        </div>
+>>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
       </div>
     </div>
   );
 }
 
+<<<<<<< HEAD
 /**
  * Giao diện xử lý lỗi hệ thống (Crash)
  */
@@ -46,10 +68,17 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   
   useEffect(() => {
     console.error("Root Error Boundary:", error);
+=======
+function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+  console.error(error);
+  const router = useRouter();
+  useEffect(() => {
+>>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
+<<<<<<< HEAD
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="max-w-md w-full rounded-3xl border border-destructive/20 bg-destructive/5 p-8 text-center backdrop-blur-sm">
         <h1 className="text-xl font-bold tracking-tight text-destructive mb-2">
@@ -60,10 +89,23 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Button
+=======
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          This page didn't load
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Something went wrong on our end. You can try refreshing or head back home.
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <button
+>>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
             onClick={() => {
               router.invalidate();
               reset();
             }}
+<<<<<<< HEAD
             variant="outline"
           >
             Thử lại
@@ -71,6 +113,18 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           <Button asChild variant="destructive">
             <a href="/">Về Trang chủ</a>
           </Button>
+=======
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Try again
+          </button>
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+          >
+            Go home
+          </a>
+>>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
         </div>
       </div>
     </div>
@@ -85,8 +139,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "HIEC Club — Khởi nghiệp & Đổi mới sáng tạo" },
       {
         name: "description",
+<<<<<<< HEAD
         content: "Cộng đồng sinh viên biến ý tưởng thành dự án có tác động thật.",
       },
+=======
+        content:
+          "HIEC là câu lạc bộ khởi nghiệp và đổi mới sáng tạo sinh viên: dự án, hoạt động và cộng đồng mentor.",
+      },
+      { name: "author", content: "HIEC Club" },
+      { property: "og:title", content: "HIEC Club — Khởi nghiệp & Đổi mới sáng tạo" },
+      {
+        property: "og:description",
+        content: "Cộng đồng sinh viên biến ý tưởng thành dự án có tác động thật.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+>>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -94,9 +162,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
+<<<<<<< HEAD
         href: "https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/favicon.ico" },
+=======
+        href: "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap",
+      },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+>>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
     ],
   }),
   shellComponent: RootShell,
@@ -111,7 +185,11 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
       </head>
+<<<<<<< HEAD
       <body className="antialiased selection:bg-primary/20 selection:text-primary">
+=======
+      <body>
+>>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
         {children}
         <Scripts />
       </body>
@@ -125,10 +203,18 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+<<<<<<< HEAD
         {/* Outlet là nơi render các route con. Toaster hiển thị thông báo góc màn hình */}
+=======
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+>>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
         <Outlet />
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 39cd77023537a057b237d7eb34914b8d94907603
