@@ -22,7 +22,7 @@ function LoginPage() {
   return (
     <AuthShell
       title="Sign in"
-      
+      isDark={true}  
     >
       <LoginForm />
     </AuthShell>

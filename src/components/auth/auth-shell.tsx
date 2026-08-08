@@ -1,41 +1,47 @@
 /**
  * AuthShell – Component khung cho các trang xác thực (đăng nhập).
- * Đã cập nhật Logo đồng bộ bằng Component HiecLogo.
+ * Đã sửa: Ép Logo hiển thị màu sáng (isDark={true}) để nổi bật trên nền gradient tối.
  */
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { HiecLogo } from "@/components/ui/hiec-logo"; // Import Logo mới
+import { HiecLogo } from "@/components/ui/hiec-logo"; 
+
+interface AuthShellProps {
+  title: string;
+  subtitle?: string; // Chuyển thành optional (?) để không bị lỗi nếu không nhập
+  children: ReactNode;
+  footer?: ReactNode;
+  isDark?: boolean; // Thêm prop này để linh hoạt
+}
 
 export function AuthShell({
   title,
   subtitle,
   children,
   footer,
-}: {
-  title: string;
-  subtitle: string;
-  children: ReactNode;
-  footer?: ReactNode;
-}) {
+  isDark = true, // Mặc định là true vì AuthShell luôn nằm trên nền bg-gradient-hero tối
+}: AuthShellProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-hero px-4 py-12">
       <div className="w-full max-w-md animate-fade-up">
         
-        {/* SỬA: Thay thế phần logo cũ bằng HiecLogo, căn giữa và làm chữ trắng để nổi bật trên nền đậm */}
+        {/* LOGO: Đã thêm isDark={isDark} để chữ chuyển sang màu trắng */}
         <div className="mb-8 flex justify-center">
           <Link to="/" className="hover:scale-105 transition-transform duration-300">
-            <HiecLogo className="text-white drop-shadow-md" />
+            <HiecLogo isDark={isDark} className="scale-125 drop-shadow-xl" />
           </Link>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-card/95 p-6 shadow-elevated backdrop-blur-sm sm:p-8">
-          <div className="mb-6">
-            <h1 className="font-display text-2xl font-bold text-card-foreground tracking-tight">
+        <div className="rounded-3xl border border-white/10 bg-card/95 p-6 shadow-elevated backdrop-blur-md sm:p-8">
+          <div className="mb-6 text-center">
+            <h1 className="font-display text-2xl font-bold text-foreground tracking-tight">
               {title}
             </h1>
-            <p className="mt-1.5 text-sm text-muted-foreground italic">
-              {subtitle}
-            </p>
+            {subtitle && (
+              <p className="mt-1.5 text-sm text-muted-foreground italic">
+                {subtitle}
+              </p>
+            )}
           </div>
           
           <div className="mt-6">
@@ -47,7 +53,14 @@ export function AuthShell({
           <div className="mt-6 text-center text-sm text-white/70">
             {footer}
           </div>
-        ) : null}
+        ) : (
+          /* Nút quay lại trang chủ mặc định nếu không có footer */
+          <div className="mt-8 text-center">
+            <Link to="/" className="text-sm text-white/60 hover:text-white transition-colors underline underline-offset-4">
+              Quay lại trang chủ
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
