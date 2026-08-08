@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye, Mail, Phone, Search, CheckCircle, UserCheck, Clock, GraduationCap } from "lucide-react";
+import { Eye, Mail, Phone, Search, CheckCircle, UserCheck, Clock, GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -9,80 +9,53 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Modal } from "@/components/ui/modal";
+import { supabase } from "@/utils/supabase";
 
-// Sử dụng 'as any' để tránh lỗi Type khi routeTree chưa kịp cập nhật
 export const Route = createFileRoute("/admin/applications")({
   component: ApplicationsPage,
 });
 
-// Dữ liệu mẫu mô phỏng các đơn ứng tuyển được gửi từ Form Signup
-const initialApplications = [
-  { 
-    id: "APP-001", 
-    fullName: "Nguyễn Công An", 
-    studentId: "20210001", 
-    university: "ĐH Bách Khoa Hà Nội", 
-    major: "Khoa học máy tính", 
-    email: "an.nc210001@sis.hust.edu.vn", 
-    phone: "0336873705", 
-    status: "pending", 
-    motivation: "Mình có niềm đam mê mãnh liệt với khởi nghiệp sáng tạo. Mong muốn được gia nhập HIEC để cùng các bạn xây dựng những dự án có sức ảnh hưởng thực tế đến cộng đồng sinh viên Bách Khoa." 
-  },
-  { 
-    id: "APP-002", 
-    fullName: "Trần Thu Thảo", 
-    studentId: "20224567", 
-    university: "ĐH Kinh tế Quốc dân", 
-    major: "Marketing", 
-    email: "thao.tt@gmail.com", 
-    phone: "0987654321", 
-    status: "reviewed", 
-    motivation: "Em đã theo dõi HIEC từ lâu qua các kỳ Bootcamp. Em muốn ứng tuyển vào ban Truyền thông để học hỏi cách xây dựng thương hiệu cho một câu lạc bộ khởi nghiệp chuyên nghiệp." 
-  },
-];
-
 function ApplicationsPage() {
-  const [apps, setApps] = React.useState<any[]>(() => {
-    try {
-      const saved = localStorage.getItem("hiec_applications");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      console.error("Lỗi đọc ứng tuyển từ localStorage:", e);
-    }
-    return initialApplications;
-  });
-
+  const [apps, setApps] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [selectedApp, setSelectedApp] = React.useState<any>(null);
   const [searchTerm, setSearchTerm] = React.useState("");
 
-  // Tự động đồng bộ khi có đơn mới nộp
-  React.useEffect(() => {
-    const loadApplications = () => {
-      try {
-        const saved = localStorage.getItem("hiec_applications");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setApps(parsed);
-            return;
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      setApps(initialApplications);
-    };
+  const fetchApplications = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("applications")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    window.addEventListener("storage", loadApplications);
-    window.addEventListener("hiec_app_submitted", loadApplications);
+      if (error) throw error;
+      setApps(data || []);
+    } catch (e) {
+      console.error("Lỗi tải đơn ứng tuyển từ Supabase:", e);
+      toast.error("Không thể tải danh sách đơn ứng tuyển.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load ban đầu + Lắng nghe Realtime có đơn mới hoặc đổi trạng thái
+  React.useEffect(() => {
+    fetchApplications();
+
+    const channel = supabase
+      .channel("admin-applications-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "applications" },
+        () => {
+          fetchApplications();
+        }
+      )
+      .subscribe();
+
     return () => {
-      window.removeEventListener("storage", loadApplications);
-      window.removeEventListener("hiec_app_submitted", loadApplications);
+      supabase.removeChannel(channel);
     };
   }, []);
 
@@ -92,21 +65,27 @@ function ApplicationsPage() {
     (app.studentId || "").includes(searchTerm)
   );
 
-  const handleApprove = (id: string) => {
-    const updated = apps.map(a => a.id === id ? { ...a, status: "reviewed" } : a);
-    setApps(updated);
+  const handleApprove = async (id: string) => {
     try {
-      localStorage.setItem("hiec_applications", JSON.stringify(updated));
+      const { error } = await supabase
+        .from("applications")
+        .update({ status: "passed_round_1" }) 
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setApps(prev => prev.map(a => a.id === id ? { ...a, status: "passed_round_1" } : a));
+      toast.success("Đã duyệt ứng viên này qua vòng đơn!");
+      setSelectedApp(null);
     } catch (e) {
-      console.error("Lỗi cập nhật localStorage:", e);
+      console.error(e);
+      toast.error("Không thể duyệt đơn lúc này.");
     }
-    toast.success("Đã đánh dấu đơn ứng tuyển này là đã xem.");
-    setSelectedApp(null);
   };
 
   return (
     <div className="space-y-6 animate-fade-up">
-      {/* Tiêu đề trang */}
+      {/* Tiêu đề trang - GIỮ NGUYÊN */}
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border/60 pb-6">
         <div>
           <h1 className="font-display text-2xl font-bold flex items-center gap-2">
@@ -129,102 +108,136 @@ function ApplicationsPage() {
       {/* Bảng danh sách */}
       <Card className="border-none shadow-elevated overflow-hidden">
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead className="font-bold">Ứng viên</TableHead>
-                <TableHead className="font-bold">Học vấn</TableHead>
-                <TableHead className="font-bold">Thông tin liên hệ</TableHead>
-                <TableHead className="font-bold">Trạng thái</TableHead>
-                <TableHead className="text-right font-bold">Thao tác</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredApps.map((app) => (
-                <TableRow key={app.id} className="hover:bg-muted/20 transition-colors">
-                  <TableCell>
-                    <div className="font-bold text-foreground">{app.fullName}</div>
-                    <div className="text-[11px] font-mono text-primary bg-primary/5 px-1.5 py-0.5 rounded w-fit mt-1">
-                      {app.studentId}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm font-medium">{app.university}</div>
-                    <div className="text-xs text-muted-foreground">{app.major}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-                        <Mail className="size-3" /> {app.email}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Phone className="size-3" /> {app.phone}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {app.status === "pending" ? (
-                      <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200 gap-1 font-medium">
-                        <Clock className="size-3" /> Chờ duyệt
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1 font-medium">
-                        <CheckCircle className="size-3" /> Đã duyệt
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => setSelectedApp(app)} className="rounded-lg">
-                      <Eye className="size-4 mr-2" /> Xem đơn
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          
-          {filteredApps.length === 0 && (
-            <div className="py-20 text-center text-muted-foreground">
-              <Search className="size-10 mx-auto opacity-20 mb-4" />
-              <p>Không tìm thấy đơn ứng tuyển nào phù hợp.</p>
+          {loading ? (
+            <div className="py-20 flex flex-col items-center justify-center text-muted-foreground gap-2">
+              <Loader2 className="size-6 animate-spin text-primary" />
+              <p className="text-sm">Đang đồng bộ dữ liệu từ hệ thống...</p>
             </div>
+          ) : (
+            <>
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow>
+                    <TableHead className="font-bold">Ứng viên</TableHead>
+                    <TableHead className="font-bold">Học vấn</TableHead>
+                    <TableHead className="font-bold">Thông tin liên hệ</TableHead>
+                    <TableHead className="font-bold">Trạng thái</TableHead>
+                    <TableHead className="text-right font-bold">Thao tác</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredApps.map((app) => (
+                    <TableRow key={app.id} className="hover:bg-muted/20 transition-colors">
+                      <TableCell>
+                        <div className="font-bold text-foreground">{app.fullName}</div>
+                        <div className="text-[11px] font-mono text-primary bg-primary/5 px-1.5 py-0.5 rounded w-fit mt-1">
+                          {app.studentId}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm font-medium">{app.university}</div>
+                        <div className="text-xs text-muted-foreground">{app.major}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
+                            <Mail className="size-3" /> {app.email}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Phone className="size-3" /> {app.phone}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {app.status === "passed_round_1" ? (
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1 font-medium italic">
+                            <CheckCircle className="size-3" /> Đỗ vòng đơn
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200 gap-1 font-medium">
+                            <Clock className="size-3" /> Chờ duyệt
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => setSelectedApp(app)} className="rounded-lg">
+                          <Eye className="size-4 mr-2" /> Xem đơn
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              
+              {filteredApps.length === 0 && (
+                <div className="py-20 text-center text-muted-foreground">
+                  <Search className="size-10 mx-auto opacity-20 mb-4" />
+                  <p>Không tìm thấy đơn ứng tuyển nào phù hợp.</p>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
 
+      {/* Modal xem chi tiết đơn ứng tuyển - GIỮ NGUYÊN */}
       {/* Modal xem chi tiết đơn ứng tuyển */}
       <Modal
         open={!!selectedApp}
         onOpenChange={(open) => !open && setSelectedApp(null)}
-        title="Chi tiết đơn ứng tuyển"
-        description={`Đơn từ: ${selectedApp?.fullName} (${selectedApp?.id})`}
+        title="Chi tiết hồ sơ ứng viên"
+        description={`Mã đơn: ${selectedApp?.id}`}
       >
         {selectedApp && (
-          <div className="space-y-5 py-4">
+          <div className="space-y-6 py-4">
+            {/* Thông tin cá nhân & Liên hệ */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Trường đại học</span>
-                <p className="text-sm font-bold flex items-center gap-2"><GraduationCap className="size-4 text-primary" /> {selectedApp.university}</p>
+                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Họ và tên</span>
+                <p className="text-sm font-bold">{selectedApp.fullName}</p>
               </div>
               <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Ngành đào tạo</span>
+                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">MSSV</span>
+                <p className="text-sm font-bold font-mono text-primary">{selectedApp.studentId}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
+                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Email</span>
+                <p className="text-xs font-bold truncate">{selectedApp.email}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
+                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Số điện thoại</span>
+                <p className="text-sm font-bold">{selectedApp.phone}</p>
+              </div>
+            </div>
+
+            {/* Thông tin học vấn */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
+                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Trường</span>
+                <p className="text-sm font-bold flex items-center gap-1"><GraduationCap className="size-4 text-primary" /> {selectedApp.university}</p>
+              </div>
+              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
+                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Ngành học</span>
                 <p className="text-sm font-bold">{selectedApp.major}</p>
               </div>
             </div>
             
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs uppercase font-black text-primary tracking-widest">Lý do muốn gia nhập HIEC:</span>
-              </div>
-              <div className="bg-primary/[0.03] p-5 rounded-2xl border-l-4 border-primary italic text-sm leading-relaxed text-foreground/80">
+            {/* Nội dung Motivation */}
+            <div className="space-y-2">
+              <span className="text-xs uppercase font-black text-primary tracking-widest">Nội dung ứng tuyển:</span>
+              <div className="bg-primary/[0.03] p-4 rounded-xl border-l-4 border-primary italic text-sm leading-relaxed text-foreground/80 max-h-[150px] overflow-y-auto">
                 "{selectedApp.motivation}"
               </div>
             </div>
 
+            <div className="text-[10px] text-muted-foreground text-right italic">
+              Ngày nộp: {new Date(selectedApp.created_at).toLocaleString('vi-VN')}
+            </div>
+
             <div className="flex gap-3 pt-4 border-t">
-              {selectedApp.status === "pending" && (
+              {selectedApp.status !== "passed_round_1" && (
                 <Button className="flex-1" variant="shimmer" onClick={() => handleApprove(selectedApp.id)}>
-                  <CheckCircle className="size-4 mr-2" /> Duyệt & Liên hệ
+                  <CheckCircle className="size-4 mr-2" /> Duyệt qua vòng đơn
                 </Button>
               )}
               <Button variant="outline" className="flex-1" onClick={() => setSelectedApp(null)}>
