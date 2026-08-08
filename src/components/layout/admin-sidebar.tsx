@@ -1,6 +1,6 @@
 /**
  * Component AdminSidebar - Thanh menu điều hướng cho Quản trị viên.
- * Đã cập nhật Logo đồng bộ bằng Component HiecLogo.
+ * Đã cập nhật: Thêm mục "Đơn ứng tuyển" vào danh sách quản lý.
  */
 import * as React from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
@@ -12,16 +12,18 @@ import {
   PanelLeftOpen,
   Palette,
   Type,
+  UserPlus, // THÊM: Icon cho mục Đơn ứng tuyển
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { useAuth } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
-import { HiecLogo } from "@/components/ui/hiec-logo"; // Import Logo mới
+import { HiecLogo } from "@/components/ui/hiec-logo";
 
 const items = [
   { title: "Tổng quan", url: "/admin/dashboard", icon: LayoutDashboard },
+  { title: "Đơn ứng tuyển", url: "/admin/applications", icon: UserPlus }, // THÊM MỤC NÀY
   { title: "Giao diện", url: "/admin/settings", icon: Palette },
   { title: "Nội dung tĩnh", url: "/admin/static-content", icon: Type },
   { title: "Bài viết", url: "/admin/posts", icon: FileText },
@@ -41,10 +43,9 @@ export function AdminSidebar() {
         collapsed ? "w-20" : "w-64",
       )}
     >
-      {/* SỬA: Thay thế phần logo cũ bằng HiecLogo */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-4 overflow-hidden">
         <HiecLogo 
-          isDark={true}  // Thêm cái này để chữ hiện màu sáng
+          isDark={true}
           showText={!collapsed} 
           className={cn("transition-all duration-300", collapsed ? "scale-90 ml-1" : "scale-100")} 
         />

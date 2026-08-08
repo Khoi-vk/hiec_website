@@ -13,8 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as TestSupabaseRouteImport } from './routes/test-supabase'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminApplicationsRouteImport } from './routes/admin/applications'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminPostsRouteImport } from './routes/admin/posts'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
@@ -40,6 +42,11 @@ const ProjectsRoute = ProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TestSupabaseRoute = TestSupabaseRouteImport.update({
   id: '/test-supabase',
   path: '/test-supabase',
@@ -48,6 +55,11 @@ const TestSupabaseRoute = TestSupabaseRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminApplicationsRoute = AdminApplicationsRouteImport.update({
+  id: '/applications',
+  path: '/applications',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -76,7 +88,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
+  '/signup': typeof SignupRoute
   '/test-supabase': typeof TestSupabaseRoute
+  '/admin/applications': typeof AdminApplicationsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -87,7 +101,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
+  '/signup': typeof SignupRoute
   '/test-supabase': typeof TestSupabaseRoute
+  '/admin/applications': typeof AdminApplicationsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -100,7 +116,9 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
+  '/signup': typeof SignupRoute
   '/test-supabase': typeof TestSupabaseRoute
+  '/admin/applications': typeof AdminApplicationsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -114,7 +132,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/projects'
+    | '/signup'
     | '/test-supabase'
+    | '/admin/applications'
     | '/admin/dashboard'
     | '/admin/posts'
     | '/admin/settings'
@@ -125,7 +145,9 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/projects'
+    | '/signup'
     | '/test-supabase'
+    | '/admin/applications'
     | '/admin/dashboard'
     | '/admin/posts'
     | '/admin/settings'
@@ -137,7 +159,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/projects'
+    | '/signup'
     | '/test-supabase'
+    | '/admin/applications'
     | '/admin/dashboard'
     | '/admin/posts'
     | '/admin/settings'
@@ -150,6 +174,7 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   ProjectsRoute: typeof ProjectsRoute
+  SignupRoute: typeof SignupRoute
   TestSupabaseRoute: typeof TestSupabaseRoute
 }
 
@@ -183,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/test-supabase': {
       id: '/test-supabase'
       path: '/test-supabase'
@@ -195,6 +227,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/applications': {
+      id: '/admin/applications'
+      path: '/applications'
+      fullPath: '/admin/applications'
+      preLoaderRoute: typeof AdminApplicationsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/dashboard': {
@@ -229,6 +268,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteRouteChildren {
+  AdminApplicationsRoute: typeof AdminApplicationsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminPostsRoute: typeof AdminPostsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -237,6 +277,7 @@ interface AdminRouteRouteChildren {
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminApplicationsRoute: AdminApplicationsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminPostsRoute: AdminPostsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
@@ -253,6 +294,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   ProjectsRoute: ProjectsRoute,
+  SignupRoute: SignupRoute,
   TestSupabaseRoute: TestSupabaseRoute,
 }
 export const routeTree = rootRouteImport
