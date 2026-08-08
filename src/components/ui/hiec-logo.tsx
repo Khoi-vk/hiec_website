@@ -3,37 +3,39 @@ import { cn } from "@/lib/utils";
 interface LogoProps {
   className?: string;
   showText?: boolean;
+  isDark?: boolean; // Thêm prop này để phân biệt nền sáng/tối
 }
 
-export function HiecLogo({ className, showText = true }: LogoProps) {
+export function HiecLogo({ className, showText = true, isDark = false }: LogoProps) {
   const logoPath = "/logo.png"; 
 
   return (
-    <div className={cn("flex items-center gap-3 select-none group", className)}>
+    <div className={cn("flex items-center gap-3 select-none", className)}>
       
-      {/* 1. ICON LOGO: Thêm bo góc và đổ bóng để nổi bật ảnh */}
-      <div className="relative flex items-center justify-center size-10 shrink-0 bg-white rounded-lg p-1 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-        <img 
-          src={logoPath} 
-          alt="HIEC Logo" 
-          className="size-full object-contain" 
-        />
+      {/* 1. BOX LOGO: Giữ nền trắng để logo luôn rõ ràng trên mọi nền */}
+      <div className="relative flex items-center justify-center size-10 shrink-0 bg-white rounded-xl p-1.5 shadow-sm border border-blue-100">
+        <img src={logoPath} alt="HIEC" className="size-full object-contain" />
       </div>
 
-      {/* 2. PHẦN CHỮ: Khống chế xuống dòng và làm màu long lanh */}
+      {/* 2. PHẦN CHỮ: Tự thích nghi màu sắc */}
       {showText && (
-        <div className="flex flex-col justify-center leading-none whitespace-nowrap">
-          {/* Dòng 1: CÂU LẠC BỘ (Màu bạc/trắng xanh tinh tế) */}
-          <span className="font-display text-[9px] font-black uppercase tracking-[0.2em] text-cyan-200/70 mb-1">
+        <div className="flex flex-col justify-center leading-tight whitespace-nowrap">
+          {/* Dòng 1: CÂU LẠC BỘ */}
+          <span className={cn(
+            "font-display text-[10px] font-bold uppercase tracking-[0.15em] mb-0.5",
+            isDark ? "text-cyan-400/90" : "text-primary/70"
+          )}>
             Câu lạc bộ
           </span>
           
-          {/* Dòng 2: Tên chính - Màu cực kỳ long lanh và nổi bật */}
-          <span className="font-display text-[14px] font-black tracking-tight flex items-center gap-1.5">
-            <span className="bg-gradient-to-r from-cyan-300 via-white to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">
-              Sáng tạo & Khởi nghiệp
-            </span>
-           
+          {/* Dòng 2: Tên chính - Màu long lanh, đứng im */}
+          <span className={cn(
+            "font-display text-[16px] font-black tracking-tight",
+            isDark 
+              ? "bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" 
+              : "text-[#00348a]" // Màu xanh đậm hoàng gia khi ở nền trắng
+          )}>
+            Sáng tạo & Khởi nghiệp <span className={isDark ? "text-white" : "text-primary"}></span>
           </span>
         </div>
       )}

@@ -44,6 +44,7 @@ export function AdminSidebar() {
       {/* SỬA: Thay thế phần logo cũ bằng HiecLogo */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-4 overflow-hidden">
         <HiecLogo 
+          isDark={true}  // Thêm cái này để chữ hiện màu sáng
           showText={!collapsed} 
           className={cn("transition-all duration-300", collapsed ? "scale-90 ml-1" : "scale-100")} 
         />
