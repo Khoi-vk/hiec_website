@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { contactInfo, coreValues, history, projects } from "@/services/hiec-service";
+// 1. Thêm dòng import này
+import { MembersSection } from "@/components/members-section"; 
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -200,6 +202,9 @@ function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* 2. CHÈN PHẦN THÀNH VIÊN VÀO ĐÂY */}
+      <MembersSection />
 
       {/* CTA liên hệ nhanh + MXH */}
       <section className="mx-auto w-full max-w-6xl px-4 pb-24">

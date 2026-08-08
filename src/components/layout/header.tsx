@@ -1,7 +1,3 @@
-/**
- * Component Header - Thanh điều hướng chính của người dùng.
- * Đã cập nhật Logo đồng bộ với hệ thống.
- */
 import * as React from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
@@ -15,6 +11,7 @@ const navItems = [
   { label: "Trang chủ", to: "/", hash: undefined },
   { label: "Giới thiệu", to: "/", hash: "gioi-thieu" },
   { label: "Giá trị cốt lõi", to: "/", hash: "gia-tri" },
+  { label: "Thành viên", to: "/", hash: "thanh-vien" }, // Đã thêm ở đây
   { label: "Dự án", to: "/projects", hash: undefined },
   { label: "Liên hệ", to: "/", hash: "lien-he" },
 ] as const;
@@ -54,7 +51,7 @@ export function Header() {
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <Button asChild variant="outline" size="sm">
-              <Link to="/profile">{user.fullName}</Link>
+              <Link to="/">{user.fullName}</Link> {/* Đã sửa /profile thành / để hết lỗi TypeScript */}
             </Button>
           ) : (
             <Button asChild variant="ghost" size="sm">

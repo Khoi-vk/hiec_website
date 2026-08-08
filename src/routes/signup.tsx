@@ -39,8 +39,8 @@ function SignupPage() {
       .from("applications")
       .insert([
         {
-          fullName: values.fullName,     // Chữ N hoa
-          studentId: values.studentId,   // Chữ I hoa
+          fullName: values.fullName,     
+          studentId: values.studentId,   
           university: values.university,
           major: values.major,
           email: values.email,
