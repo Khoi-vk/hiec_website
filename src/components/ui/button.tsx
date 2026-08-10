@@ -16,9 +16,7 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        /** HIEC signature: gradient brand button with a shimmer sweep. */
-        shimmer:
-          "bg-gradient-brand text-primary-foreground shadow-glow hover:brightness-110 after:pointer-events-none after:absolute after:inset-y-0 after:-left-1/2 after:w-1/3 after:bg-primary-foreground/30 after:blur-md after:animate-shimmer",
+        shimmer: "bg-primary text-primary-foreground shadow-glow hover:bg-primary/90",
         hero: "bg-gold text-gold-foreground shadow-elevated hover:brightness-105",
         heroOutline:
           "border border-primary-foreground/40 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm hover:bg-primary-foreground/20",

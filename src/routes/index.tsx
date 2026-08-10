@@ -1,230 +1,74 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  ArrowRight,
-  Facebook,
-  Instagram,
-  Lightbulb,
+  ArrowDownRight,
+  ArrowUpRight,
+  BriefcaseBusiness,
+  Building2,
+  CalendarDays,
   Mail,
-  MessageCircle,
-  Music2,
+  Megaphone,
+  MoveRight,
+  Network,
   ShieldCheck,
-  Target,
+  Sparkles,
   Users,
 } from "lucide-react";
 
-import heroImage from "@/assets/hiec-hero.jpg";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { MovementGallery } from "@/components/home/movement-gallery";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { contactInfo, coreValues } from "@/services/hiec-service";
+import { contactInfo, history } from "@/services/hiec-service";
 
-// Dữ liệu lịch sử CLB (Timeline) mới
-const hiecTimeline = [
-  {
-    year: "2019",
-    title: "Đặt nền móng khởi đầu",
-    description: "Thành lập HIEC dưới sự bảo trợ của Ban Học tập - Nghiên cứu Khoa học Đoàn Thanh niên Đại học Bách Khoa Hà Nội.",
-  },
-  {
-    year: "2021 - 2022",
-    title: "Chuẩn hóa & Tái cấu trúc",
-    description: "Vượt qua đại dịch, chuyển đổi số mô hình sinh hoạt, hoàn thiện quy trình đào tạo nội bộ chuyên sâu về Marketing, Sản phẩm và Nghiên cứu thị trường.",
-  },
-  {
-    year: "2023 - 2024",
-    title: "Mở rộng hệ sinh thái",
-    description: "Triển khai chuỗi chương trình thực chiến, nâng cao kết nối doanh nghiệp và mang đến các buổi training ứng dụng thực tế chất lượng cho thành viên.",
-  },
-  {
-    year: "2025 - 2026",
-    title: "Đột phá & Khẳng định vị thế",
-    description: "Đồng hành tổ chức và bảo trợ truyền thông các sân chơi công nghệ lớn mang tầm quốc gia và khu vực (như cuộc thi BK Fintech Hackday).",
-  },
+const departments = [
+  { code: "01", title: "Ban Phát triển chiến lược", text: "Định hình hướng đi, nghiên cứu cơ hội và biến tầm nhìn HIEC thành những chương trình có mục tiêu rõ ràng.", icon: Network },
+  { code: "02", title: "Ban Truyền thông", text: "Kể câu chuyện HIEC bằng nội dung, hình ảnh và những chiến dịch khiến cộng đồng muốn cùng tham gia.", icon: Megaphone },
+  { code: "03", title: "Ban Đối ngoại", text: "Mở rộng mạng lưới mentor, doanh nghiệp và đối tác để mỗi thành viên có thêm một cánh cửa bước ra thế giới.", icon: BriefcaseBusiness },
+  { code: "04", title: "Ban Nhân sự Sự kiện", text: "Xây văn hóa nội bộ, chăm sóc con người và tạo ra những trải nghiệm sự kiện đáng nhớ.", icon: Users },
+];
+
+const highlights = [
+  { number: "06+", label: "năm xây cộng đồng" },
+  { number: "04", label: "ban chuyên môn" },
+  { number: "24", label: "dự án đã triển khai" },
+  { number: "∞", label: "ý tưởng được lắng nghe" },
 ];
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "HIEC — Câu lạc bộ Sáng tạo và Khởi nghiệp HUST" },
-      {
-        name: "description",
-        content:
-          "Câu lạc bộ Sáng tạo và Khởi nghiệp HUST — Nơi kết nối công nghệ, đổi mới sáng tạo và tư duy kinh doanh thực chiến.",
-      },
-      { property: "og:title", content: "HIEC — Câu lạc bộ Sáng tạo và Khởi nghiệp HUST" },
-      {
-        property: "og:description",
-        content: "Cộng đồng sinh viên biến ý tưởng thành dự án có tác động thật.",
-      },
+      { title: "HIEC — Câu lạc bộ Sáng tạo & Khởi nghiệp HUST" },
+      { name: "description", content: "HIEC là cộng đồng sinh viên học bằng cách làm, kết nối bằng giá trị và tạo tác động thật." },
     ],
   }),
   component: HomePage,
 });
 
-const valueIcons = [Lightbulb, ShieldCheck, Users, Target];
-
 function HomePage() {
   return (
     <PublicLayout>
-      {/* Banner */}
-      <section className="relative overflow-hidden bg-gradient-hero">
-        <img
-          src={heroImage}
-          alt="Thành viên HIEC HUST"
-          width={1600}
-          height={900}
-          className="absolute inset-0 size-full object-cover opacity-25"
-        />
-        <div className="relative mx-auto grid w-full max-w-6xl gap-10 px-4 py-24 md:py-32 text-center md:text-left">
-          <div className="max-w-2xl animate-fade-up">
-            <Badge className="border-primary-foreground/30 bg-primary-foreground/15 text-primary-foreground">
-              HIEC · SINCE 2019
-            </Badge>
-            <h1 className="mt-5 font-display text-4xl font-extrabold leading-tight text-primary-foreground sm:text-5xl md:text-6xl">
-              Ý tưởng sinh viên, <br />
-              <span className="text-gold uppercase">tác động thật</span>
-            </h1>
-            <p className="mt-5 max-w-xl text-lg text-primary-foreground/85">
-              <strong>Câu lạc bộ Sáng tạo và Khởi nghiệp HUST</strong> — Nơi bạn được huấn luyện, kết nối
-              mentor và hiện thực hóa ý tưởng khởi nghiệp thành những giải pháp có giá trị thực cho xã hội.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3 justify-center md:justify-start">
-              <Button asChild variant="hero" size="xl">
-                <Link to="/signup">
-                  Đăng ký tham gia <ArrowRight className="ml-2" />
-                </Link>
-              </Button>
-              <Button asChild variant="heroOutline" size="xl">
-                <Link to="/projects">Xem dự án</Link>
-              </Button>
+      <main>
+        <section className="relative overflow-hidden border-b border-border px-5 pb-16 pt-14 lg:px-8 lg:pb-24 lg:pt-20">
+          <div className="pointer-events-none absolute -right-24 top-0 size-80 rounded-full border-[40px] border-primary/20" />
+          <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.88fr_1.12fr]">
+            <div className="relative z-10 animate-fade-up">
+              <p className="mb-6 flex items-center gap-2 text-xs font-black uppercase tracking-[0.25em] text-primary-deep dark:text-primary"><Sparkles className="size-4" /> HIEC / Since 2019</p>
+              <h1 className="max-w-3xl text-5xl font-black leading-[0.94] tracking-[-0.06em] sm:text-6xl lg:text-8xl">Khởi nguồn sáng tạo,<br /><span className="text-primary-deep dark:text-primary">Chuyển lối thành công</span></h1>
+              <p className="mt-7 max-w-xl text-base leading-8 text-muted-foreground sm:text-lg">Câu lạc bộ Sáng tạo & Khởi nghiệp HUST — nơi những người trẻ học bằng cách làm, kết nối bằng giá trị và cùng nhau tạo ra điều đáng tự hào.</p>
+              <div className="mt-9 flex flex-wrap gap-3"><Button asChild size="lg" className="rounded-full px-7"><Link to="/signup">Tham gia HIEC <ArrowUpRight className="ml-2 size-4" /></Link></Button><Button asChild size="lg" variant="outline" className="rounded-full px-7"><a href="#lich-su">Khám phá câu chuyện <ArrowDownRight className="ml-2 size-4" /></a></Button></div>
+              <div className="mt-12 grid max-w-lg grid-cols-2 gap-x-8 gap-y-5 border-t border-border pt-6 sm:grid-cols-4">{highlights.map((item) => <div key={item.label}><p className="text-2xl font-black">{item.number}</p><p className="mt-1 text-[11px] leading-4 text-muted-foreground">{item.label}</p></div>)}</div>
             </div>
+            <MovementGallery />
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Giới thiệu + lịch sử */}
-      <section id="gioi-thieu" className="mx-auto w-full max-w-6xl px-4 py-20">
-        <div className="grid gap-16 md:grid-cols-2 items-start">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-              Giới thiệu
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl leading-tight">
-              Một cộng đồng <br /> học bằng cách làm
-            </h2>
-            <p className="mt-5 text-muted-foreground leading-relaxed text-justify">
-              Xuất phát từ nhóm sinh viên đầy hoài bão Gen 1, HIEC xây dựng một cộng đồng kết nối sâu sắc giữa 
-              khoa học công nghệ, đổi mới sáng tạo và tư duy kinh doanh. Chúng tôi hoạt động thực chiến 
-              với cấu trúc các ban nội bộ vững mạnh, tạo bệ phóng giúp sinh viên nâng cao chuyên môn, 
-              rèn luyện kỹ năng mềm và hiện thực hóa các ý tưởng khởi nghiệp thành những giải pháp có giá trị thực cho xã hội.
-            </p>
-            <div className="mt-8 pt-8 border-t border-border/50">
-                <div className="h-1.5 w-20 bg-primary rounded-full" />
-            </div>
-          </div>
+        <section id="lich-su" className="border-b border-border bg-card px-5 py-20 lg:px-8 lg:py-28"><div className="mx-auto max-w-7xl"><div className="grid gap-12 lg:grid-cols-[0.7fr_1.3fr]"><div><p className="text-sm font-black uppercase tracking-[0.22em] text-primary-deep dark:text-primary">01 / Lịch sử</p><h2 className="mt-4 max-w-md text-4xl font-black leading-tight sm:text-5xl">Mỗi chặng đường là một lần trưởng thành.</h2><p className="mt-6 max-w-sm leading-7 text-muted-foreground">Từ một nhóm sinh viên có chung sự tò mò, HIEC lớn lên nhờ những người dám bắt đầu, dám thử và dám làm lại.</p></div><div className="grid gap-0 border-l border-border">{history.map((item, index) => <article key={item.year} className="group relative border-b border-border px-7 py-6 last:border-b-0 sm:grid sm:grid-cols-[8rem_1fr] sm:gap-4"><span className="absolute -left-[5px] top-8 size-2.5 rounded-full bg-primary ring-8 ring-card" /><p className="text-2xl font-black text-primary-deep dark:text-primary">{item.year}</p><div><h3 className="text-xl font-black group-hover:text-primary-deep dark:group-hover:text-primary">{item.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p></div></article>)}</div></div></div></section>
 
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-              Hành trình phát triển
-            </p>
-            <ol className="mt-8 space-y-8 border-l-2 border-primary/20 pl-8 relative">
-              {hiecTimeline.map((item) => (
-                <li key={item.year} className="relative">
-                  <span className="absolute -left-[41px] top-1 grid size-4 place-items-center rounded-full bg-primary ring-4 ring-background shadow-sm" />
-                  <p className="font-display text-sm font-bold text-primary italic leading-none mb-1">{item.year}</p>
-                  <h3 className="text-lg font-bold text-foreground uppercase tracking-tight">{item.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      </section>
+        <section id="co-cau" className="px-5 py-20 lg:px-8 lg:py-28"><div className="mx-auto max-w-7xl"><div className="mb-12 flex flex-wrap items-end justify-between gap-6"><div><p className="text-sm font-black uppercase tracking-[0.22em] text-primary-deep dark:text-primary">02 / Cơ cấu phòng ban</p><h2 className="mt-4 text-4xl font-black sm:text-5xl">Một đội ngũ.<br />Bốn cách tạo giá trị.</h2></div><p className="max-w-sm text-sm leading-7 text-muted-foreground">Mỗi ban là một mảnh ghép độc lập, nhưng cùng vận hành để HIEC trở thành một hệ sinh thái học tập và hành động.</p></div><div className="grid gap-4 md:grid-cols-2">{departments.map((department) => { const Icon = department.icon; return <article key={department.code} className="group rounded-[2rem] border border-border bg-card p-7 transition-all hover:-translate-y-1 hover:border-primary hover:shadow-elevated"><div className="flex items-start justify-between"><span className="text-sm font-black text-primary-deep dark:text-primary">{department.code}</span><span className="grid size-11 place-items-center rounded-2xl bg-primary/20 text-primary-deep dark:text-primary"><Icon className="size-5" /></span></div><h3 className="mt-9 max-w-xs text-2xl font-black leading-tight">{department.title}</h3><p className="mt-4 max-w-md text-sm leading-7 text-muted-foreground">{department.text}</p><div className="mt-8 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary-deep dark:text-primary">Khám phá ban <MoveRight className="size-4 transition-transform group-hover:translate-x-1" /></div></article>; })}</div></div></section>
 
-      {/* Giá trị cốt lõi */}
-      <section id="gia-tri" className="bg-[#fafafa] py-20 border-y border-border/40">
-        <div className="mx-auto w-full max-w-6xl px-4">
-          <div className="max-w-xl mb-12 text-center md:text-left">
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-              Giá trị cốt lõi
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">
-              Bốn nguyên tắc định hình HIEC
-            </h2>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {coreValues.map((value, i) => {
-              const Icon = valueIcons[i] ?? Lightbulb;
-              return (
-                <Card key={value.title} className="border-none shadow-sm hover:shadow-xl transition-all duration-300 rounded-2xl bg-white">
-                  <CardHeader>
-                    <span className="grid size-12 place-items-center rounded-xl bg-primary/5 text-primary">
-                      <Icon className="size-6" />
-                    </span>
-                    <CardTitle className="mt-4 font-display text-lg uppercase font-bold">{value.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{value.description}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+        <section className="border-y border-border bg-card px-5 py-20 lg:px-8 lg:py-28"><div className="mx-auto max-w-7xl"><div className="mb-10 flex flex-wrap items-end justify-between gap-6"><div><p className="text-sm font-black uppercase tracking-[0.22em] text-primary-deep dark:text-primary">03 / HIEC in action</p><h2 className="mt-4 text-4xl font-black sm:text-5xl">Học bằng cách làm.</h2></div><Link to="/projects" className="flex items-center gap-2 text-sm font-black text-primary-deep hover:underline dark:text-primary">Xem tất cả dự án <ArrowUpRight className="size-4" /></Link></div><div className="grid gap-4 lg:grid-cols-[1.4fr_0.8fr_0.8fr]"><article className="min-h-[20rem] rounded-[2rem] bg-primary p-8 text-primary-foreground"><Building2 className="size-7" /><p className="mt-20 text-xs font-black uppercase tracking-widest opacity-70">Flagship program</p><h3 className="mt-3 max-w-md text-3xl font-black">HIEC Startup Bootcamp</h3><p className="mt-3 max-w-md text-sm leading-6 opacity-80">6 tuần biến một ý tưởng còn thô thành một câu chuyện có thể pitching.</p></article><article className="rounded-[2rem] border border-border bg-background p-7"><CalendarDays className="size-6 text-primary-deep dark:text-primary" /><p className="mt-16 text-xs font-black uppercase tracking-widest text-muted-foreground">Monthly</p><h3 className="mt-3 text-2xl font-black">HIEC Talk</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Đối thoại với người đang làm thật.</p></article><article className="rounded-[2rem] border border-border bg-background p-7"><ShieldCheck className="size-6 text-primary-deep dark:text-primary" /><p className="mt-16 text-xs font-black uppercase tracking-widest text-muted-foreground">Community</p><h3 className="mt-3 text-2xl font-black">Mentor Connect</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Kết nối đúng người, đúng thời điểm.</p></article></div></div></section>
 
-      {/* CTA liên hệ nhanh + MXH */}
-      <section id="lien-he" className="mx-auto w-full max-w-6xl px-4 pb-24 pt-10">
-        <div className="overflow-hidden rounded-[2.5rem] bg-gradient-hero p-8 shadow-2xl sm:p-12">
-          <div className="flex flex-wrap items-center justify-between gap-10">
-            <div className="max-w-lg">
-              <h2 className="font-display text-3xl font-bold text-primary-foreground leading-tight">
-                Sẵn sàng bắt đầu <br /> cùng HIEC?
-              </h2>
-              <p className="mt-4 text-primary-foreground/85">
-                Liên hệ nhanh với ban chủ nhiệm qua Gmail hoặc theo dõi HIEC trên
-                mạng xã hội để không bỏ lỡ đợt tuyển thành viên mới nhất.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Button asChild variant="hero" size="lg" className="rounded-xl font-bold px-8">
-                  <a 
-                    href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contactInfo.email}`} 
-                    target="_blank" 
-                    rel="noreferrer noopener"
-                  >
-                    <Mail className="mr-2 size-5" /> Gửi Gmail
-                  </a>
-                </Button>
-                <Button asChild variant="heroOutline" size="lg" className="rounded-xl font-bold px-8">
-                  <a href={contactInfo.messenger} target="_blank" rel="noreferrer noopener">
-                    <MessageCircle className="mr-2 size-5" /> Chat Messenger
-                  </a>
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              {[
-                { icon: Facebook, href: "https://facebook.com/hiec.hust", label: "Facebook" },
-                { icon: Music2, href: "https://tiktok.com/@hiec.hust", label: "TikTok" },
-                { icon: Instagram, href: "https://instagram.com/hiec.hust", label: "Instagram" },
-              ].map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  aria-label={s.label}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="grid size-14 place-items-center rounded-2xl border border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground transition-all hover:bg-primary-foreground/20 hover:scale-110 shadow-lg"
-                >
-                  <s.icon className="size-6" />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+        <section className="px-5 py-20 lg:px-8 lg:py-28"><div className="mx-auto grid max-w-7xl gap-10 rounded-[2rem] border border-border bg-primary/20 p-8 sm:p-12 lg:grid-cols-[1fr_auto] lg:items-end"><div><p className="text-sm font-black uppercase tracking-[0.22em] text-primary-deep dark:text-primary">Make your move</p><h2 className="mt-4 max-w-2xl text-4xl font-black leading-tight sm:text-6xl">Đừng chỉ có một ý tưởng.<br />Hãy làm nó thành thật.</h2><p className="mt-5 max-w-xl text-muted-foreground">Nếu bạn muốn thử sức trong một môi trường nhiều năng lượng, HIEC đang chờ bạn.</p></div><div className="flex flex-wrap gap-3"><Button asChild size="lg" className="rounded-full"><Link to="/signup">Đăng ký tham gia <ArrowUpRight className="ml-2 size-4" /></Link></Button><Button asChild size="lg" variant="outline" className="rounded-full"><a href={`mailto:${contactInfo.email}`}><Mail className="mr-2 size-4" /> Liên hệ</a></Button></div></div></section>
+      </main>
     </PublicLayout>
   );
 }

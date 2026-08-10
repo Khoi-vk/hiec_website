@@ -59,12 +59,6 @@ function DashboardPage() {
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trafficData}>
-                <defs>
-                  <linearGradient id="views" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--color-primary)" stopOpacity={0.5} />
-                    <stop offset="100%" stopColor="var(--color-primary)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
                 <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
@@ -79,7 +73,8 @@ function DashboardPage() {
                   type="monotone"
                   dataKey="views"
                   stroke="var(--color-primary)"
-                  fill="url(#views)"
+                  fill="var(--color-primary)"
+                  fillOpacity={0.18}
                   strokeWidth={2}
                 />
               </AreaChart>

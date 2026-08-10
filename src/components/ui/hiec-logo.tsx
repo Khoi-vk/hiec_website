@@ -32,7 +32,7 @@ export function HiecLogo({ className, showText = true, isDark = false }: LogoPro
           <span className={cn(
             "font-display text-[16px] font-black tracking-tight",
             isDark 
-              ? "bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-transparent drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" 
+              ? "text-primary-foreground" 
               : "text-[#00348a]" // Màu xanh đậm hoàng gia khi ở nền trắng
           )}>
             Sáng tạo & Khởi nghiệp 

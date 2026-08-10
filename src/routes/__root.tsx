@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center">
-      <div className="size-24 rounded-3xl bg-gradient-brand flex items-center justify-center text-white font-black text-4xl shadow-glow mb-8 animate-float">
+      <div className="size-24 rounded-3xl bg-primary flex items-center justify-center text-primary-foreground font-black text-4xl shadow-glow mb-8 animate-float">
         !
       </div>
       <h1 className="font-display text-5xl font-black tracking-tighter sm:text-7xl">404</h1>

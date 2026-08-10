@@ -128,7 +128,7 @@ function SettingsPage() {
             <CardTitle className="font-display text-lg">Ảnh nền banner</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="h-32 rounded-xl bg-gradient-hero" />
+            <div className="h-32 rounded-xl bg-primary" />
             <Input id="banner" type="file" accept="image/*" />
           </CardContent>
         </Card>

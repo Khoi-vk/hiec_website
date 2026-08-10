@@ -9,7 +9,7 @@ import { PublicLayout } from "@/components/layout/public-layout";
 import { supabase } from "@/utils/supabase";
 
 // Sử dụng 'as any' để tránh lỗi treo Crawling nếu hệ thống chưa cập nhật kịp
-export const Route = createFileRoute("/activities" as any)({
+export const Route = createFileRoute("/activities")({
   component: ActivitiesPage,
 });
 

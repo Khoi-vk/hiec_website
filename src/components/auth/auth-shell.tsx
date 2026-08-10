@@ -1,6 +1,6 @@
 /**
  * AuthShell – Component khung cho các trang xác thực (đăng nhập).
- * Đã sửa: Ép Logo hiển thị màu sáng (isDark={true}) để nổi bật trên nền gradient tối.
+ * Khung xác thực phẳng, tương thích với cả hai theme.
  */
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
@@ -19,10 +19,10 @@ export function AuthShell({
   subtitle,
   children,
   footer,
-  isDark = true, // Mặc định là true vì AuthShell luôn nằm trên nền bg-gradient-hero tối
+  isDark = true,
 }: AuthShellProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-hero px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-primary-deep px-4 py-12">
       <div className="w-full max-w-md animate-fade-up">
         
         {/* LOGO: Đã thêm isDark={isDark} để chữ chuyển sang màu trắng */}

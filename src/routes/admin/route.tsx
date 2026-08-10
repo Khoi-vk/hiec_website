@@ -48,7 +48,7 @@ function AdminLayout() {
               <p className="text-sm font-bold leading-none">{user.fullName}</p>
               <p className="text-[10px] text-muted-foreground uppercase mt-1 tracking-tighter">Quản trị viên hệ thống</p>
             </div>
-            <div className="size-8 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-xs shadow-glow">
+            <div className="size-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs shadow-glow">
               {user.fullName.charAt(0)}
             </div>
           </div>

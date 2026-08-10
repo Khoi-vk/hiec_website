@@ -42,7 +42,7 @@ export function Footer() {
 
   if (loading) {
     return (
-      <footer className="border-t border-border/60 bg-gradient-surface">
+      <footer className="border-t border-border/60 bg-background">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="grid gap-10 md:grid-cols-3">
             {[...Array(3)].map((_, i) => (
@@ -63,7 +63,7 @@ export function Footer() {
   const { brand, description, socials, navigation, contact } = data;
 
   return (
-    <footer id="lien-he" className="border-t border-border/60 bg-gradient-surface">
+    <footer id="lien-he" className="border-t border-border/60 bg-background">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 md:grid-cols-3">
         
         {/* Cột 1: Logo & Giới thiệu ngắn */}

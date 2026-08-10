@@ -72,7 +72,7 @@ function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero py-10 px-4 flex flex-col items-center">
+    <div className="min-h-screen bg-primary-deep py-10 px-4 flex flex-col items-center">
       <Link to="/" className="mb-8 hover:scale-105 transition-transform">
         <HiecLogo isDark={true} className="scale-125" />
       </Link>

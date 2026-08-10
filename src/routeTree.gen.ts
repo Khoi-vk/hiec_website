@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MembersRouteImport } from './routes/members'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as TestSupabaseRouteImport } from './routes/test-supabase'
@@ -27,6 +29,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ActivitiesRoute = ActivitiesRouteImport.update({
+  id: '/activities',
+  path: '/activities',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -35,6 +42,11 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembersRoute = MembersRouteImport.update({
+  id: '/members',
+  path: '/members',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsRoute = ProjectsRouteImport.update({
@@ -86,7 +98,9 @@ const AdminStaticContentRoute = AdminStaticContentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/activities': typeof ActivitiesRoute
   '/login': typeof LoginRoute
+  '/members': typeof MembersRoute
   '/projects': typeof ProjectsRoute
   '/signup': typeof SignupRoute
   '/test-supabase': typeof TestSupabaseRoute
@@ -99,7 +113,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activities': typeof ActivitiesRoute
   '/login': typeof LoginRoute
+  '/members': typeof MembersRoute
   '/projects': typeof ProjectsRoute
   '/signup': typeof SignupRoute
   '/test-supabase': typeof TestSupabaseRoute
@@ -114,7 +130,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/activities': typeof ActivitiesRoute
   '/login': typeof LoginRoute
+  '/members': typeof MembersRoute
   '/projects': typeof ProjectsRoute
   '/signup': typeof SignupRoute
   '/test-supabase': typeof TestSupabaseRoute
@@ -130,7 +148,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/activities'
     | '/login'
+    | '/members'
     | '/projects'
     | '/signup'
     | '/test-supabase'
@@ -143,7 +163,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/activities'
     | '/login'
+    | '/members'
     | '/projects'
     | '/signup'
     | '/test-supabase'
@@ -157,7 +179,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/activities'
     | '/login'
+    | '/members'
     | '/projects'
     | '/signup'
     | '/test-supabase'
@@ -172,7 +196,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  ActivitiesRoute: typeof ActivitiesRoute
   LoginRoute: typeof LoginRoute
+  MembersRoute: typeof MembersRoute
   ProjectsRoute: typeof ProjectsRoute
   SignupRoute: typeof SignupRoute
   TestSupabaseRoute: typeof TestSupabaseRoute
@@ -187,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/activities': {
+      id: '/activities'
+      path: '/activities'
+      fullPath: '/activities'
+      preLoaderRoute: typeof ActivitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -199,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/members': {
+      id: '/members'
+      path: '/members'
+      fullPath: '/members'
+      preLoaderRoute: typeof MembersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects': {
@@ -292,7 +332,9 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  ActivitiesRoute: ActivitiesRoute,
   LoginRoute: LoginRoute,
+  MembersRoute: MembersRoute,
   ProjectsRoute: ProjectsRoute,
   SignupRoute: SignupRoute,
   TestSupabaseRoute: TestSupabaseRoute,
