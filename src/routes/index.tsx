@@ -202,8 +202,45 @@ function HomePage() {
           ))}
         </div>
       </section>
+      {/* Hoạt động nổi bật */}
+      <section id="du-an" className="mx-auto w-full max-w-6xl px-4 py-20">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary">
+              Dự án
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Dự án & dấu ấn</h2>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/projects">
+              Xem tất cả <ArrowRight />
+            </Link>
+          </Button>
+        </div>
 
-      
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {featured.map((project) => (
+            <Card key={project.id} className="group overflow-hidden border-border/70">
+              <div className="h-1.5 w-full bg-gradient-brand" />
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary">{project.category}</Badge>
+                  <span className="text-xs text-muted-foreground">{project.year}</span>
+                </div>
+                <CardTitle className="mt-3 font-display text-xl group-hover:text-primary">
+                  {project.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{project.excerpt}</p>
+                <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                  <Rocket className="size-4" /> {project.metric}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
       {/* 2. CHÈN PHẦN THÀNH VIÊN VÀO ĐÂY */}
       <MembersSection />
 
