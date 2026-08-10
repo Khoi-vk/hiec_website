@@ -16,12 +16,8 @@ import { supabase } from "@/utils/supabase";
 import { toast } from "sonner";
 
 const navItems = [
-  { label: "Trang chủ", to: "/", hash: undefined },
-  { label: "Giới thiệu", to: "/", hash: "gioi-thieu" },
-  { label: "Giá trị cốt lõi", to: "/", hash: "gia-tri" },
   { label: "Thành viên", to: "/", hash: "thanh-vien" },
   { label: "Dự án", to: "/projects", hash: undefined },
-  { label: "Liên hệ", to: "/", hash: "lien-he" },
 ] as const;
 
 export function Header() {
