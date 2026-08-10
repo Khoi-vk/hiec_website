@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ActivitiesRouteImport } from './routes/activities'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as ArticlesRouteImport } from './routes/articles'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MembersRouteImport } from './routes/members'
 import { Route as ProjectsRouteImport } from './routes/projects'
@@ -37,6 +40,21 @@ const ActivitiesRoute = ActivitiesRouteImport.update({
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesRoute = ArticlesRouteImport.update({
+  id: '/articles',
+  path: '/articles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -99,6 +117,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/activities': typeof ActivitiesRoute
+  '/articles': typeof ArticlesRoute
+  '/dashboard': typeof DashboardRoute
+  '/gallery': typeof GalleryRoute
   '/login': typeof LoginRoute
   '/members': typeof MembersRoute
   '/projects': typeof ProjectsRoute
@@ -114,6 +135,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
+  '/articles': typeof ArticlesRoute
+  '/dashboard': typeof DashboardRoute
+  '/gallery': typeof GalleryRoute
   '/login': typeof LoginRoute
   '/members': typeof MembersRoute
   '/projects': typeof ProjectsRoute
@@ -131,6 +155,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/activities': typeof ActivitiesRoute
+  '/articles': typeof ArticlesRoute
+  '/dashboard': typeof DashboardRoute
+  '/gallery': typeof GalleryRoute
   '/login': typeof LoginRoute
   '/members': typeof MembersRoute
   '/projects': typeof ProjectsRoute
@@ -149,6 +176,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/activities'
+    | '/articles'
+    | '/dashboard'
+    | '/gallery'
     | '/login'
     | '/members'
     | '/projects'
@@ -164,6 +194,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/activities'
+    | '/articles'
+    | '/dashboard'
+    | '/gallery'
     | '/login'
     | '/members'
     | '/projects'
@@ -180,6 +213,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/activities'
+    | '/articles'
+    | '/dashboard'
+    | '/gallery'
     | '/login'
     | '/members'
     | '/projects'
@@ -197,6 +233,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   ActivitiesRoute: typeof ActivitiesRoute
+  ArticlesRoute: typeof ArticlesRoute
+  DashboardRoute: typeof DashboardRoute
+  GalleryRoute: typeof GalleryRoute
   LoginRoute: typeof LoginRoute
   MembersRoute: typeof MembersRoute
   ProjectsRoute: typeof ProjectsRoute
@@ -225,6 +264,27 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles': {
+      id: '/articles'
+      path: '/articles'
+      fullPath: '/articles'
+      preLoaderRoute: typeof ArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -333,6 +393,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   ActivitiesRoute: ActivitiesRoute,
+  ArticlesRoute: ArticlesRoute,
+  DashboardRoute: DashboardRoute,
+  GalleryRoute: GalleryRoute,
   LoginRoute: LoginRoute,
   MembersRoute: MembersRoute,
   ProjectsRoute: ProjectsRoute,

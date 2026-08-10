@@ -1,41 +1,41 @@
 import { cn } from "@/lib/utils";
 
-interface LogoProps {
+interface HiecLogoProps {
+  isDark?: boolean;
   className?: string;
   showText?: boolean;
-  isDark?: boolean; // Thêm prop này để phân biệt nền sáng/tối
 }
 
-export function HiecLogo({ className, showText = true, isDark = false }: LogoProps) {
-  const logoPath = "/logo.png"; 
-
+export function HiecLogo({ isDark, className, showText = true }: HiecLogoProps) {
   return (
-    <div className={cn("flex items-center gap-3 select-none", className)}>
-      
-      {/* 1. BOX LOGO: Giữ nền trắng để logo luôn rõ ràng trên mọi nền */}
-      <div className="relative flex items-center justify-center size-10 shrink-0 bg-white rounded-xl p-1.5 shadow-sm border border-blue-100">
-        <img src={logoPath} alt="HIEC" className="size-full object-contain" />
+    <div className={cn("flex items-center gap-3", className)}>
+      {/* Icon Logo tròn - Giữ nguyên */}
+      <div className="relative size-10 flex-shrink-0 bg-white rounded-full shadow-lg flex items-center justify-center border border-slate-200">
+        <img src="/logo.png" alt="HIEC" className="size-7 object-contain" />
       </div>
 
-      {/* 2. PHẦN CHỮ: Tự thích nghi màu sắc */}
       {showText && (
-        <div className="flex flex-col justify-center leading-tight whitespace-nowrap">
+        <div className="flex flex-col justify-center overflow-hidden">
           {/* Dòng 1: CÂU LẠC BỘ */}
-          <span className={cn(
-            "font-display text-[10px] font-bold uppercase tracking-[0.15em] mb-0.5",
-            isDark ? "text-cyan-400/90" : "text-primary/70"
-          )}>
+          <span
+            className={cn(
+              "text-[9px] uppercase font-black tracking-[0.3em] leading-none mb-1 transition-colors duration-300 whitespace-nowrap",
+              isDark ? "text-white/60" : "text-slate-500 dark:text-slate-400"
+            )}
+          >
             Câu lạc bộ
           </span>
-          
-          {/* Dòng 2: Tên chính - Màu long lanh, đứng im */}
-          <span className={cn(
-            "font-display text-[16px] font-black tracking-tight",
-            isDark 
-              ? "text-primary-foreground" 
-              : "text-[#00348a]" // Màu xanh đậm hoàng gia khi ở nền trắng
-          )}>
-            Sáng tạo & Khởi nghiệp 
+
+          {/* Dòng 2: SÁNG TẠO & KHỞI NGHIỆP - FONT CHỮ "CÔNG" KHÔNG XUỐNG DÒNG */}
+          <span
+            className={cn(
+              "text-[15px] font-black uppercase tracking-tighter leading-none transition-colors duration-300 whitespace-nowrap",
+              isDark 
+                ? "text-white" 
+                : "text-[#0f3d3e] dark:text-white"
+            )}
+          >
+            Sáng tạo & Khởi nghiệp
           </span>
         </div>
       )}
