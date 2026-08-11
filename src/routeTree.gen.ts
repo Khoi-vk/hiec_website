@@ -23,7 +23,7 @@ import { Route as TestSupabaseRouteImport } from './routes/test-supabase'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminApplicationsRouteImport } from './routes/admin/applications'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
-import { Route as AdminPostsRouteImport } from './routes/admin/posts'
+import { Route as AdminManageActivitiesRouteImport } from './routes/admin/manage-activities'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminStaticContentRouteImport } from './routes/admin/static-content'
 
@@ -97,9 +97,9 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminPostsRoute = AdminPostsRouteImport.update({
-  id: '/posts',
-  path: '/posts',
+const AdminManageActivitiesRoute = AdminManageActivitiesRouteImport.update({
+  id: '/manage-activities',
+  path: '/manage-activities',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -127,7 +127,7 @@ export interface FileRoutesByFullPath {
   '/test-supabase': typeof TestSupabaseRoute
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/posts': typeof AdminPostsRoute
+  '/admin/manage-activities': typeof AdminManageActivitiesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/static-content': typeof AdminStaticContentRoute
   '/admin/': typeof AdminIndexRoute
@@ -145,7 +145,7 @@ export interface FileRoutesByTo {
   '/test-supabase': typeof TestSupabaseRoute
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/posts': typeof AdminPostsRoute
+  '/admin/manage-activities': typeof AdminManageActivitiesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/static-content': typeof AdminStaticContentRoute
   '/admin': typeof AdminIndexRoute
@@ -165,7 +165,7 @@ export interface FileRoutesById {
   '/test-supabase': typeof TestSupabaseRoute
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/posts': typeof AdminPostsRoute
+  '/admin/manage-activities': typeof AdminManageActivitiesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/static-content': typeof AdminStaticContentRoute
   '/admin/': typeof AdminIndexRoute
@@ -186,7 +186,7 @@ export interface FileRouteTypes {
     | '/test-supabase'
     | '/admin/applications'
     | '/admin/dashboard'
-    | '/admin/posts'
+    | '/admin/manage-activities'
     | '/admin/settings'
     | '/admin/static-content'
     | '/admin/'
@@ -204,7 +204,7 @@ export interface FileRouteTypes {
     | '/test-supabase'
     | '/admin/applications'
     | '/admin/dashboard'
-    | '/admin/posts'
+    | '/admin/manage-activities'
     | '/admin/settings'
     | '/admin/static-content'
     | '/admin'
@@ -223,7 +223,7 @@ export interface FileRouteTypes {
     | '/test-supabase'
     | '/admin/applications'
     | '/admin/dashboard'
-    | '/admin/posts'
+    | '/admin/manage-activities'
     | '/admin/settings'
     | '/admin/static-content'
     | '/admin/'
@@ -343,11 +343,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/posts': {
-      id: '/admin/posts'
-      path: '/posts'
-      fullPath: '/admin/posts'
-      preLoaderRoute: typeof AdminPostsRouteImport
+    '/admin/manage-activities': {
+      id: '/admin/manage-activities'
+      path: '/manage-activities'
+      fullPath: '/admin/manage-activities'
+      preLoaderRoute: typeof AdminManageActivitiesRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/settings': {
@@ -370,7 +370,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminPostsRoute: typeof AdminPostsRoute
+  AdminManageActivitiesRoute: typeof AdminManageActivitiesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminStaticContentRoute: typeof AdminStaticContentRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -379,7 +379,7 @@ interface AdminRouteRouteChildren {
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
-  AdminPostsRoute: AdminPostsRoute,
+  AdminManageActivitiesRoute: AdminManageActivitiesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminStaticContentRoute: AdminStaticContentRoute,
   AdminIndexRoute: AdminIndexRoute,
