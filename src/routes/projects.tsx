@@ -42,7 +42,7 @@ function ProjectsPage() {
               <Badge className="bg-cyan-100/50 text-cyan-700 border-none mb-4 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.2em]">
                 Showcase
               </Badge>
-              <h1 className="font-display text-7xl md:text-9xl font-black text-[#0f3d3e] uppercase tracking-tighter leading-[0.75]">
+              <h1 className="font-sans text-5xl md:text-6xl font-bold text-[#0f3d3e] uppercase tracking-[-0.04em] leading-[0.9]">
                 Dự án
               </h1>
             </div>
