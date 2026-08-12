@@ -47,7 +47,7 @@ function MembersPage() {
               <Badge className="bg-cyan-100/50 text-cyan-700 border-none mb-2 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.2em]">
                 Our Team
               </Badge>
-              <h1 className="font-display text-6xl md:text-8xl font-black text-[#0f3d3e] uppercase tracking-tighter leading-[0.8]">
+              <h1 className="font-sans text-5xl md:text-6xl font-bold text-[#0f3d3e] uppercase tracking-[-0.04em] leading-[0.9]">
                 Thành viên
               </h1>
             </div>
