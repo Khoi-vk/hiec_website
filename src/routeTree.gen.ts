@@ -24,6 +24,8 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminApplicationsRouteImport } from './routes/admin/applications'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminManageActivitiesRouteImport } from './routes/admin/manage-activities'
+import { Route as AdminManageMembersRouteImport } from './routes/admin/manage-members'
+import { Route as AdminManageProjectsRouteImport } from './routes/admin/manage-projects'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminStaticContentRouteImport } from './routes/admin/static-content'
 
@@ -102,6 +104,16 @@ const AdminManageActivitiesRoute = AdminManageActivitiesRouteImport.update({
   path: '/manage-activities',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminManageMembersRoute = AdminManageMembersRouteImport.update({
+  id: '/manage-members',
+  path: '/manage-members',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminManageProjectsRoute = AdminManageProjectsRouteImport.update({
+  id: '/manage-projects',
+  path: '/manage-projects',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -128,6 +140,8 @@ export interface FileRoutesByFullPath {
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/manage-activities': typeof AdminManageActivitiesRoute
+  '/admin/manage-members': typeof AdminManageMembersRoute
+  '/admin/manage-projects': typeof AdminManageProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/static-content': typeof AdminStaticContentRoute
   '/admin/': typeof AdminIndexRoute
@@ -146,6 +160,8 @@ export interface FileRoutesByTo {
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/manage-activities': typeof AdminManageActivitiesRoute
+  '/admin/manage-members': typeof AdminManageMembersRoute
+  '/admin/manage-projects': typeof AdminManageProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/static-content': typeof AdminStaticContentRoute
   '/admin': typeof AdminIndexRoute
@@ -166,6 +182,8 @@ export interface FileRoutesById {
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/manage-activities': typeof AdminManageActivitiesRoute
+  '/admin/manage-members': typeof AdminManageMembersRoute
+  '/admin/manage-projects': typeof AdminManageProjectsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/static-content': typeof AdminStaticContentRoute
   '/admin/': typeof AdminIndexRoute
@@ -187,6 +205,8 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/dashboard'
     | '/admin/manage-activities'
+    | '/admin/manage-members'
+    | '/admin/manage-projects'
     | '/admin/settings'
     | '/admin/static-content'
     | '/admin/'
@@ -205,6 +225,8 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/dashboard'
     | '/admin/manage-activities'
+    | '/admin/manage-members'
+    | '/admin/manage-projects'
     | '/admin/settings'
     | '/admin/static-content'
     | '/admin'
@@ -224,6 +246,8 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/dashboard'
     | '/admin/manage-activities'
+    | '/admin/manage-members'
+    | '/admin/manage-projects'
     | '/admin/settings'
     | '/admin/static-content'
     | '/admin/'
@@ -350,6 +374,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminManageActivitiesRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/manage-members': {
+      id: '/admin/manage-members'
+      path: '/manage-members'
+      fullPath: '/admin/manage-members'
+      preLoaderRoute: typeof AdminManageMembersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/manage-projects': {
+      id: '/admin/manage-projects'
+      path: '/manage-projects'
+      fullPath: '/admin/manage-projects'
+      preLoaderRoute: typeof AdminManageProjectsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -371,6 +409,8 @@ interface AdminRouteRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminManageActivitiesRoute: typeof AdminManageActivitiesRoute
+  AdminManageMembersRoute: typeof AdminManageMembersRoute
+  AdminManageProjectsRoute: typeof AdminManageProjectsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminStaticContentRoute: typeof AdminStaticContentRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -380,6 +420,8 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminManageActivitiesRoute: AdminManageActivitiesRoute,
+  AdminManageMembersRoute: AdminManageMembersRoute,
+  AdminManageProjectsRoute: AdminManageProjectsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminStaticContentRoute: AdminStaticContentRoute,
   AdminIndexRoute: AdminIndexRoute,

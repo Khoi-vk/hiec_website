@@ -54,7 +54,7 @@ function MembersPage() {
 
             <div className="max-w-md md:border-l-2 border-cyan-500/20 md:pl-8 animate-fade-up [animation-delay:200ms]">
               <h2 className="text-[#0f3d3e] text-sm md:text-lg font-black uppercase tracking-tight mb-2 leading-tight">
-                Đội ngũ nòng cốt <br /> dẫn dắt HIEC HUST
+                Đội ngũ nòng cốt <br /> dẫn dắt HIEC
               </h2>
               <p className="text-slate-500 text-xs md:text-sm font-medium leading-relaxed">
                 Những cá nhân xuất sắc cùng chung tay xây dựng hệ sinh thái khởi nghiệp sáng tạo.

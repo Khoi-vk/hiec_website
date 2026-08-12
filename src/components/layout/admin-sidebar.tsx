@@ -12,6 +12,7 @@ import {
   PanelLeftOpen,
   UserCheck,
   Rocket,
+  Users,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ const navItems = [
   { title: "Đơn ứng tuyển", url: "/admin/applications", icon: UserCheck },
   { title: "Quản lý dự án", url: "/admin/manage-projects", icon: Rocket },
   { title: "Quản lý hoạt động", url: "/admin/manage-activities", icon: FileText },
+  { title: "Quản lý Thành viên", url: "/admin/manage-members", icon: Users }, 
 ] as const;
 
 export function AdminSidebar() {
