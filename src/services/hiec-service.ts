@@ -94,9 +94,9 @@ export const coreValues = [
 
 export const history = [
   { year: "2019", title: "Thành lập HIEC", description: "12 sinh viên sáng lập câu lạc bộ khởi nghiệp & đổi mới sáng tạo." },
-  { year: "2021", title: "Mở rộng hệ sinh thái", description: "Ra mắt Mentor Connect, hợp tác cùng 3 vườn ươm doanh nghiệp." },
+  { year: "2021", title: "Mở rộng hệ sinh thái", description: "Hợp tác cùng 3 vườn ươm doanh nghiệp." },
   { year: "2023", title: "Vươn ra cấp thành phố", description: "Đại diện trường tham dự và đạt thành tích tại các cuộc thi lớn." },
-  { year: "2025", title: "1.000+ thành viên", description: "Cộng đồng alumni và thành viên hoạt động trên 4 mảng chuyên môn." },
+  { year: "2025", title: "350+ thành viên", description: "Cộng đồng alumni và thành viên hoạt động trên 4 mảng chuyên môn." },
 ];
 
 export const adminStats = [
