@@ -89,6 +89,24 @@ function AdminManageActivitiesPage() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+  if (!confirm("Xác nhận xóa bài viết này?")) return;
+
+  try {
+    const { error } = await supabase
+      .from("activities")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+
+    toast.success("Đã xóa bài viết.");
+    fetchActs();
+  } catch (err: any) {
+    toast.error(err.message);
+  }
+};
+
   return (
     <div className="space-y-6 text-left">
       <div className="flex justify-between items-center border-b pb-4">
@@ -120,7 +138,29 @@ function AdminManageActivitiesPage() {
                 <TableCell className="font-bold text-[#0f3d3e]">{a.title}</TableCell>
                 <TableCell className="text-center">{a.date}</TableCell>
                 <TableCell className="text-right pr-8">
-                  <Button variant="ghost" size="sm" onClick={() => { setFormData(a); setEditingId(a.id); setIsOpen(true); }}><Pencil className="h-4 w-4" /></Button>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setFormData(a);
+                        setEditingId(a.id);
+                        setIsOpen(true);
+                      }}
+                      className="rounded-xl hover:bg-blue-50 hover:text-blue-600"
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(a.id)}
+                      className="rounded-xl hover:bg-red-50 hover:text-red-600"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
