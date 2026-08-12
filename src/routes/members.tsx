@@ -41,7 +41,7 @@ function MembersPage() {
       <section className="relative overflow-hidden bg-white pt-8 pb-4 md:pt-12 md:pb-6 border-b border-slate-100">
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-cyan-50/50 blur-[100px] rounded-full -z-10" />
         
-        <div className="container relative mx-auto px-4">
+        <div className="max-w-[1300px] mx-auto px-6 md:px-12">  
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-12">
             <div className="flex-shrink-0 animate-fade-up">
               <Badge className="bg-cyan-100/50 text-cyan-700 border-none mb-2 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.2em]">
@@ -66,7 +66,7 @@ function MembersPage() {
 
       {/* 2. DANH SÁCH THÀNH VIÊN - CĂN GIỮA */}
       <section className="py-8 md:py-12 bg-slate-50/30 min-h-[600px]">
-        <div className="container mx-auto px-4">
+        <div className="max-w-[1300px] mx-auto px-6 md:px-12">
           {loading ? (
             <div className="flex justify-center py-20 text-cyan-600">
               <Loader2 className="animate-spin size-8" />
