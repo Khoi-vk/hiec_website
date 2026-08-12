@@ -51,7 +51,13 @@ function HomePage() {
           <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.88fr_1.12fr]">
             <div className="relative z-10 animate-fade-up">
               <p className="mb-6 flex items-center gap-2 text-xs font-black uppercase tracking-[0.25em] text-primary-deep dark:text-primary"><Sparkles className="size-4" /> HIEC / Since 2019</p>
-              <h1 className="max-w-3xl text-5xl font-black leading-[0.94] tracking-[-0.06em] sm:text-6xl lg:text-8xl">Khởi nguồn sáng tạo,<br /><span className="text-primary-deep dark:text-primary">Chuyển lối thành công</span></h1>
+              <h1 className="max-w-3xl font-sans text-5xl font-bold leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+                Khởi nguồn sáng tạo,
+                <br />
+                <span className="text-primary-deep dark:text-primary">
+                  Chuyển lối thành công
+                </span>
+              </h1>
               <p className="mt-7 max-w-xl text-base leading-8 text-muted-foreground sm:text-lg">Câu lạc bộ Sáng tạo & Khởi nghiệp HUST — nơi những người trẻ học bằng cách làm, kết nối bằng giá trị và cùng nhau tạo ra điều đáng tự hào.</p>
               <div className="mt-9 flex flex-wrap gap-3"><Button asChild size="lg" className="rounded-full px-7"><Link to="/signup">Tham gia HIEC <ArrowUpRight className="ml-2 size-4" /></Link></Button><Button asChild size="lg" variant="outline" className="rounded-full px-7"><a href="#lich-su">Khám phá câu chuyện <ArrowDownRight className="ml-2 size-4" /></a></Button></div>
               <div className="mt-12 grid max-w-lg grid-cols-2 gap-x-8 gap-y-5 border-t border-border pt-6 sm:grid-cols-4">{highlights.map((item) => <div key={item.label}><p className="text-2xl font-black">{item.number}</p><p className="mt-1 text-[11px] leading-4 text-muted-foreground">{item.label}</p></div>)}</div>
