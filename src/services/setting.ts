@@ -29,7 +29,6 @@ const defaultFooterData: FooterData = {
     { label: 'Trang chủ', path: '/' },
     { label: 'Dự án & dấu ấn', path: '/projects' },
     { label: 'Đăng ký tham gia', path: '/signup' },
-    { label: 'Khu vực quản trị', path: '/admin/dashboard' },
   ],
   contact: {
     email: 'hiec.hust@gmail.com',
