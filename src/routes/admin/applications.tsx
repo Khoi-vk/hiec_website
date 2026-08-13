@@ -1,6 +1,10 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Eye, Mail, Phone, Search, CheckCircle, UserCheck, Clock, GraduationCap, Loader2 } from "lucide-react";
+import { 
+  Eye, Mail, Phone, Search, CheckCircle, 
+  ClipboardList, Clock, GraduationCap, Trash2, 
+  Loader2, Send 
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -12,236 +16,234 @@ import { Modal } from "@/components/ui/modal";
 import { supabase } from "@/utils/supabase";
 
 export const Route = createFileRoute("/admin/applications")({
-  component: ApplicationsPage,
+  component: RegistrationsPage,
 });
 
-function ApplicationsPage() {
-  const [apps, setApps] = React.useState<any[]>([]);
+function RegistrationsPage() {
+  const [registrations, setRegistrations] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [selectedApp, setSelectedApp] = React.useState<any>(null);
+  const [selectedReg, setSelectedReg] = React.useState<any>(null);
   const [searchTerm, setSearchTerm] = React.useState("");
 
-  const fetchApplications = async () => {
+  // HÀM LẤY DỮ LIỆU TỪ BẢNG: applications
+  const fetchRegistrations = async () => {
     try {
       setLoading(true);
+      console.log("Đang gọi Supabase lấy dữ liệu từ bảng 'applications'...");
+      
       const { data, error } = await supabase
         .from("applications")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setApps(data || []);
-    } catch (e) {
-      console.error("Lỗi tải đơn ứng tuyển từ Supabase:", e);
-      toast.error("Không thể tải danh sách đơn ứng tuyển.");
+      if (error) {
+        console.error("Lỗi Supabase trả về:", error);
+        throw error;
+      }
+
+      console.log("Dữ liệu tải về thành công:", data);
+      setRegistrations(data || []);
+    } catch (e: any) {
+      console.error("Lỗi kĩ thuật khi load data:", e);
+      toast.error("Không thể kết nối với Database", {
+        description: e.message || "Vui lòng kiểm tra lại bảng 'applications' trên Supabase."
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Load ban đầu + Lắng nghe Realtime có đơn mới hoặc đổi trạng thái
   React.useEffect(() => {
-    fetchApplications();
-
+    fetchRegistrations();
+    
+    // Đăng ký Realtime để có đơn mới là hiện ngay
     const channel = supabase
-      .channel("admin-applications-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "applications" },
-        () => {
-          fetchApplications();
-        }
-      )
+      .channel("db-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "applications" }, () => {
+        fetchRegistrations();
+      })
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Lọc danh sách theo tìm kiếm
-  const filteredApps = apps.filter(app => 
-    (app.fullName || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (app.studentId || "").includes(searchTerm)
-  );
-
-  const handleApprove = async (id: string) => {
+  const handleMarkAsContacted = async (id: string) => {
     try {
       const { error } = await supabase
         .from("applications")
-        .update({ status: "passed_round_1" }) 
+        .update({ status: "contacted" })
         .eq("id", id);
 
       if (error) throw error;
-
-      setApps(prev => prev.map(a => a.id === id ? { ...a, status: "passed_round_1" } : a));
-      toast.success("Đã duyệt ứng viên này qua vòng đơn!");
-      setSelectedApp(null);
-    } catch (e) {
-      console.error(e);
-      toast.error("Không thể duyệt đơn lúc này.");
+      toast.success("Đã xác nhận gửi thông tin thành công.");
+      setSelectedReg(null);
+      fetchRegistrations();
+    } catch (e: any) {
+      toast.error("Lỗi cập nhật: " + e.message);
     }
   };
 
+  // Lọc dữ liệu theo tìm kiếm (Hỗ trợ cả cột chữ hoa và chữ thường)
+  const filteredData = registrations.filter(reg => {
+    const name = (reg.fullName || reg.fullname || "").toLowerCase();
+    const sid = (reg.studentId || reg.studentid || "");
+    return name.includes(searchTerm.toLowerCase()) || sid.includes(searchTerm);
+  });
+
   return (
-    <div className="space-y-6 animate-fade-up">
-      {/* Tiêu đề trang - GIỮ NGUYÊN */}
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border/60 pb-6">
+    <div className="space-y-8 animate-fade-up text-left px-2">
+      {/* HEADER: Giao diện mỏng, font chữ "Công" */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-100 pb-8">
         <div>
-          <h1 className="font-display text-2xl font-bold flex items-center gap-2">
-            <UserCheck className="text-primary size-6" /> Quản lý đơn ứng tuyển
+          <h1 className="font-display text-5xl font-black uppercase tracking-tighter text-[#0f3d3e] flex items-center gap-3">
+            <ClipboardList className="text-cyan-600 size-10" /> Đăng ký nhận tin
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">Danh sách sinh viên nộp đơn tham gia HIEC HUST.</p>
+          <p className="text-sm text-slate-400 mt-2 font-medium italic">
+            Quản lý danh sách sinh viên đăng ký thông tin từ HIEC HUST.
+          </p>
         </div>
         
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-300" />
           <Input 
             placeholder="Tìm theo tên hoặc MSSV..." 
-            className="pl-10 h-10 rounded-xl" 
+            className="pl-11 h-14 rounded-2xl border-none bg-white shadow-sm focus-visible:ring-cyan-500 font-medium" 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      {/* Bảng danh sách */}
-      <Card className="border-none shadow-elevated overflow-hidden">
+      {/* BẢNG DANH SÁCH PREMIUM */}
+      <Card className="border-none shadow-2xl shadow-slate-200/50 rounded-[2.5rem] overflow-hidden bg-white">
         <CardContent className="p-0">
-          {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center text-muted-foreground gap-2">
-              <Loader2 className="size-6 animate-spin text-primary" />
-              <p className="text-sm">Đang đồng bộ dữ liệu từ hệ thống...</p>
+          <Table>
+            <TableHeader className="bg-slate-50/50">
+              <TableRow className="border-none">
+                <TableHead className="font-black uppercase text-[10px] tracking-widest text-slate-400 pl-8 py-6">Người đăng ký</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest text-slate-400">Trường / Ngành</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest text-slate-400 text-center">Tình trạng</TableHead>
+                <TableHead className="text-right font-black uppercase text-[10px] tracking-widest text-slate-400 pr-8">Thao tác</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                <TableRow><TableCell colSpan={4} className="text-center py-20"><Loader2 className="animate-spin mx-auto text-cyan-600 size-10" /></TableCell></TableRow>
+              ) : filteredData.map((reg) => (
+                <TableRow key={reg.id} className="hover:bg-slate-50/80 transition-all border-b border-slate-50 last:border-0 group">
+                  <TableCell className="pl-8 py-6">
+                    <div className="font-black text-[#1a2e35] uppercase text-sm group-hover:text-cyan-600 transition-colors">
+                      {reg.fullName || reg.fullname}
+                    </div>
+                    <div className="text-[10px] font-mono font-bold text-slate-400 mt-1 uppercase tracking-wider">
+                      ID: {reg.studentId || reg.studentid}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-xs font-bold text-[#0f3d3e] uppercase">{reg.university}</div>
+                    <div className="text-[10px] text-slate-400 font-medium mt-1">{reg.major}</div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {reg.status === "contacted" ? (
+                      <Badge className="bg-cyan-50 text-cyan-700 border-none font-black text-[9px] uppercase px-3 py-1 rounded-full">
+                        <Send className="size-3 mr-1" /> Đã gửi tin
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-amber-50 text-amber-600 border-none font-black text-[9px] uppercase px-3 py-1 rounded-full animate-pulse">
+                        <Clock className="size-3 mr-1" /> Chờ xử lý
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right pr-8">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => setSelectedReg(reg)} 
+                      className="rounded-xl hover:bg-cyan-50 hover:text-cyan-600"
+                    >
+                      <Eye className="size-5" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          
+          {!loading && filteredData.length === 0 && (
+            <div className="py-24 text-center">
+              <Search className="size-12 text-slate-100 mx-auto mb-4" />
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Không có dữ liệu đăng ký</p>
             </div>
-          ) : (
-            <>
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow>
-                    <TableHead className="font-bold">Ứng viên</TableHead>
-                    <TableHead className="font-bold">Học vấn</TableHead>
-                    <TableHead className="font-bold">Thông tin liên hệ</TableHead>
-                    <TableHead className="font-bold">Trạng thái</TableHead>
-                    <TableHead className="text-right font-bold">Thao tác</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredApps.map((app) => (
-                    <TableRow key={app.id} className="hover:bg-muted/20 transition-colors">
-                      <TableCell>
-                        <div className="font-bold text-foreground">{app.fullName}</div>
-                        <div className="text-[11px] font-mono text-primary bg-primary/5 px-1.5 py-0.5 rounded w-fit mt-1">
-                          {app.studentId}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm font-medium">{app.university}</div>
-                        <div className="text-xs text-muted-foreground">{app.major}</div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
-                            <Mail className="size-3" /> {app.email}
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Phone className="size-3" /> {app.phone}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {app.status === "passed_round_1" ? (
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1 font-medium italic">
-                            <CheckCircle className="size-3" /> Đỗ vòng đơn
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200 gap-1 font-medium">
-                            <Clock className="size-3" /> Chờ duyệt
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => setSelectedApp(app)} className="rounded-lg">
-                          <Eye className="size-4 mr-2" /> Xem đơn
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              
-              {filteredApps.length === 0 && (
-                <div className="py-20 text-center text-muted-foreground">
-                  <Search className="size-10 mx-auto opacity-20 mb-4" />
-                  <p>Không tìm thấy đơn ứng tuyển nào phù hợp.</p>
-                </div>
-              )}
-            </>
           )}
         </CardContent>
       </Card>
 
-      {/* Modal xem chi tiết đơn ứng tuyển - GIỮ NGUYÊN */}
-      {/* Modal xem chi tiết đơn ứng tuyển */}
+      {/* MODAL CHI TIẾT SANG TRỌNG */}
       <Modal
-        open={!!selectedApp}
-        onOpenChange={(open) => !open && setSelectedApp(null)}
-        title="Chi tiết hồ sơ ứng viên"
-        description={`Mã đơn: ${selectedApp?.id}`}
+        open={!!selectedReg}
+        onOpenChange={(open) => !open && setSelectedReg(null)}
+        title="HỒ SƠ ĐĂNG KÝ"
+        description="Thông tin chi tiết sinh viên đăng ký nhận bản tin HIEC."
       >
-        {selectedApp && (
-          <div className="space-y-6 py-4">
-            {/* Thông tin cá nhân & Liên hệ */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Họ và tên</span>
-                <p className="text-sm font-bold">{selectedApp.fullName}</p>
+        {selectedReg && (
+          <div className="max-w-4xl mx-auto space-y-8 py-4 max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar text-left">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 shadow-inner">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2">Họ và tên</span>
+                <p className="text-2xl font-black text-[#0f3d3e] uppercase tracking-tighter">
+                  {selectedReg.fullName || selectedReg.fullname}
+                </p>
               </div>
-              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">MSSV</span>
-                <p className="text-sm font-bold font-mono text-primary">{selectedApp.studentId}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Email</span>
-                <p className="text-xs font-bold truncate">{selectedApp.email}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Số điện thoại</span>
-                <p className="text-sm font-bold">{selectedApp.phone}</p>
+              <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 shadow-inner">
+                <span className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2">Mã số sinh viên</span>
+                <p className="text-2xl font-black text-cyan-600 font-mono tracking-tighter">
+                  {selectedReg.studentId || selectedReg.studentid}
+                </p>
               </div>
             </div>
 
-            {/* Thông tin học vấn */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Trường</span>
-                <p className="text-sm font-bold flex items-center gap-1"><GraduationCap className="size-4 text-primary" /> {selectedApp.university}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
+              <div className="space-y-4">
+                 <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-600">Thông tin liên hệ</h4>
+                 <div className="space-y-3">
+                    <div className="flex items-center gap-4 p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                       <Mail className="size-5 text-cyan-500" />
+                       <span className="font-bold text-sm text-[#1a2e35]">{selectedReg.email}</span>
+                    </div>
+                    <div className="flex items-center gap-4 p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                       <Phone className="size-5 text-cyan-500" />
+                       <span className="font-bold text-sm text-[#1a2e35]">{selectedReg.phone}</span>
+                    </div>
+                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                <span className="text-[10px] uppercase font-black text-muted-foreground block mb-1">Ngành học</span>
-                <p className="text-sm font-bold">{selectedApp.major}</p>
-              </div>
-            </div>
-            
-            {/* Nội dung Motivation */}
-            <div className="space-y-2">
-              <span className="text-xs uppercase font-black text-primary tracking-widest">Nội dung ứng tuyển:</span>
-              <div className="bg-primary/[0.03] p-4 rounded-xl border-l-4 border-primary italic text-sm leading-relaxed text-foreground/80 max-h-[150px] overflow-y-auto">
-                "{selectedApp.motivation}"
+
+              <div className="space-y-4">
+                 <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-600">Học vấn</h4>
+                 <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm flex items-start gap-4">
+                    <GraduationCap className="size-8 text-cyan-500 shrink-0" />
+                    <div>
+                       <p className="font-black text-[#0f3d3e] uppercase text-sm leading-tight">{selectedReg.university}</p>
+                       <p className="text-xs text-slate-400 font-bold mt-1 uppercase">{selectedReg.major}</p>
+                    </div>
+                 </div>
               </div>
             </div>
 
-            <div className="text-[10px] text-muted-foreground text-right italic">
-              Ngày nộp: {new Date(selectedApp.created_at).toLocaleString('vi-VN')}
-            </div>
-
-            <div className="flex gap-3 pt-4 border-t">
-              {selectedApp.status !== "passed_round_1" && (
-                <Button className="flex-1" variant="shimmer" onClick={() => handleApprove(selectedApp.id)}>
-                  <CheckCircle className="size-4 mr-2" /> Duyệt qua vòng đơn
+            <div className="flex gap-4 pt-8 border-t border-slate-100">
+              {selectedReg.status !== "contacted" && (
+                <Button 
+                  className="flex-[2] py-8 font-black uppercase tracking-[0.2em] rounded-2xl text-white bg-[#0f3d3e] hover:bg-[#1a2e35] shadow-2xl shadow-blue-900/20" 
+                  onClick={() => handleMarkAsContacted(selectedReg.id)}
+                >
+                  <Send className="size-5 mr-3 text-cyan-400" /> Đã gửi tin
                 </Button>
               )}
-              <Button variant="outline" className="flex-1" onClick={() => setSelectedApp(null)}>
-                Đóng lại
+              <Button 
+                variant="outline" 
+                className="flex-1 rounded-2xl py-8 font-black uppercase tracking-widest border-slate-200 text-slate-400 hover:bg-slate-50" 
+                onClick={() => setSelectedReg(null)}
+              >
+                Đóng
               </Button>
             </div>
           </div>

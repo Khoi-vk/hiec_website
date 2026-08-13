@@ -23,7 +23,7 @@ import { Modal } from "@/components/ui/modal"; // KHẮC PHỤC: Thêm dòng nà
 
 const navItems = [
   { title: "Tổng quan", url: "/admin/dashboard", icon: LayoutDashboard },
-  { title: "Đơn ứng tuyển", url: "/admin/applications", icon: UserCheck },
+  { title: "Đơn đăng kí", url: "/admin/applications", icon: UserCheck },
   { title: "Quản lý dự án", url: "/admin/manage-projects", icon: Rocket },
   { title: "Quản lý hoạt động", url: "/admin/manage-activities", icon: FileText },
   { title: "Quản lý Thành viên", url: "/admin/manage-members", icon: Users }, 
