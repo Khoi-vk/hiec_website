@@ -52,9 +52,9 @@ function HomePage() {
             <div className="relative z-10 animate-fade-up">
               <p className="mb-6 flex items-center gap-2 text-xs font-black uppercase tracking-[0.25em] text-primary-deep dark:text-primary"><Sparkles className="size-4" /> HIEC / Since 2019</p>
               <h1 className="max-w-3xl font-sans text-5xl font-bold leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
-                Khởi nguồn sáng tạo –{" "}
+                Khởi nguồn sáng tạo,{" "}
                 <span className="text-primary-deep dark:text-primary">
-                  Chuyển lối thành công
+                  Dẫn lối thành công
                 </span>
               </h1>
               <p className="mt-7 max-w-xl text-base leading-8 text-muted-foreground sm:text-lg">Câu lạc bộ Sáng tạo & Khởi nghiệp HUST — nơi những người trẻ học bằng cách làm, kết nối bằng giá trị và cùng nhau tạo ra điều đáng tự hào.</p>
