@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldError } from "@/components/auth/field-error";
 import { PasswordInput } from "@/components/auth/password-input";
-import { HiecLogo } from "@/components/ui/hiec-logo";
 import { signupSchema, type SignupValues } from "@/lib/validators/auth-validator";
 import { supabase } from "@/utils/supabase";
 
