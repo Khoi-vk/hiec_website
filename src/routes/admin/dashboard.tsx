@@ -1,9 +1,11 @@
+import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Eye, FileText, TrendingUp, UserPlus } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { adminStats, trafficData } from "@/services/hiec-service";
+import { supabase } from "@/utils/supabase";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({
@@ -23,6 +25,20 @@ export const Route = createFileRoute("/admin/dashboard")({
 const icons = [FileText, Eye, UserPlus, TrendingUp];
 
 function DashboardPage() {
+  const [memberCount, setMemberCount] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    async function fetchMemberCount() {
+      const { count, error } = await supabase
+        .from("members")
+        .select("*", { count: "exact", head: true });
+
+      if (!error) setMemberCount(count ?? 0);
+    }
+
+    fetchMemberCount();
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>
@@ -33,6 +49,7 @@ function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {adminStats.map((stat, i) => {
           const Icon = icons[i] ?? FileText;
+          const isMemberStat = i === 3;
           return (
             <Card key={stat.label}>
               <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
@@ -42,8 +59,10 @@ function DashboardPage() {
                 <Icon className="size-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <p className="font-display text-2xl font-bold">{stat.value}</p>
-                <p className="mt-1 text-xs text-success">{stat.delta}</p>
+                <p className="font-display text-2xl font-bold">
+                  {isMemberStat ? (memberCount ?? "—") : stat.value}
+                </p>
+                {!isMemberStat && <p className="mt-1 text-xs text-success">{stat.delta}</p>}
               </CardContent>
             </Card>
           );
