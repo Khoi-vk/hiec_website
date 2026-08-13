@@ -76,7 +76,7 @@ function ActivitiesPage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {activities.map((act) => (
                 <div key={act.id} onClick={() => setSelectedAct(act)} className="group cursor-pointer">
-                  <Card className="h-full border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white border border-slate-100">
+                  <Card className="flex h-full flex-col border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white border border-slate-100">
                     <div className="aspect-[16/10] overflow-hidden relative m-1.5 rounded-[1.5rem]">
                       <img 
                         src={act.imageUrl || "https://images.unsplash.com/photo-1523580494863-6f30312248f5?q=80"} 
@@ -84,7 +84,7 @@ function ActivitiesPage() {
                         alt={act.title}
                       />
                     </div>
-                    <CardContent className="p-6 pt-2">
+                    <CardContent className="flex flex-1 flex-col p-6 pt-2">
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-[10px] font-bold text-cyan-600 uppercase tracking-widest bg-cyan-50 px-2 py-0.5 rounded">{act.date}</span>
                         <Sparkles className="size-3 text-cyan-200" />
@@ -92,7 +92,7 @@ function ActivitiesPage() {
                       <h3 className="font-display text-base font-black text-[#1a2e35] group-hover:text-cyan-600 transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
                         {act.title}
                       </h3>
-                      <p className="text-slate-500 text-[11px] line-clamp-2 font-medium mb-5">{act.excerpt}</p>
+                      <p className="min-h-[2.5rem] text-slate-500 text-[11px] line-clamp-2 font-medium mb-5">{act.excerpt}</p>
                       <div className="flex items-center justify-between mt-auto">
                          <span className="text-[9px] font-black tracking-widest text-slate-400 uppercase">Chi tiết</span>
                          <div className="size-8 rounded-lg bg-cyan-100/50 text-cyan-600 flex items-center justify-center group-hover:bg-cyan-500 group-hover:text-white transition-all duration-300">
