@@ -2,9 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Eye, FileText, TrendingUp, UserPlus } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { adminStats, projects, trafficData } from "@/services/hiec-service";
+import { adminStats, trafficData } from "@/services/hiec-service";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({
@@ -51,8 +50,8 @@ function DashboardPage() {
         })}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div>
+        <Card>
           <CardHeader>
             <CardTitle className="font-display text-lg">Lượt truy cập 6 tháng</CardTitle>
           </CardHeader>
@@ -82,26 +81,6 @@ function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-display text-lg">Bài viết mới nhất</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {projects.slice(0, 5).map((post) => (
-              <div key={post.id} className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{post.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {post.category} · {post.year}
-                  </p>
-                </div>
-                <Badge variant={post.published ? "default" : "secondary"}>
-                  {post.published ? "Hiện" : "Ẩn"}
-                </Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
