@@ -1,30 +1,27 @@
-import { z } from "zod";
+import * as z from "zod";
 
-export const strongPasswordSchema = z
-  .string()
-  .min(6, "Mật khẩu tối thiểu 6 ký tự")
-  .regex(/[A-Z]/, "Cần ít nhất 1 chữ hoa")
-  .regex(/[0-9]/, "Cần ít nhất 1 chữ số");
-
+/**
+ * 1. Schema dành cho trang Nộp đơn (Signup)
+ * Không cần mật khẩu và lý do tham gia theo ý ông.
+ */
 export const signupSchema = z.object({
-  fullName: z.string().min(2, "Vui lòng nhập họ và tên hợp lệ"),
-  studentId: z.string().min(5, "Mã số sinh viên không hợp lệ"),
+  fullName: z.string().min(2, "Vui lòng nhập họ tên"),
+  studentId: z.string().min(5, "Vui lòng nhập MSSV"),
   university: z.string().min(2, "Vui lòng nhập tên trường"),
   major: z.string().min(2, "Vui lòng nhập ngành học"),
-  email: z.string().email("Email cá nhân không hợp lệ"),
-  phone: z.string().regex(/^\d{10,11}$/, "Số điện thoại phải có 10-11 chữ số"),
-  motivation: z.string().min(20, "Vui lòng chia sẻ thêm về lý do bạn ứng tuyển (tối thiểu 20 ký tự)"),
-  experience: z.string().optional(),
-  password: strongPasswordSchema,
-  confirmPassword: z.string().min(1, "Vui lòng xác nhận mật khẩu"),
-}).refine((data) => data.password === data.confirmPassword, {
-  path: ["confirmPassword"],
-  message: "Mật khẩu xác nhận không khớp",
+  email: z.string().email("Email không hợp lệ"),
+  phone: z.string().min(10, "Số điện thoại không hợp lệ"),
 });
 
-export type SignupValues = z.infer<typeof signupSchema>;
-
+/**
+ * 2. Schema dành cho trang Đăng nhập (Login)
+ * BẮT BUỘC phải giữ lại password ở đây thì ông mới gõ mật khẩu vào Admin được.
+ */
 export const loginSchema = z.object({
+  // Vì trang Login của ông chỉ có 1 ô mật khẩu (SĐT sếp An) nên ta chỉ cần dòng này:
   password: z.string().min(1, "Vui lòng nhập mật khẩu"),
 });
+
+// Xuất kiểu dữ liệu để code không bị gạch đỏ
+export type SignupValues = z.infer<typeof signupSchema>;
 export type LoginValues = z.infer<typeof loginSchema>;
