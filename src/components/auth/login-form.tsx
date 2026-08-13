@@ -71,12 +71,6 @@ export function LoginForm() {
           {...register("password")}
         />
         
-        {/* Gợi ý cho người dùng nội bộ CLB */}
-        <div className="rounded-lg bg-primary/5 p-3 border border-primary/10 mt-2">
-          <p className="text-xs text-primary font-medium leading-relaxed">
-            💡 Gợi ý: Sử dụng mật khẩu để đăng nhập quyền Quản trị.
-          </p>
-        </div>
         
         <FieldError message={errors.password?.message} />
       </div>
