@@ -26,17 +26,23 @@ const icons = [FileText, Eye, UserPlus, TrendingUp];
 
 function DashboardPage() {
   const [memberCount, setMemberCount] = React.useState<number | null>(null);
+  const [contentCount, setContentCount] = React.useState<number | null>(null);
 
   React.useEffect(() => {
-    async function fetchMemberCount() {
-      const { count, error } = await supabase
-        .from("members")
-        .select("*", { count: "exact", head: true });
+    async function fetchDashboardCounts() {
+      const [membersResult, projectsResult, activitiesResult] = await Promise.all([
+        supabase.from("members").select("*", { count: "exact", head: true }),
+        supabase.from("projects").select("*", { count: "exact", head: true }),
+        supabase.from("activities").select("*", { count: "exact", head: true }),
+      ]);
 
-      if (!error) setMemberCount(count ?? 0);
+      if (!membersResult.error) setMemberCount(membersResult.count ?? 0);
+      if (!projectsResult.error && !activitiesResult.error) {
+        setContentCount((projectsResult.count ?? 0) + (activitiesResult.count ?? 0));
+      }
     }
 
-    fetchMemberCount();
+    fetchDashboardCounts();
   }, []);
 
   return (
@@ -49,6 +55,7 @@ function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {adminStats.map((stat, i) => {
           const Icon = icons[i] ?? FileText;
+          const isContentStat = i === 0;
           const isMemberStat = i === 3;
           return (
             <Card key={stat.label}>
@@ -60,9 +67,9 @@ function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <p className="font-display text-2xl font-bold">
-                  {isMemberStat ? (memberCount ?? "—") : stat.value}
+                  {isContentStat ? (contentCount ?? "—") : isMemberStat ? (memberCount ?? "—") : stat.value}
                 </p>
-                {!isMemberStat && <p className="mt-1 text-xs text-success">{stat.delta}</p>}
+                {!isContentStat && !isMemberStat && <p className="mt-1 text-xs text-success">{stat.delta}</p>}
               </CardContent>
             </Card>
           );
