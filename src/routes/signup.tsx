@@ -211,11 +211,6 @@ function SignupPage() {
         )}
       </div>
       
-      {!isSubmitted && (
-        <div className="mt-8 text-white/70 text-sm">
-          Đã có tài khoản? <Link to="/login" className="text-white font-bold hover:underline">Đăng nhập</Link>
-        </div>
-      )}
     </div>
   );
 }

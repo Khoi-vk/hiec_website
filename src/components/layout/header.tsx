@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LogOut, Menu, UserPlus, X } from "lucide-react";
+import { LogIn, LogOut, Menu, UserPlus, X } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -62,9 +62,14 @@ export function Header() {
                 <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Đăng xuất"><LogOut className="size-4" /></Button>
               </>
             ) : (
-              <Button variant="default" size="sm" onClick={() => navigate({ to: "/signup" })}>
-                <UserPlus className="mr-2 size-4" /> Tham gia
-              </Button>
+              <>
+                <Button variant="default" size="sm" onClick={() => navigate({ to: "/signup" })}>
+                  <UserPlus className="mr-2 size-4" /> Tham gia
+                </Button>
+                <Button variant="default" size="sm" onClick={() => navigate({ to: "/login" })}>
+                  <LogIn className="mr-2 size-4" /> Đăng nhập
+                </Button>
+              </>
             )}
           </div>
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen((value) => !value)} aria-label="Mở menu">
@@ -81,7 +86,12 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            {!user && <Link to="/signup" onClick={() => setOpen(false)} className="mt-2 rounded-xl bg-primary px-3 py-3 text-center text-sm font-bold text-primary-foreground">Tham gia HIEC</Link>}
+            {!user && (
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <Link to="/signup" onClick={() => setOpen(false)} className="rounded-xl bg-primary px-3 py-3 text-center text-sm font-bold text-primary-foreground">Tham gia HIEC</Link>
+                <Link to="/login" onClick={() => setOpen(false)} className="rounded-xl bg-primary px-3 py-3 text-center text-sm font-bold text-primary-foreground">Đăng nhập</Link>
+              </div>
+            )}
           </div>
         </nav>
       )}
