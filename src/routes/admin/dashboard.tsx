@@ -27,22 +27,37 @@ const icons = [FileText, Eye, UserPlus, TrendingUp];
 function DashboardPage() {
   const [memberCount, setMemberCount] = React.useState<number | null>(null);
   const [contentCount, setContentCount] = React.useState<number | null>(null);
+  const [applicationCount, setApplicationCount] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     async function fetchDashboardCounts() {
-      const [membersResult, projectsResult, activitiesResult] = await Promise.all([
+      const [membersResult, projectsResult, activitiesResult, applicationsResult] = await Promise.all([
         supabase.from("members").select("*", { count: "exact", head: true }),
         supabase.from("projects").select("*", { count: "exact", head: true }),
         supabase.from("activities").select("*", { count: "exact", head: true }),
+        supabase.from("applications").select("*", { count: "exact", head: true }),
       ]);
 
       if (!membersResult.error) setMemberCount(membersResult.count ?? 0);
       if (!projectsResult.error && !activitiesResult.error) {
         setContentCount((projectsResult.count ?? 0) + (activitiesResult.count ?? 0));
       }
+      if (!applicationsResult.error) setApplicationCount(applicationsResult.count ?? 0);
     }
 
     fetchDashboardCounts();
+
+    // Cập nhật realtime: có đơn đăng ký mới là con số thay đổi ngay
+    const channel = supabase
+      .channel("dashboard-applications")
+      .on("postgres_changes", { event: "*", schema: "public", table: "applications" }, () => {
+        fetchDashboardCounts();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
@@ -57,6 +72,7 @@ function DashboardPage() {
           const Icon = icons[i] ?? FileText;
           const isContentStat = i === 0;
           const isMemberStat = i === 3;
+          const isApplicationStat = i === 2;
           return (
             <Card key={stat.label}>
               <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
@@ -67,7 +83,7 @@ function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <p className="font-display text-2xl font-bold">
-                  {isContentStat ? (contentCount ?? "—") : isMemberStat ? (memberCount ?? "—") : stat.value}
+                  {isContentStat ? (contentCount ?? "—") : isMemberStat ? (memberCount ?? "—") : isApplicationStat ? (applicationCount ?? "—") : stat.value}
                 </p>
                 {!isContentStat && !isMemberStat && <p className="mt-1 text-xs text-success">{stat.delta}</p>}
               </CardContent>
