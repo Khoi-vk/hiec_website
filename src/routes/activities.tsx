@@ -46,7 +46,7 @@ function ActivitiesPage() {
                 Latest Events
               </Badge>
               {/* CHỮ LỚN: Sáng đen (slate-900) - Tối trắng (white) */}
-              <h1 className="font-display text-7xl md:text-9xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-[0.75]">
+              <h1 className="font-sans text-5xl md:text-6xl font-bold text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.9] transition-colors">
                 Hoạt động
               </h1>
             </div>

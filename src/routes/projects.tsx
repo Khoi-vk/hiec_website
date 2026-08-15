@@ -53,7 +53,7 @@ function ProjectsPage() {
               <Badge className="bg-cyan-100/50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 border-none mb-4 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.2em]">
                 HIEC Showcase
               </Badge>
-              <h1 className="font-display text-7xl md:text-9xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-[0.75]">
+              <h1 className="font-sans text-5xl md:text-6xl font-bold text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.9] transition-colors">
                 Dự án
               </h1>
             </div>
@@ -87,8 +87,11 @@ function ProjectsPage() {
                   onClick={() => setSelectedProject(project)}
                   className="group cursor-pointer"
                 >
-                  <Card className="h-full border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800">
-                    <div className="aspect-[16/10] overflow-hidden m-1.5 rounded-[1.5rem]">
+                  {/* THÊM 'flex flex-col' vào Card */}
+                  <Card className="flex flex-col h-full border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800">
+                    
+                    {/* THÊM 'shrink-0' để vùng chứa ảnh không bị bóp méo */}
+                    <div className="aspect-[16/10] overflow-hidden m-1.5 rounded-[1.5rem] shrink-0">
                       <img 
                         src={project.imageUrl || "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80"} 
                         className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -96,7 +99,8 @@ function ProjectsPage() {
                       />
                     </div>
 
-                    <CardContent className="p-6 pt-2">
+                    {/* THÊM 'flex flex-col grow' vào CardContent để nó chiếm hết phần không gian còn lại */}
+                    <CardContent className="flex flex-col grow p-6 pt-2">
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">
                           Năm {project.year}
@@ -104,7 +108,6 @@ function ProjectsPage() {
                         <Rocket className="size-3 text-primary/20" />
                       </div>
                       
-                      {/* TIÊU ĐỀ CARD: Tự đảo màu */}
                       <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
                         {project.title}
                       </h3>
@@ -112,11 +115,12 @@ function ProjectsPage() {
                         {project.excerpt}
                       </p>
                       
+                      {/* Nhờ có phần grow ở trên, class mt-auto ở đây sẽ đẩy khối này xuống sát đáy */}
                       <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-50 dark:border-slate-800">
-                         <span className="text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase group-hover:text-primary transition-colors">Chi tiết dự án</span>
-                         <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                          <span className="text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase group-hover:text-primary transition-colors">Chi tiết dự án</span>
+                          <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                             <ArrowRight className="size-3.5" />
-                         </div>
+                          </div>
                       </div>
                     </CardContent>
                   </Card>
