@@ -67,11 +67,16 @@ function ActivitiesPage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {activities.map((act) => (
                 <div key={act.id} onClick={() => setSelectedAct(act)} className="group cursor-pointer">
-                  <Card className="h-full border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800">
-                    <div className="aspect-[16/10] overflow-hidden m-1.5 rounded-[1.5rem]">
+                  {/* THÊM 'flex flex-col' vào Card */}
+                  <Card className="flex flex-col h-full border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800">
+                    
+                    {/* THÊM 'shrink-0' để đảm bảo vùng chứa ảnh không bị co lại */}
+                    <div className="aspect-[16/10] overflow-hidden m-1.5 rounded-[1.5rem] shrink-0">
                       <img src={act.imageUrl} className="size-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
                     </div>
-                    <CardContent className="p-6 pt-2">
+                    
+                    {/* THÊM 'flex flex-col grow' vào CardContent */}
+                    <CardContent className="flex flex-col grow p-6 pt-2">
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">{act.date}</span>
                         <Sparkles className="size-3 text-primary/20" />
@@ -83,11 +88,12 @@ function ActivitiesPage() {
                       </h3>
                       <p className="text-slate-600 dark:text-slate-400 text-[11px] line-clamp-2 font-medium mb-5">{act.excerpt}</p>
                       
+                      {/* Thuộc tính mt-auto giờ sẽ hoạt động hoàn hảo */}
                       <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-50 dark:border-slate-800">
-                         <span className="text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase group-hover:text-primary transition-colors">Chi tiết</span>
-                         <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                          <span className="text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase group-hover:text-primary transition-colors">Chi tiết</span>
+                          <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                             <ArrowRight className="size-3.5" />
-                         </div>
+                          </div>
                       </div>
                     </CardContent>
                   </Card>
