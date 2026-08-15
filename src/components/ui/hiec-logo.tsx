@@ -19,11 +19,11 @@ export function HiecLogo({ isDark, className, showText = true }: HiecLogoProps) 
       </div>
 
       {showText && (
-        <div className="flex flex-col leading-[0.9]">
+        <div className="flex self-stretch flex-col justify-between leading-[0.9]">
           {/* Dòng 1: CÂU LẠC BỘ */}
           <span
             className={cn(
-              "text-[9px] uppercase font-black tracking-[0.2em] transition-colors duration-300",
+              "mt-1.5 text-[11px] uppercase font-black tracking-[0.2em] transition-colors duration-300",
               isDark 
                 ? "text-white/70" // Ép màu sáng
                 : "text-slate-500 dark:text-slate-400" // Tự động: Sáng xám - Tối xám nhạt
@@ -35,13 +35,13 @@ export function HiecLogo({ isDark, className, showText = true }: HiecLogoProps) 
           {/* Dòng 2: Sáng tạo & Khởi nghiệp */}
           <span
             className={cn(
-              "text-[15px] font-black uppercase tracking-tighter transition-colors duration-300 whitespace-nowrap",
+              "mb-0.5 text-[15px] font-black uppercase tracking-tighter transition-colors duration-300 whitespace-nowrap",
               isDark 
                 ? "text-white" // Ép màu sáng
                 : "text-[#0f3d3e] dark:text-white" // Tự động: Sáng Xanh Đen - Tối Trắng tinh
             )}
           >
-            Sáng tạo & Khởi nghiệp
+            Sáng tạo & Khởi nghiệp HUST
           </span>
         </div>
       )}
