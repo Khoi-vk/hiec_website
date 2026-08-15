@@ -114,55 +114,67 @@ function ProjectsManagementPage() {
 
   return (
     <div className="space-y-6 animate-fade-up text-left">
-      <div className="flex justify-between items-center border-b pb-6">
+      <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-6 transition-colors">
         <div>
-          <h1 className="text-2xl font-black uppercase tracking-tighter text-[#0f3d3e] flex items-center gap-2">
-            <Rocket className="text-blue-600 size-6" /> Quản lý Dự án
+          <h1 className="text-2xl font-black uppercase tracking-tighter text-[#0f3d3e] dark:text-white flex items-center gap-2 transition-colors">
+            <Rocket className="text-blue-600 dark:text-blue-400 size-6 transition-colors" /> Quản lý Dự án
           </h1>
-          <p className="text-xs text-muted-foreground mt-1 font-medium italic">Công bố những dự án đột phá của HIEC HUST.</p>
+          <p className="text-xs text-muted-foreground dark:text-slate-400 mt-1 font-medium italic transition-colors">
+            Công bố những dự án đột phá của HIEC HUST.
+          </p>
         </div>
         
-        {/* NÚT THÊM: ĐÃ SỬA CHỮ TRẮNG DỄ NHÌN */}
+        {/* NÚT THÊM */}
         <Button 
           onClick={() => { setEditingId(null); setFormData({title:"", year:"2025", excerpt:"", content:"", imageUrl:""}); setIsOpen(true); }} 
-          className="rounded-full font-black uppercase tracking-widest px-8 py-6 bg-[#0f3d3e] text-white hover:bg-[#1a4d4f] shadow-lg shadow-blue-900/20 transition-all active:scale-95"
+          className="rounded-full font-black uppercase tracking-widest px-8 py-6 bg-[#0f3d3e] dark:bg-cyan-700 text-white hover:bg-[#1a4d4f] dark:hover:bg-cyan-600 shadow-lg shadow-blue-900/20 dark:shadow-cyan-900/40 transition-all active:scale-95"
         >
-          <Plus className="mr-2 h-5 w-5 text-cyan-400" /> 
+          <Plus className="mr-2 h-5 w-5 text-cyan-400 dark:text-cyan-200" /> 
           THÊM DỰ ÁN
         </Button>
       </div>
 
-      <Card className="rounded-[2rem] border-none shadow-md overflow-hidden bg-white">
+      <Card className="rounded-[2rem] border-none shadow-md overflow-hidden bg-white dark:bg-slate-900 transition-colors">
         <CardContent className="p-0">
           <Table>
-            <TableHeader className="bg-slate-50">
-              <TableRow>
-                <TableHead className="font-bold pl-8 py-4 text-[#0f3d3e]">Ảnh bìa</TableHead>
-                <TableHead className="font-bold text-[#0f3d3e]">Tên dự án</TableHead>
-                <TableHead className="font-bold text-center text-[#0f3d3e]">Năm</TableHead>
-                <TableHead className="text-right pr-8 font-bold text-[#0f3d3e]">Thao tác</TableHead>
+            <TableHeader className="bg-slate-50 dark:bg-slate-950/50 transition-colors">
+              <TableRow className="border-none">
+                <TableHead className="font-bold pl-8 py-4 text-[#0f3d3e] dark:text-slate-300">Ảnh bìa</TableHead>
+                <TableHead className="font-bold text-[#0f3d3e] dark:text-slate-300">Tên dự án</TableHead>
+                <TableHead className="font-bold text-center text-[#0f3d3e] dark:text-slate-300">Năm</TableHead>
+                <TableHead className="text-right pr-8 font-bold text-[#0f3d3e] dark:text-slate-300">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow><TableCell colSpan={4} className="text-center py-20"><Loader2 className="animate-spin mx-auto text-blue-600" /></TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-center py-20"><Loader2 className="animate-spin mx-auto text-blue-600 dark:text-blue-400" /></TableCell></TableRow>
               ) : projects.map((p) => (
-                <TableRow key={p.id} className="hover:bg-slate-50/50 transition-colors border-b border-slate-50">
+                <TableRow key={p.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-50 dark:border-slate-800/50">
                   <TableCell className="pl-8">
-                    <div className="size-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm">
+                    <div className="size-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">
                       <img src={p.imageUrl || "https://via.placeholder.com/150"} className="w-full h-full object-cover" alt="" />
                     </div>
                   </TableCell>
-                  <TableCell className="font-bold text-[#1a2e35] uppercase tracking-tight text-sm">{p.title}</TableCell>
+                  <TableCell className="font-bold text-[#1a2e35] dark:text-slate-100 uppercase tracking-tight text-sm transition-colors">{p.title}</TableCell>
                   <TableCell className="text-center">
-                    <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">{p.year}</span>
+                    <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-[10px] font-black uppercase transition-colors">{p.year}</span>
                   </TableCell>
                   <TableCell className="text-right pr-8">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => { setFormData(p); setEditingId(p.id); setIsOpen(true); }} className="rounded-xl hover:bg-blue-50 hover:text-blue-600">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => { setFormData(p); setEditingId(p.id); setIsOpen(true); }} 
+                        className="rounded-xl text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
+                      >
                         <Pencil className="size-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(p.id)} className="rounded-xl hover:bg-red-50 hover:text-red-600">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDelete(p.id)} 
+                        className="rounded-xl text-slate-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all"
+                      >
                         <Trash2 className="size-4" />
                       </Button>
                     </div>
@@ -171,7 +183,7 @@ function ProjectsManagementPage() {
               ))}
             </TableBody>
           </Table>
-          {projects.length === 0 && !loading && <p className="text-center py-20 text-slate-400 text-sm font-medium">Chưa có dự án nào được đăng tải.</p>}
+          {projects.length === 0 && !loading && <p className="text-center py-20 text-slate-400 dark:text-slate-500 text-sm font-medium transition-colors">Chưa có dự án nào được đăng tải.</p>}
         </CardContent>
       </Card>
 
@@ -184,52 +196,81 @@ function ProjectsManagementPage() {
       >
         <div className="space-y-4 py-4 max-h-[75vh] overflow-y-auto pr-2 custom-scrollbar">
           <div className="space-y-1 text-left">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Tên dự án chiến lược</label>
-            <Input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="VD: Startup Bootcamp 2025..." className="rounded-xl bg-slate-50 border-none h-12 font-bold text-[#0f3d3e]" />
+            <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest pl-1 transition-colors">Tên dự án chiến lược</label>
+            <Input 
+              value={formData.title} 
+              onChange={e => setFormData({...formData, title: e.target.value})} 
+              placeholder="VD: Startup Bootcamp 2025..." 
+              className="rounded-xl bg-slate-50 dark:bg-slate-900 border-none h-12 font-bold text-[#0f3d3e] dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-colors" 
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-left">
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Năm triển khai</label>
-              <Input placeholder="2025" value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} className="rounded-xl bg-slate-50 border-none h-12" />
+              <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest pl-1 transition-colors">Năm triển khai</label>
+              <Input 
+                placeholder="2025" 
+                value={formData.year} 
+                onChange={e => setFormData({...formData, year: e.target.value})} 
+                className="rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-none h-12 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-colors" 
+              />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Tải ảnh dự án</label>
-              <Input type="file" accept="image/*" onChange={handleFileUpload} className="rounded-xl bg-slate-50 border-none h-12 text-xs pt-3 cursor-pointer" />
+              <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest pl-1 transition-colors">Tải ảnh dự án</label>
+              <Input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleFileUpload} 
+                className="rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-none h-12 text-xs pt-3 cursor-pointer transition-colors" 
+              />
             </div>
           </div>
 
           {formData.imageUrl && (
-            <div className="relative aspect-video rounded-3xl overflow-hidden border-2 border-blue-100 shadow-xl group">
+            <div className="relative aspect-video rounded-3xl overflow-hidden border-2 border-blue-100 dark:border-blue-900/50 shadow-xl group transition-colors">
                <img src={formData.imageUrl} className="w-full h-full object-cover" alt="Preview" />
-               <button type="button" onClick={() => setFormData({...formData, imageUrl: ""})} className="absolute top-4 right-4 bg-white/90 backdrop-blur rounded-full p-2 text-red-500 shadow-lg hover:bg-red-500 hover:text-white transition-all">
+               <button 
+                 type="button" 
+                 onClick={() => setFormData({...formData, imageUrl: ""})} 
+                 className="absolute top-4 right-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded-full p-2 text-red-500 shadow-lg hover:bg-red-500 hover:text-white transition-all"
+               >
                  <X className="size-5" />
                </button>
             </div>
           )}
 
           <div className="space-y-1 text-left">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Mô tả ngắn (Danh sách)</label>
-            <Textarea value={formData.excerpt} onChange={e => setFormData({...formData, excerpt: e.target.value})} placeholder="Viết 1-2 câu giới thiệu..." className="rounded-xl bg-slate-50 border-none min-h-[80px]" />
+            <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest pl-1 transition-colors">Mô tả ngắn (Danh sách)</label>
+            <Textarea 
+              value={formData.excerpt} 
+              onChange={e => setFormData({...formData, excerpt: e.target.value})} 
+              placeholder="Viết 1-2 câu giới thiệu..." 
+              className="rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 border-none min-h-[80px] transition-colors" 
+            />
           </div>
 
           <div className="space-y-1 text-left">
-            <label className="text-[10px] font-black uppercase text-blue-600 tracking-widest pl-1">Hành trình chi tiết</label>
-            <Textarea value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} placeholder="Kể về dự án tại đây..." className="min-h-[200px] rounded-2xl bg-slate-50 border-none p-4" />
+            <label className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-widest pl-1 transition-colors">Hành trình chi tiết</label>
+            <Textarea 
+              value={formData.content} 
+              onChange={e => setFormData({...formData, content: e.target.value})} 
+              placeholder="Kể về dự án tại đây..." 
+              className="min-h-[200px] rounded-2xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 border-none p-4 transition-colors" 
+            />
           </div>
 
-        <Button 
-            className="w-full py-8 font-black uppercase tracking-[0.2em] rounded-2xl text-white bg-[#0f3d3e] hover:bg-[#1a2e35] shadow-xl shadow-cyan-900/20 transition-all hover:scale-[1.01] active:scale-95 border-none mt-4" 
-            onClick={handleSubmit} 
-            disabled={isSubmitting}
-        >
-            {isSubmitting ? (
-                <Loader2 className="animate-spin mr-2 h-5 w-5" />
-            ) : (
-                <Save className="mr-2 h-5 w-5 text-cyan-400" /> 
-            )}
-            {editingId ? "CẬP NHẬT DỰ ÁN" : "ĐĂNG DỰ ÁN LÊN WEB"}
-        </Button>
+          <Button 
+              className="w-full py-8 font-black uppercase tracking-[0.2em] rounded-2xl text-white bg-[#0f3d3e] dark:bg-cyan-700 hover:bg-[#1a2e35] dark:hover:bg-cyan-600 shadow-xl shadow-cyan-900/20 dark:shadow-cyan-900/40 transition-all hover:scale-[1.01] active:scale-95 border-none mt-4" 
+              onClick={handleSubmit} 
+              disabled={isSubmitting}
+          >
+              {isSubmitting ? (
+                  <Loader2 className="animate-spin mr-2 h-5 w-5" />
+              ) : (
+                  <Save className="mr-2 h-5 w-5 text-cyan-400 dark:text-cyan-200" /> 
+              )}
+              {editingId ? "CẬP NHẬT DỰ ÁN" : "ĐĂNG DỰ ÁN LÊN WEB"}
+          </Button>
         </div>
       </Modal>
     </div>
