@@ -93,12 +93,8 @@ function RegistrationsPage() {
       {/* 1. BANNER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100 dark:border-slate-800 pb-8 pt-2">
         <div className="flex-shrink-0">
-          <Badge className="bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-400 border-none mb-2 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.2em]">
-            Database Management
-          </Badge>
-          <h1 className="font-display text-6xl md:text-7xl font-black text-[#0f3d3e] dark:text-white uppercase tracking-tighter leading-[0.8] transition-colors">
-            Đăng ký
-          </h1>
+          
+          
         </div>
 
         <div className="w-full md:max-w-xl md:border-l-2 border-cyan-500/20 dark:border-cyan-500/10 md:pl-8 flex flex-col gap-4">
