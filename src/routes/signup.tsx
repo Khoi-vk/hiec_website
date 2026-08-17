@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as React from "react";
-import { ArrowLeft, CheckCircle, Home, LogIn, Loader2 } from "lucide-react";
+import { ArrowLeft, CheckCircle, Home, Loader2, ChevronDown } from "lucide-react";
+
 import { HomePage } from "./index";
 
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,12 @@ export const Route = createFileRoute("/signup")({
   component: SignupPage,
 });
 
+const audienceOptions = [
+  "Sinh viên",
+  "Phụ huynh",
+  "Doanh nghiệp",
+] as const;
+
 function SignupPage() {
   const navigate = useNavigate();
   const [isSubmitted, setIsSubmitted] = React.useState(false);
@@ -35,33 +42,50 @@ function SignupPage() {
 
   const onSubmit = async (values: SignupValues) => {
     try {
-      const { error } = await supabase
-        .from("applications")
-        .insert([
-          {
-            fullName: values.fullName,
-            studentId: values.studentId,
-            university: values.university,
-            major: values.major,
-            email: values.email,
-            phone: values.phone,
-            motivation: "Đăng ký nhận thông tin", // Gửi giá trị mặc định vì đã xóa ô nhập
-            status: "pending",
-          },
-        ]);
+      // Kiểm tra email đã đăng ký hay chưa
+      const { data: existingApplication, error: checkError } =
+        await supabase
+          .from("applications")
+          .select("id")
+          .eq("email", values.email.trim().toLowerCase())
+          .maybeSingle();
 
-      if (error) {
-        console.error("Lỗi khi lưu lên Supabase:", error);
-        toast.error("Gửi đơn thất bại!", {
+      if (checkError) {
+        console.error("Lỗi kiểm tra email:", checkError);
+
+        toast.error("Không thể kiểm tra thông tin", {
           description: "Hệ thống đang bận, vui lòng thử lại sau.",
         });
+
         return;
       }
 
-      toast.success("Gửi đơn thành công!");
+      if (existingApplication) {
+        toast.error("Email này đã đăng ký nhận thông tin.");
+        return;
+      }
+
+      // Lưu đăng ký mới
+      const { error } = await supabase.from("applications").insert({
+        full_name: values.fullName.trim(),
+        email: values.email.trim().toLowerCase(),
+        audience: values.audience,
+      });
+
+      if (error) {
+        console.error("Lỗi khi lưu lên Supabase:", error);
+
+        toast.error("Đăng ký thất bại!", {
+          description: "Hệ thống đang bận, vui lòng thử lại sau.",
+        });
+
+        return;
+      }
+
       setIsSubmitted(true);
-    } catch (e) {
-      console.error("Lỗi hệ thống không xác định:", e);
+    } catch (error) {
+      console.error("Lỗi hệ thống:", error);
+
       toast.error("Đã xảy ra lỗi!", {
         description: "Vui lòng kiểm tra lại kết nối mạng.",
       });
@@ -79,7 +103,7 @@ function SignupPage() {
       <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/40 backdrop-blur-md">
         <div className="min-h-full px-4 py-6 flex items-center justify-center">
 
-          {/* CARD FORM - Thu nhỏ lại thành max-w-lg cho đẹp và không tràn */}
+          {/* CARD */}
           <div className="relative w-full max-w-lg rounded-[2.5rem] bg-card p-6 sm:p-10 shadow-2xl border border-white/20">
 
             {/* NÚT QUAY LẠI */}
@@ -93,104 +117,143 @@ function SignupPage() {
             </button>
 
             {isSubmitted ? (
-              /* GIAO DIỆN SAU KHI NỘP - GIỮ NGUYÊN NỘI DUNG CỦA ÔNG */
+              /* =========================
+                 MÀN ĐĂNG KÝ THÀNH CÔNG
+                 ========================= */
               <div className="py-6 text-center animate-fade-up">
                 <div className="size-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="size-12" />
                 </div>
-                <h1 className="font-display text-3xl font-black text-[#0f3d3e] mb-4 uppercase tracking-tighter">
-                  Chúc mừng bạn đã gửi đơn thành công!
+
+                <h1 className="font-display text-3xl font-black text-[#0f3d3e] mb-4 tracking-tight">
+                  Đăng ký nhận tin thành công!
                 </h1>
-                <div className="space-y-4 mb-10 text-slate-500 leading-relaxed text-left">
-                  <p className="text-lg font-medium text-center">
-                    Cảm ơn bạn đã quan tâm đến HIEC!
-                  </p>
-                  <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 space-y-3">
-                    <p className="text-sm">
-                      1. Đơn đăng kí nhận thông tin của bạn đã được chuyển tới Ban Nhân sự - Sự kiện.
-                    </p>
-                    <p className="text-sm">
-                      2. CLB sẽ gửi thông tin đến bạn qua{" "}
-                      <strong>Email</strong> hoặc{" "}
-                      <strong>Số điện thoại.</strong>
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 gap-3">
-                  <Button
-                    variant="shimmer"
-                    className="py-7 rounded-2xl font-black uppercase tracking-widest bg-[#0f3d3e] text-white"
-                    onClick={() => navigate({ to: "/" })}
-                  >
-                    <Home className="size-5 mr-2" />
-                    Quay lại trang chủ
-                  </Button>
-                </div>
+
+                <p className="text-lg font-medium text-slate-500 leading-relaxed mb-10">
+                  Cảm ơn bạn đã quan tâm đến HIEC!
+                </p>
+
+                <Button
+                  variant="shimmer"
+                  className="w-full py-7 rounded-2xl font-black uppercase tracking-widest bg-[#0f3d3e] text-white"
+                  onClick={() => navigate({ to: "/" })}
+                >
+                  <Home className="size-5 mr-2" />
+                  Quay lại trang chủ
+                </Button>
               </div>
             ) : (
-              /* FORM ĐĂNG KÝ */
+              /* =========================
+                 FORM ĐĂNG KÝ NHẬN THÔNG TIN
+                 ========================= */
               <>
                 <div className="mb-8 text-center">
                   <h1 className="font-display text-2xl font-black tracking-tight text-[#0f3d3e] uppercase">
-                    ĐĂNG KÍ NHẬN THÔNG TIN TỪ HIEC
+                    ĐĂNG KÝ NHẬN THÔNG TIN
                   </h1>
+
                   <p className="text-slate-400 text-xs font-bold mt-2 italic">
                     Hãy để chúng mình giúp bạn hiểu rõ hơn về HIEC nhé!
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="space-y-5"
+                >
+                  {/* HỌ VÀ TÊN */}
                   <div className="space-y-1.5 text-left">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Họ và tên</Label>
-                    <Input {...register("fullName")} placeholder="Nguyễn Văn A" className="rounded-xl bg-slate-50 border-none h-11 font-bold" />
+                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">
+                      Họ và tên{" "}
+                      <span className="text-red-500">*</span>
+                    </Label>
+
+                    <Input
+                      {...register("fullName")}
+                      placeholder="Nguyễn Văn A"
+                      className="rounded-xl bg-slate-50 border-none h-11 font-bold"
+                    />
+
                     <FieldError message={errors.fullName?.message} />
                   </div>
 
+                  {/* EMAIL */}
                   <div className="space-y-1.5 text-left">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Mã số sinh viên</Label>
-                    <Input {...register("studentId")} placeholder="202xxxxxx" className="rounded-xl bg-slate-50 border-none h-11 font-bold" />
-                    <FieldError message={errors.studentId?.message} />
+                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">
+                      Email{" "}
+                      <span className="text-red-500">*</span>
+                    </Label>
+
+                    <Input
+                      {...register("email")}
+                      type="email"
+                      placeholder="name@example.com"
+                      className="rounded-xl bg-slate-50 border-none h-11 font-bold"
+                    />
+
+                    <FieldError message={errors.email?.message} />
                   </div>
 
+                  {/* ĐỐI TƯỢNG */}
                   <div className="space-y-1.5 text-left">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Trường đại học</Label>
-                    <Input {...register("university")} placeholder="Đại học Bách Khoa Hà Nội" className="rounded-xl bg-slate-50 border-none h-11 font-bold" />
-                    <FieldError message={errors.university?.message} />
-                  </div>
+                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">
+                      Đối tượng{" "}
+                      <span className="text-red-500">*</span>
+                    </Label>
 
-                  <div className="space-y-1.5 text-left">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Ngành học</Label>
-                    <Input {...register("major")} placeholder="Khoa học máy tính" className="rounded-xl bg-slate-50 border-none h-11 font-bold" />
-                    <FieldError message={errors.major?.message} />
-                  </div>
+                    <div className="relative">
+                      <select
+                        {...register("audience")}
+                        defaultValue=""
+                        className={`w-full h-11 appearance-none rounded-xl bg-slate-50 border-none px-3 pr-10 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/30 ${
+                          !errors.audience
+                            ? "text-slate-700"
+                            : "text-slate-700"
+                        }`}
+                      >
+                        <option value="" disabled>
+                          Chọn đối tượng
+                        </option>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5 text-left">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Email cá nhân</Label>
-                      <Input {...register("email")} type="email" placeholder="name@example.com" className="rounded-xl bg-slate-50 border-none h-11 font-bold" />
-                      <FieldError message={errors.email?.message} />
+                        {audienceOptions.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
                     </div>
 
-                    <div className="space-y-1.5 text-left">
-                      <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">Số điện thoại</Label>
-                      <Input {...register("phone")} placeholder="0xxxxxxxxx" className="rounded-xl bg-slate-50 border-none h-11 font-bold" />
-                      <FieldError message={errors.phone?.message} />
-                    </div>
+                    <FieldError message={errors.audience?.message} />
                   </div>
 
-                  <div className="pt-4">
+                  {/* XÁC NHẬN */}
+                  <p className="pt-2 text-center text-[10px] leading-5 text-slate-400 font-bold">
+                    Khi ấn vào nút đăng ký, bạn đồng ý với việc nhận tin từ
+                    chúng tôi qua email.
+                  </p>
+
+                  {/* BUTTON */}
+                  <div className="pt-2">
                     <Button
                       type="submit"
-                      disabled={isSubmitting}
-                      className={`w-full py-8 text-base font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all cursor-pointer ${
-                        isValid ? "bg-[#0f3d3e] text-white hover:bg-[#1a2e35]" : "bg-slate-100 text-slate-400"
+                      disabled={!isValid || isSubmitting}
+                      className={`w-full py-8 text-base font-black uppercase tracking-[0.15em] rounded-2xl shadow-xl transition-all ${
+                        isValid && !isSubmitting
+                          ? "bg-[#0f3d3e] text-white hover:bg-[#1a2e35]"
+                          : "bg-slate-100 text-slate-400 cursor-not-allowed"
                       }`}
                     >
-                      {isSubmitting ? <Loader2 className="animate-spin size-5" /> : "Nộp đơn đăng kí ngay"}
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="animate-spin size-5 mr-2" />
+                          Đang đăng ký...
+                        </>
+                      ) : (
+                        "Đăng ký nhận tin"
+                      )}
                     </Button>
-                    <p className="text-center text-[10px] text-slate-400 font-bold uppercase mt-4">
-                      Khi ấn vào nút đăng ký, bạn đồng ý với việc nhận tin từ chúng tôi qua email.
-                    </p>
                   </div>
                 </form>
               </>

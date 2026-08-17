@@ -5,12 +5,19 @@ import * as z from "zod";
  * Không cần mật khẩu và lý do tham gia theo ý ông.
  */
 export const signupSchema = z.object({
-  fullName: z.string().min(2, "Vui lòng nhập họ tên"),
-  studentId: z.string().min(5, "Vui lòng nhập MSSV"),
-  university: z.string().min(2, "Vui lòng nhập tên trường"),
-  major: z.string().min(2, "Vui lòng nhập ngành học"),
-  email: z.string().email("Email không hợp lệ"),
-  phone: z.string().min(10, "Số điện thoại không hợp lệ"),
+  fullName: z
+    .string()
+    .trim()
+    .min(5, "Định dạng tên không hợp lệ"),
+
+  email: z
+    .string()
+    .trim()
+    .email("Định dạng email không hợp lệ"),
+
+  audience: z
+    .string()
+    .min(1, "Vui lòng chọn đối tượng"),
 });
 
 /**
