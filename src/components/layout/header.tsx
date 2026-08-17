@@ -64,7 +64,7 @@ export function Header() {
             ) : (
               <>
                 <Button variant="default" size="sm" onClick={() => navigate({ to: "/signup" })}>
-                  <UserPlus className="mr-2 size-4" /> Tham gia
+                  <UserPlus className="mr-2 size-4" /> Theo dõi
                 </Button>
                 <Button variant="default" size="sm" onClick={() => navigate({ to: "/login" })}>
                   <LogIn className="mr-2 size-4" /> Đăng nhập
