@@ -4,9 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as React from "react";
 import { ArrowLeft, CheckCircle, Home, Loader2, ChevronDown } from "lucide-react";
-
 import { HomePage } from "./index";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
