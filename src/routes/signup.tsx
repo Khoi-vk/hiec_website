@@ -189,7 +189,7 @@ function SignupPage() {
                       {isSubmitting ? <Loader2 className="animate-spin size-5" /> : "Nộp đơn đăng kí ngay"}
                     </Button>
                     <p className="text-center text-[10px] text-slate-400 font-bold uppercase mt-4">
-                      Dữ liệu của bạn sẽ được bảo mật bởi HIEC.
+                      Khi ấn vào nút đăng ký, bạn đồng ý với việc nhận tin từ chúng tôi qua email.
                     </p>
                   </div>
                 </form>
