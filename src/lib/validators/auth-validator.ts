@@ -4,6 +4,7 @@ import * as z from "zod";
  * 1. Schema dành cho trang Nộp đơn (Signup)
  * Không cần mật khẩu và lý do tham gia theo ý ông.
  */
+
 export const signupSchema = z.object({
   fullName: z
     .string()
