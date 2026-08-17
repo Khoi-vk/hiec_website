@@ -64,24 +64,40 @@ function SignupPage() {
       
       setIsSubmitted(true);
 
-      // Lưu đăng ký mới
-      const { error } = await supabase.from("applications").insert({
-        full_name: values.fullName.trim(),
-        email: values.email.trim().toLowerCase(),
-        audience: values.audience,
-      });
-
-      if (error) {
-        console.error("Lỗi khi lưu lên Supabase:", error);
-
-        toast.error("Đăng ký thất bại!", {
-          description: "Hệ thống đang bận, vui lòng thử lại sau.",
-        });
-
-        return;
-      }
-
-      setIsSubmitted(true);
+      const onSubmit = async (values: SignupValues) => {
+        try {
+          const { error } = await supabase
+            .from("applications")
+            .insert({
+              full_name: values.fullName.trim(),
+              email: values.email.trim().toLowerCase(),
+              audience: values.audience,
+            });
+      
+          if (error) {
+            console.error("Lỗi khi lưu lên Supabase:", error);
+      
+            if (error.code === "23505") {
+              toast.error("Email này đã đăng ký nhận thông tin.");
+              return;
+            }
+      
+            toast.error("Đăng ký thất bại!", {
+              description: "Hệ thống đang bận, vui lòng thử lại sau.",
+            });
+      
+            return;
+          }
+      
+          setIsSubmitted(true);
+        } catch (error) {
+          console.error("Lỗi hệ thống:", error);
+      
+          toast.error("Đã xảy ra lỗi!", {
+            description: "Vui lòng kiểm tra lại kết nối mạng.",
+          });
+        }
+      };
     } catch (error) {
       console.error("Lỗi hệ thống:", error);
 
