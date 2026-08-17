@@ -41,27 +41,28 @@ function SignupPage() {
   const onSubmit = async (values: SignupValues) => {
     try {
       // Kiểm tra email đã đăng ký hay chưa
-      const { data: existingApplication, error: checkError } =
-        await supabase
-          .from("applications")
-          .select("id")
-          .eq("email", values.email.trim().toLowerCase())
-          .maybeSingle();
-
-      if (checkError) {
-        console.error("Lỗi kiểm tra email:", checkError);
-
-        toast.error("Không thể kiểm tra thông tin", {
+      const { error } = await supabase.from("applications").insert({
+        full_name: values.fullName.trim(),
+        email: values.email.trim().toLowerCase(),
+        audience: values.audience,
+      });
+      
+      if (error) {
+        console.error("Lỗi khi lưu lên Supabase:", error);
+      
+        if (error.code === "23505") {
+          toast.error("Email này đã đăng ký nhận thông tin.");
+          return;
+        }
+      
+        toast.error("Đăng ký thất bại!", {
           description: "Hệ thống đang bận, vui lòng thử lại sau.",
         });
-
+      
         return;
       }
-
-      if (existingApplication) {
-        toast.error("Email này đã đăng ký nhận thông tin.");
-        return;
-      }
+      
+      setIsSubmitted(true);
 
       // Lưu đăng ký mới
       const { error } = await supabase.from("applications").insert({
