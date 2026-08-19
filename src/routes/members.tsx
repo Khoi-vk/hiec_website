@@ -100,18 +100,14 @@ function MembersPage() {
 
                     {/* NỘI DUNG CARD: Có 'grow' để đẩy footer xuống đáy */}
                     <CardContent className="flex flex-col grow p-6 pt-3">
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-900/30 px-2 py-0.5 rounded transition-colors uppercase tracking-widest">
-                          {member.position}
-                        </span>
-                      </div>
                       
-                      <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors leading-tight uppercase tracking-tighter mb-1 line-clamp-2">
+                      
+                      <h3 className="font-sans text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors leading-snug tracking-normal mb-1.5 line-clamp-2">
                         {member.fullName}
                       </h3>
                       
-                      <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium mb-5">
-                        Ban: {member.department}
+                      <p className="text-slate-600 dark:text-slate-300 text-sm font-semibold mb-5">
+                        {member.department}
                       </p>
                       
                       {/* FOOTER NẰM DƯỚI CÙNG (nhờ mt-auto) */}
