@@ -9,21 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/auth/field-error";
-import {
-  signupSchema,
-  type SignupValues,
-} from "@/lib/validators/auth-validator";
+import { signupSchema, type SignupValues } from "@/lib/validators/auth-validator";
 import { supabase } from "@/utils/supabase";
 
 export const Route = createFileRoute("/signup")({
   component: SignupPage,
 });
 
-const audienceOptions = [
-  "Sinh viên",
-  "Phụ huynh",
-  "Doanh nghiệp",
-] as const;
+const audienceOptions = ["Sinh viên", "Phụ huynh", "Doanh nghiệp"] as const;
 
 function SignupPage() {
   const navigate = useNavigate();
@@ -46,58 +39,23 @@ function SignupPage() {
         email: values.email.trim().toLowerCase(),
         audience: values.audience,
       });
-      
+
       if (error) {
         console.error("Lỗi khi lưu lên Supabase:", error);
-      
+
         if (error.code === "23505") {
           toast.error("Email này đã đăng ký nhận thông tin.");
           return;
         }
-      
+
         toast.error("Đăng ký thất bại!", {
           description: "Hệ thống đang bận, vui lòng thử lại sau.",
         });
-      
+
         return;
       }
-      
-      setIsSubmitted(true);
 
-      const onSubmit = async (values: SignupValues) => {
-        try {
-          const { error } = await supabase
-            .from("applications")
-            .insert({
-              full_name: values.fullName.trim(),
-              email: values.email.trim().toLowerCase(),
-              audience: values.audience,
-            });
-      
-          if (error) {
-            console.error("Lỗi khi lưu lên Supabase:", error);
-      
-            if (error.code === "23505") {
-              toast.error("Email này đã đăng ký nhận thông tin.");
-              return;
-            }
-      
-            toast.error("Đăng ký thất bại!", {
-              description: "Hệ thống đang bận, vui lòng thử lại sau.",
-            });
-      
-            return;
-          }
-      
-          setIsSubmitted(true);
-        } catch (error) {
-          console.error("Lỗi hệ thống:", error);
-      
-          toast.error("Đã xảy ra lỗi!", {
-            description: "Vui lòng kiểm tra lại kết nối mạng.",
-          });
-        }
-      };
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Lỗi hệ thống:", error);
 
@@ -117,15 +75,13 @@ function SignupPage() {
       {/* LỚP PHỦ MỜ */}
       <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/40 backdrop-blur-md">
         <div className="min-h-full px-4 py-6 flex items-center justify-center">
-
           {/* CARD */}
           <div className="relative w-full max-w-lg rounded-[2.5rem] bg-card p-6 sm:p-10 shadow-2xl border border-white/20">
-
             {/* NÚT QUAY LẠI */}
             <button
               type="button"
               onClick={() => navigate({ to: "/" })}
-              className="mb-6 inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-[#0f3d3e] transition-colors"
+              className="mb-6 inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-[#0f3d3e] dark:hover:text-primary transition-colors"
             >
               <ArrowLeft className="size-3" />
               Quay lại trang chủ
@@ -140,11 +96,11 @@ function SignupPage() {
                   <CheckCircle className="size-12" />
                 </div>
 
-                <h1 className="font-display text-3xl font-black text-[#0f3d3e] mb-4 tracking-tight">
+                <h1 className="font-display text-3xl font-black text-[#0f3d3e] dark:text-white mb-4 tracking-tight">
                   Đăng ký nhận tin thành công!
                 </h1>
 
-                <p className="text-lg font-medium text-slate-500 leading-relaxed mb-10">
+                <p className="text-lg font-medium text-slate-500 dark:text-slate-300 leading-relaxed mb-10">
                   Cảm ơn bạn đã quan tâm đến HIEC!
                 </p>
 
@@ -163,30 +119,26 @@ function SignupPage() {
                  ========================= */
               <>
                 <div className="mb-8 text-center">
-                  <h1 className="font-display text-2xl font-black tracking-tight text-[#0f3d3e] uppercase">
+                  <h1 className="font-display text-2xl font-black tracking-tight text-[#0f3d3e] dark:text-white uppercase">
                     ĐĂNG KÝ NHẬN THÔNG TIN
                   </h1>
 
-                  <p className="text-slate-400 text-xs font-bold mt-2 italic">
+                  <p className="text-slate-400 dark:text-slate-300 text-xs font-bold mt-2 italic">
                     Hãy để chúng mình giúp bạn hiểu rõ hơn về HIEC nhé!
                   </p>
                 </div>
 
-                <form
-                  onSubmit={handleSubmit(onSubmit)}
-                  className="space-y-5"
-                >
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                   {/* HỌ VÀ TÊN */}
                   <div className="space-y-1.5 text-left">
                     <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">
-                      Họ và tên{" "}
-                      <span className="text-red-500">*</span>
+                      Họ và tên <span className="text-red-500">*</span>
                     </Label>
 
                     <Input
                       {...register("fullName")}
                       placeholder="Nguyễn Văn A"
-                      className="rounded-xl bg-slate-50 border-none h-11 font-bold"
+                      className="rounded-xl bg-slate-50 text-slate-900 placeholder:text-slate-400 border-none h-11 font-bold"
                     />
 
                     <FieldError message={errors.fullName?.message} />
@@ -195,15 +147,14 @@ function SignupPage() {
                   {/* EMAIL */}
                   <div className="space-y-1.5 text-left">
                     <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">
-                      Email{" "}
-                      <span className="text-red-500">*</span>
+                      Email <span className="text-red-500">*</span>
                     </Label>
 
                     <Input
                       {...register("email")}
                       type="email"
                       placeholder="name@example.com"
-                      className="rounded-xl bg-slate-50 border-none h-11 font-bold"
+                      className="rounded-xl bg-slate-50 text-slate-900 placeholder:text-slate-400 border-none h-11 font-bold"
                     />
 
                     <FieldError message={errors.email?.message} />
@@ -212,26 +163,21 @@ function SignupPage() {
                   {/* ĐỐI TƯỢNG */}
                   <div className="space-y-1.5 text-left">
                     <Label className="text-[10px] font-black uppercase text-slate-400 ml-1">
-                      Đối tượng{" "}
-                      <span className="text-red-500">*</span>
+                      Đối tượng <span className="text-red-500">*</span>
                     </Label>
 
                     <div className="relative">
                       <select
                         {...register("audience")}
                         defaultValue=""
-                        className={`w-full h-11 appearance-none rounded-xl bg-slate-50 border-none px-3 pr-10 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/30 ${
-                          !errors.audience
-                            ? "text-slate-700"
-                            : "text-slate-700"
-                        }`}
+                        className="w-full h-11 appearance-none rounded-xl bg-slate-50 border-none px-3 pr-10 text-sm font-bold text-slate-900 outline-none focus:ring-2 focus:ring-primary/30"
                       >
-                        <option value="" disabled>
+                        <option value="" disabled className="text-slate-400">
                           Chọn đối tượng
                         </option>
 
                         {audienceOptions.map((option) => (
-                          <option key={option} value={option}>
+                          <option key={option} value={option} className="text-slate-900">
                             {option}
                           </option>
                         ))}
@@ -245,8 +191,7 @@ function SignupPage() {
 
                   {/* XÁC NHẬN */}
                   <p className="pt-2 text-center text-[10px] leading-5 text-slate-400 font-bold">
-                    Khi ấn vào nút đăng ký, bạn đồng ý với việc nhận tin từ
-                    chúng tôi qua email.
+                    Khi ấn vào nút đăng ký, bạn đồng ý với việc nhận tin từ chúng tôi qua email.
                   </p>
 
                   {/* BUTTON */}
