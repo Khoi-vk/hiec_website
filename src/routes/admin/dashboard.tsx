@@ -1,7 +1,15 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Eye, FileText, TrendingUp, UserPlus } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { adminStats, trafficData } from "@/services/hiec-service";
@@ -31,12 +39,13 @@ function DashboardPage() {
 
   React.useEffect(() => {
     async function fetchDashboardCounts() {
-      const [membersResult, projectsResult, activitiesResult, applicationsResult] = await Promise.all([
-        supabase.from("members").select("*", { count: "exact", head: true }),
-        supabase.from("projects").select("*", { count: "exact", head: true }),
-        supabase.from("activities").select("*", { count: "exact", head: true }),
-        supabase.from("applications").select("*", { count: "exact", head: true }),
-      ]);
+      const [membersResult, projectsResult, activitiesResult, applicationsResult] =
+        await Promise.all([
+          supabase.from("members").select("*", { count: "exact", head: true }),
+          supabase.from("projects").select("*", { count: "exact", head: true }),
+          supabase.from("activities").select("*", { count: "exact", head: true }),
+          supabase.from("applications").select("*", { count: "exact", head: true }),
+        ]);
 
       if (!membersResult.error) setMemberCount(membersResult.count ?? 0);
       if (!projectsResult.error && !activitiesResult.error) {
@@ -83,9 +92,17 @@ function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <p className="font-display text-2xl font-bold">
-                  {isContentStat ? (contentCount ?? "—") : isMemberStat ? (memberCount ?? "—") : isApplicationStat ? (applicationCount ?? "—") : stat.value}
+                  {isContentStat
+                    ? (contentCount ?? "—")
+                    : isMemberStat
+                      ? (memberCount ?? "—")
+                      : isApplicationStat
+                        ? (applicationCount ?? "—")
+                        : stat.value}
                 </p>
-                {!isContentStat && !isMemberStat && <p className="mt-1 text-xs text-success">{stat.delta}</p>}
+                {!isContentStat && !isMemberStat && !isApplicationStat && (
+                  <p className="mt-1 text-xs text-success">{stat.delta}</p>
+                )}
               </CardContent>
             </Card>
           );
@@ -122,7 +139,6 @@ function DashboardPage() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
       </div>
     </div>
   );
