@@ -38,34 +38,62 @@ function DashboardPage() {
   const [applicationCount, setApplicationCount] = React.useState<number | null>(null);
 
   React.useEffect(() => {
-    async function fetchDashboardCounts() {
-      const [membersResult, projectsResult, activitiesResult, applicationsResult] =
-        await Promise.all([
-          supabase.from("members").select("*", { count: "exact", head: true }),
-          supabase.from("projects").select("*", { count: "exact", head: true }),
-          supabase.from("activities").select("*", { count: "exact", head: true }),
-          supabase.from("applications").select("*", { count: "exact", head: true }),
-        ]);
+    let isMounted = true;
 
-      if (!membersResult.error) setMemberCount(membersResult.count ?? 0);
-      if (!projectsResult.error && !activitiesResult.error) {
-        setContentCount((projectsResult.count ?? 0) + (activitiesResult.count ?? 0));
+    async function fetchDashboardCounts() {
+      try {
+        const [membersResult, projectsResult, activitiesResult, applicationsResult] =
+          await Promise.allSettled([
+            supabase.from("members").select("*", { count: "exact", head: true }),
+            supabase.from("projects").select("*", { count: "exact", head: true }),
+            supabase.from("activities").select("*", { count: "exact", head: true }),
+            supabase.from("applications").select("*", { count: "exact", head: true }),
+          ]);
+
+        if (!isMounted) return;
+
+        if (membersResult.status === "fulfilled" && !membersResult.value.error) {
+          setMemberCount(membersResult.value.count ?? 0);
+        }
+        if (
+          projectsResult.status === "fulfilled" &&
+          activitiesResult.status === "fulfilled" &&
+          !projectsResult.value.error &&
+          !activitiesResult.value.error
+        ) {
+          setContentCount((projectsResult.value.count ?? 0) + (activitiesResult.value.count ?? 0));
+        }
+        if (applicationsResult.status === "fulfilled" && !applicationsResult.value.error) {
+          setApplicationCount(applicationsResult.value.count ?? 0);
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải số liệu tổng quan:", err);
       }
-      if (!applicationsResult.error) setApplicationCount(applicationsResult.count ?? 0);
     }
 
     fetchDashboardCounts();
 
-    // Cập nhật realtime: có đơn đăng ký mới là con số thay đổi ngay
-    const channel = supabase
-      .channel("dashboard-applications")
-      .on("postgres_changes", { event: "*", schema: "public", table: "applications" }, () => {
-        fetchDashboardCounts();
-      })
-      .subscribe();
+    let channel: any = null;
+    try {
+      channel = supabase
+        .channel("dashboard-applications")
+        .on("postgres_changes", { event: "*", schema: "public", table: "applications" }, () => {
+          fetchDashboardCounts();
+        })
+        .subscribe();
+    } catch (err) {
+      console.warn("Không thể đăng ký realtime trên dashboard:", err);
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      isMounted = false;
+      if (channel) {
+        try {
+          supabase.removeChannel(channel);
+        } catch {
+          // ignore
+        }
+      }
     };
   }, []);
 
