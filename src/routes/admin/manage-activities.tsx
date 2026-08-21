@@ -215,6 +215,72 @@ function AdminManageActivitiesPage() {
             </div>
           </div>
 
+          // Thêm chọn Tag vào form Admin
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase text-slate-400">
+              Chuyên mục / Tag
+            </label>
+          
+            <div className="flex flex-wrap gap-2">
+              {activityTags.map((tag) => {
+                const checked = formData.tags.includes(tag);
+          
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        tags: checked
+                          ? prev.tags.filter((item) => item !== tag)
+                          : [...prev.tags, tag],
+                      }));
+                    }}
+                    className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all ${
+                      checked
+                        ? "bg-cyan-600 text-white"
+                        : "bg-slate-100 text-slate-500 hover:bg-cyan-50"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                );
+              })}
+            </div>
+          
+            <p className="text-[10px] text-slate-400">
+              Có thể chọn nhiều chuyên mục.
+            </p>
+          </div>
+
+          // Thêm trạng thái bài viết
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase text-slate-400">
+              Trạng thái bài viết
+            </label>
+          
+            <select
+              value={formData.status}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  status: e.target.value,
+                }))
+              }
+              className="w-full h-11 rounded-xl bg-slate-50 border-none px-3 text-sm font-bold"
+            >
+              {activityStatuses.map((status) => (
+                <option
+                  key={status.value}
+                  value={status.value}
+                >
+                  {status.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* HIỂN THỊ ẢNH XEM TRƯỚC (PREVIEW) */}
           {formData.imageUrl && (
             <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-cyan-100 dark:border-cyan-900/50 shadow-sm transition-colors">
