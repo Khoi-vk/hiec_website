@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, Loader2, Save, Image as ImageIcon, X } from "luci
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -139,7 +140,6 @@ function AdminManageActivitiesPage() {
         <Button onClick={() => { setEditingId(null);
                                 setFormData({
                                   title: "",
-                                  date: "",
                                   event_date: "",
                                   excerpt: "",
                                   content: "",
@@ -157,10 +157,25 @@ function AdminManageActivitiesPage() {
         <Table>
           <TableHeader className="bg-slate-50 dark:bg-slate-950/50 transition-colors">
             <TableRow className="border-none">
-              <TableHead className="font-bold pl-8 text-slate-700 dark:text-slate-300">Ảnh</TableHead>
-              <TableHead className="font-bold text-slate-700 dark:text-slate-300">Tiêu đề</TableHead>
-              <TableHead className="font-bold text-center text-slate-700 dark:text-slate-300">Ngày</TableHead>
-              <TableHead className="text-right pr-8 font-bold text-slate-700 dark:text-slate-300">Thao tác</TableHead>
+              <TableHead className="font-bold pl-8 text-slate-700 dark:text-slate-300">
+                Ảnh
+              </TableHead>
+          
+              <TableHead className="font-bold text-slate-700 dark:text-slate-300">
+                Tiêu đề
+              </TableHead>
+          
+              <TableHead className="font-bold text-center text-slate-700 dark:text-slate-300">
+                Ngày
+              </TableHead>
+          
+              <TableHead className="font-bold text-center text-slate-700 dark:text-slate-300">
+                Trạng thái
+              </TableHead>
+          
+              <TableHead className="text-right pr-8 font-bold text-slate-700 dark:text-slate-300">
+                Thao tác
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -172,7 +187,30 @@ function AdminManageActivitiesPage() {
                   </div>
                 </TableCell>
                 <TableCell className="font-bold text-[#0f3d3e] dark:text-slate-100 transition-colors">{a.title}</TableCell>
-                <TableCell className="text-center text-slate-600 dark:text-slate-400 transition-colors">{a.date}</TableCell>
+                <TableCell className="text-center text-slate-600 dark:text-slate-400 transition-colors">
+                  {a.event_date
+                    ? new Date(`${a.event_date}T00:00:00`).toLocaleDateString("vi-VN")
+                    : "—"}
+                </TableCell>
+                
+                <TableCell className="text-center">
+                  <Badge
+                    variant={
+                      a.status === "published"
+                        ? "default"
+                        : a.status === "cancelled"
+                          ? "destructive"
+                          : "secondary"
+                    }
+                  >
+                    {a.status === "published"
+                      ? "Công khai"
+                      : a.status === "cancelled"
+                        ? "Đã huỷ"
+                        : "Bản nháp"}
+                  </Badge>
+                </TableCell>
+                
                 <TableCell className="text-right pr-8">
                   <div className="flex justify-end gap-2">
                     <Button
