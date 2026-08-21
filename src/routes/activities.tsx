@@ -8,6 +8,7 @@ import { Modal } from "@/components/ui/modal";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { HiecLogo } from "@/components/ui/hiec-logo";
 import { supabase } from "@/utils/supabase";
+import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/activities")({
   component: ActivitiesPage,
@@ -17,6 +18,7 @@ function ActivitiesPage() {
   const [activities, setActivities] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [selectedAct, setSelectedAct] = React.useState<any>(null);
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   React.useEffect(() => {
     async function fetchActivities() {
@@ -34,6 +36,17 @@ function ActivitiesPage() {
     }
     fetchActivities();
   }, []);
+
+  const filteredActivities = activities.filter((activity) => {
+    const keyword = searchTerm.trim().toLowerCase();
+  
+    if (!keyword) return true;
+  
+    return (
+      activity.title?.toLowerCase().includes(keyword) ||
+      activity.excerpt?.toLowerCase().includes(keyword)
+    );
+  });
 
   return (
     <PublicLayout>
@@ -61,11 +74,19 @@ function ActivitiesPage() {
       {/* 2. DANH SÁCH CARD */}
       <section className="py-12 bg-slate-50/30 dark:bg-slate-900/20 min-h-[600px] transition-colors duration-300">
         <div className="max-w-[1300px] mx-auto px-6 md:px-12">
+          <div className="mb-8">
+            <Input
+              placeholder="Tìm kiếm hoạt động..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-12 w-full rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 sm:max-w-md"
+            />
+          </div>
           {loading ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin size-8 text-primary" /></div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {activities.map((act) => (
+              {filteredActivities.map((act) => (
                 <div key={act.id} onClick={() => setSelectedAct(act)} className="group cursor-pointer">
                   {/* THÊM 'flex flex-col' vào Card */}
                   <Card className="flex flex-col h-full border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800">
