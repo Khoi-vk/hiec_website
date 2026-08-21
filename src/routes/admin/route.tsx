@@ -39,21 +39,7 @@ function AdminLayout() {
       
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Header của trang Admin */}
-        <header className="flex h-16 items-center justify-between border-b border-border bg-background px-6">
-          <p className="font-display text-sm font-semibold uppercase tracking-widest text-primary">
-            Bảng điều khiển HIEC
-          </p>
-          <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold leading-none">{user.fullName}</p>
-              <p className="text-[10px] text-muted-foreground uppercase mt-1 tracking-tighter">Quản trị viên hệ thống</p>
-            </div>
-            <div className="size-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs shadow-glow">
-              {user.fullName.charAt(0)}
-            </div>
-          </div>
-        </header>
-
+        
         {/* Nội dung thay đổi của từng trang admin con (Dashboard, Posts, v.v.) */}
         <main className="flex-1 p-6 overflow-y-auto">
           <Outlet />
