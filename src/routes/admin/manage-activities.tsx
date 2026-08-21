@@ -235,7 +235,6 @@ function AdminManageActivitiesPage() {
             </div>
           </div>
 
-          // Thêm chọn Tag vào form Admin
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase text-slate-400">
               Chuyên mục / Tag
@@ -274,7 +273,6 @@ function AdminManageActivitiesPage() {
             </p>
           </div>
 
-          // Thêm trạng thái bài viết
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase text-slate-400">
               Trạng thái bài viết
