@@ -10,10 +10,33 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Modal } from "@/components/ui/modal";
 import { supabase } from "@/utils/supabase";
 
-// ĐẢM BẢO TÊN FILE LÀ: manage-activities.tsx
 export const Route = createFileRoute("/admin/manage-activities")({
   component: AdminManageActivitiesPage,
 });
+
+  const activityStatuses = [
+    {
+      value: "draft",
+      label: "Bản nháp",
+    },
+    {
+      value: "published",
+      label: "Công khai",
+    },
+    {
+      value: "cancelled",
+      label: "Đã huỷ",
+    },
+  ] as const;
+  
+  const activityTags = [
+    "HIEC News",
+    "Workshop",
+    "Training",
+    "Event",
+    "Startup",
+    "Community",
+  ]; // Đây là các tag hoạt động ví dụ thôi nha ae, sau có hoạt động cụ thể như nào thì sửa ở đây nha
 
 function AdminManageActivitiesPage() {
   const [acts, setActs] = React.useState<any[]>([]);
@@ -26,9 +49,12 @@ function AdminManageActivitiesPage() {
   const [formData, setFormData] = React.useState({
     title: "",
     date: "",
+    event_date: "",
     excerpt: "",
     content: "",
-    imageUrl: "" // Đường dẫn ảnh
+    imageUrl: "",
+    tags: [] as string[],
+    status: "draft",
   });
 
   const fetchActs = async () => {
