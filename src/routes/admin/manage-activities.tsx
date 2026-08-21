@@ -137,7 +137,18 @@ function AdminManageActivitiesPage() {
     <div className="space-y-6 text-left animate-fade-up">
       <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-4 transition-colors">
         <h1 className="text-2xl font-black uppercase tracking-tighter text-[#0f3d3e] dark:text-white transition-colors">Quản lý Hoạt động</h1>
-        <Button onClick={() => { setEditingId(null); setFormData({title:"", date:"", excerpt:"", content:"", imageUrl:""}); setIsOpen(true); }} className="rounded-xl font-bold bg-cyan-600 dark:bg-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white transition-colors">
+        <Button onClick={() => { setEditingId(null);
+                                setFormData({
+                                  title: "",
+                                  date: "",
+                                  event_date: "",
+                                  excerpt: "",
+                                  content: "",
+                                  imageUrl: "",
+                                  tags: [],
+                                  status: "draft",
+                                });
+                                setIsOpen(true); }} className="rounded-xl font-bold bg-cyan-600 dark:bg-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white transition-colors">
           <Plus className="mr-2 h-4 w-4" /> ĐĂNG BÀI MỚI
         </Button>
       </div>
@@ -205,7 +216,17 @@ function AdminManageActivitiesPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 transition-colors">Ngày diễn ra</label>
-              <Input placeholder="VD: 19/11/2025" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-colors" />
+              <Input
+                type="date"
+                value={formData.event_date}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    event_date: e.target.value,
+                  })
+                }
+                className="rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors"
+              />
             </div>
             
             {/* NÚT THÊM ẢNH */}
