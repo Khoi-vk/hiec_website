@@ -48,7 +48,6 @@ function AdminManageActivitiesPage() {
   // Form chứa cả link ảnh
   const [formData, setFormData] = React.useState({
     title: "",
-    date: "",
     event_date: "",
     excerpt: "",
     content: "",
