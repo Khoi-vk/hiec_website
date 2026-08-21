@@ -14,7 +14,8 @@ const navItems = [
   { label: "Trang chủ", to: "/" },
   { label: "Hoạt động", to: "/activities" },
   { label: "Dự án", to: "/projects" },
-  { label: "Thành viên", to: "/members" },
+  { label: "Cơ cấu CLB", to: "/members" },
+  { label: "Học liệu", to: "#" },
 ] as const;
 
 export function Header() {
@@ -39,18 +40,30 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center gap-1 rounded-full border border-border bg-card p-1 md:flex">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-semibold transition-colors",
-                pathname === item.to ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent hover:text-foreground",
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) =>
+            item.to === "#" ? (
+              <button
+                key={item.label}
+                type="button"
+                className="cursor-default rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                {item.label}
+              </button>
+            ) : (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={cn(
+                  "rounded-full px-4 py-2 text-sm font-semibold transition-colors",
+                  pathname === item.to
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                )}
+              >
+                {item.label}
+              </Link>
+            ),
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -58,8 +71,16 @@ export function Header() {
           <div className="hidden items-center gap-2 sm:flex">
             {user ? (
               <>
-                <Button variant="outline" size="sm" onClick={() => navigate({ to: "/admin/applications" })}>Quản trị</Button>
-                <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Đăng xuất"><LogOut className="size-4" /></Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate({ to: "/admin/applications" })}
+                >
+                  Quản trị
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Đăng xuất">
+                  <LogOut className="size-4" />
+                </Button>
               </>
             ) : (
               <>
@@ -72,7 +93,13 @@ export function Header() {
               </>
             )}
           </div>
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen((value) => !value)} aria-label="Mở menu">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setOpen((value) => !value)}
+            aria-label="Mở menu"
+          >
             {open ? <X /> : <Menu />}
           </Button>
         </div>
@@ -81,15 +108,43 @@ export function Header() {
       {open && (
         <nav className="border-t border-border bg-background px-5 py-3 md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-1">
-            {navItems.map((item) => (
-              <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold hover:bg-accent">
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) =>
+              item.to === "#" ? (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-3 text-left text-sm font-semibold text-muted-foreground hover:bg-accent"
+                >
+                  {item.label}
+                </button>
+              ) : (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-3 text-sm font-semibold hover:bg-accent"
+                >
+                  {item.label}
+                </Link>
+              ),
+            )}
             {!user && (
               <div className="mt-2 grid grid-cols-2 gap-2">
-                <Link to="/signup" onClick={() => setOpen(false)} className="rounded-xl bg-primary px-3 py-3 text-center text-sm font-bold text-primary-foreground">Tham gia HIEC</Link>
-                <Link to="/login" onClick={() => setOpen(false)} className="rounded-xl bg-primary px-3 py-3 text-center text-sm font-bold text-primary-foreground">Đăng nhập</Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl bg-primary px-3 py-3 text-center text-sm font-bold text-primary-foreground"
+                >
+                  Tham gia HIEC
+                </Link>
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl bg-primary px-3 py-3 text-center text-sm font-bold text-primary-foreground"
+                >
+                  Đăng nhập
+                </Link>
               </div>
             )}
           </div>
