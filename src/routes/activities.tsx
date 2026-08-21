@@ -26,7 +26,8 @@ function ActivitiesPage() {
         const { data, error } = await supabase
           .from("activities")
           .select("*")
-          .order("created_at", { ascending: false });
+          .eq("status", "published")
+          .order("event_date", { ascending: false });
         if (data) setActivities(data);
       } catch (err) {
         console.error("Lỗi:", err);
