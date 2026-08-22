@@ -1,6 +1,16 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Pencil, Trash2, Loader2, Save, Users, UserCircle, X } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Loader2,
+  Save,
+  Users,
+  UserCircle,
+  X,
+  ChevronDown,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,6 +30,22 @@ import { supabase } from "@/utils/supabase";
 export const Route = createFileRoute("/admin/manage-members")({
   component: MembersManagementPage,
 });
+
+const DEPARTMENT_OPTIONS = [
+  "Ban Chủ nhiệm",
+  "Ban Phát triển chiến lược",
+  "Ban Nhân sự & Sự kiện",
+  "Ban Truyền thông",
+  "Ban Đối ngoại",
+] as const;
+
+const POSITION_OPTIONS = [
+  "Chủ nhiệm",
+  "Phó Chủ nhiệm",
+  "Trưởng ban",
+  "Phó ban",
+  "Thành viên",
+] as const;
 
 function MembersManagementPage() {
   const [members, setMembers] = React.useState<any[]>([]);
@@ -235,28 +261,58 @@ function MembersManagementPage() {
               className="rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 transition-colors">
-                Chức vụ
+                Chức vụ <span className="text-red-500">*</span>
               </label>
-              <Input
-                placeholder="VD: Chủ tịch"
-                value={formData.position}
-                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                className="rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-colors"
-              />
+              <div className="relative">
+                <select
+                  value={formData.position}
+                  onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                  className="w-full h-11 appearance-none rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 pr-9 text-sm font-semibold text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition-colors"
+                >
+                  <option value="" disabled className="text-slate-400 dark:text-slate-500">
+                    -- Chọn chức vụ --
+                  </option>
+                  {POSITION_OPTIONS.map((pos) => (
+                    <option
+                      key={pos}
+                      value={pos}
+                      className="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900"
+                    >
+                      {pos}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+              </div>
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 transition-colors">
                 Ban / Bộ phận
               </label>
-              <Input
-                placeholder="VD: Ban Điều Hành"
-                value={formData.department}
-                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                className="rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-colors"
-              />
+              <div className="relative">
+                <select
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  className="w-full h-11 appearance-none rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 pr-9 text-sm font-semibold text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500/50 transition-colors"
+                >
+                  <option value="" className="text-slate-400 dark:text-slate-500">
+                    -- Chọn Ban / Bộ phận --
+                  </option>
+                  {DEPARTMENT_OPTIONS.map((dept) => (
+                    <option
+                      key={dept}
+                      value={dept}
+                      className="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900"
+                    >
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
