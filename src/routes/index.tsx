@@ -13,6 +13,7 @@ import {
 import { PublicLayout } from "@/components/layout/public-layout";
 import { MovementGallery } from "@/components/home/movement-gallery";
 import { ActionShowcase } from "@/components/home/action-showcase";
+import { NewsletterCard } from "@/components/home/newsletter-card";
 import { Button } from "@/components/ui/button";
 import { contactInfo, history } from "@/services/hiec-service";
 
@@ -258,6 +259,9 @@ export function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ĐĂNG KÝ NHẬN THÔNG TIN CARD */}
+        <NewsletterCard />
       </main>
     </PublicLayout>
   );
