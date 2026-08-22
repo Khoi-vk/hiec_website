@@ -12,6 +12,7 @@ import {
 
 import { PublicLayout } from "@/components/layout/public-layout";
 import { MovementGallery } from "@/components/home/movement-gallery";
+import { ActionShowcase } from "@/components/home/action-showcase";
 import { Button } from "@/components/ui/button";
 import { contactInfo, history } from "@/services/hiec-service";
 
@@ -206,13 +207,25 @@ export function HomePage() {
                 </p>
                 <h2 className="mt-4 text-4xl font-black sm:text-5xl">Học bằng cách làm.</h2>
               </div>
-              <Link
-                to="/projects"
-                className="flex items-center gap-2 text-sm font-black text-primary-deep hover:underline dark:text-primary"
-              >
-                Xem tất cả dự án <ArrowUpRight className="size-4" />
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link
+                  to="/activities"
+                  className="flex items-center gap-1.5 text-sm font-black text-primary-deep hover:underline dark:text-primary"
+                >
+                  Tất cả hoạt động <ArrowUpRight className="size-4" />
+                </Link>
+                <span className="text-border">|</span>
+                <Link
+                  to="/projects"
+                  className="flex items-center gap-1.5 text-sm font-black text-primary-deep hover:underline dark:text-primary"
+                >
+                  Tất cả dự án <ArrowUpRight className="size-4" />
+                </Link>
+              </div>
             </div>
+
+            {/* Horizontal scroll track displaying activities and projects from database */}
+            <ActionShowcase />
           </div>
         </section>
 
