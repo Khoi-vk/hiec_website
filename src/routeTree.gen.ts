@@ -26,6 +26,7 @@ import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminManageActivitiesRouteImport } from './routes/admin/manage-activities'
 import { Route as AdminManageMembersRouteImport } from './routes/admin/manage-members'
 import { Route as AdminManageProjectsRouteImport } from './routes/admin/manage-projects'
+import { Route as AdminMemberLayoutRouteImport } from './routes/admin/member-layout'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminStaticContentRouteImport } from './routes/admin/static-content'
 
@@ -114,6 +115,11 @@ const AdminManageProjectsRoute = AdminManageProjectsRouteImport.update({
   path: '/manage-projects',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminMemberLayoutRoute = AdminMemberLayoutRouteImport.update({
+  id: '/member-layout',
+  path: '/member-layout',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/admin/manage-activities': typeof AdminManageActivitiesRoute
   '/admin/manage-members': typeof AdminManageMembersRoute
   '/admin/manage-projects': typeof AdminManageProjectsRoute
+  '/admin/member-layout': typeof AdminMemberLayoutRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/static-content': typeof AdminStaticContentRoute
   '/admin/': typeof AdminIndexRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/admin/manage-activities': typeof AdminManageActivitiesRoute
   '/admin/manage-members': typeof AdminManageMembersRoute
   '/admin/manage-projects': typeof AdminManageProjectsRoute
+  '/admin/member-layout': typeof AdminMemberLayoutRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/static-content': typeof AdminStaticContentRoute
   '/admin': typeof AdminIndexRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/admin/manage-activities': typeof AdminManageActivitiesRoute
   '/admin/manage-members': typeof AdminManageMembersRoute
   '/admin/manage-projects': typeof AdminManageProjectsRoute
+  '/admin/member-layout': typeof AdminMemberLayoutRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/static-content': typeof AdminStaticContentRoute
   '/admin/': typeof AdminIndexRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/admin/manage-activities'
     | '/admin/manage-members'
     | '/admin/manage-projects'
+    | '/admin/member-layout'
     | '/admin/settings'
     | '/admin/static-content'
     | '/admin/'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin/manage-activities'
     | '/admin/manage-members'
     | '/admin/manage-projects'
+    | '/admin/member-layout'
     | '/admin/settings'
     | '/admin/static-content'
     | '/admin'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin/manage-activities'
     | '/admin/manage-members'
     | '/admin/manage-projects'
+    | '/admin/member-layout'
     | '/admin/settings'
     | '/admin/static-content'
     | '/admin/'
@@ -388,6 +400,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminManageProjectsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/member-layout': {
+      id: '/admin/member-layout'
+      path: '/member-layout'
+      fullPath: '/admin/member-layout'
+      preLoaderRoute: typeof AdminMemberLayoutRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -411,6 +430,7 @@ interface AdminRouteRouteChildren {
   AdminManageActivitiesRoute: typeof AdminManageActivitiesRoute
   AdminManageMembersRoute: typeof AdminManageMembersRoute
   AdminManageProjectsRoute: typeof AdminManageProjectsRoute
+  AdminMemberLayoutRoute: typeof AdminMemberLayoutRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminStaticContentRoute: typeof AdminStaticContentRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -422,6 +442,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminManageActivitiesRoute: AdminManageActivitiesRoute,
   AdminManageMembersRoute: AdminManageMembersRoute,
   AdminManageProjectsRoute: AdminManageProjectsRoute,
+  AdminMemberLayoutRoute: AdminMemberLayoutRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminStaticContentRoute: AdminStaticContentRoute,
   AdminIndexRoute: AdminIndexRoute,

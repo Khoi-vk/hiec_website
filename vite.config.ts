@@ -3,10 +3,10 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
-    // Cấu hình router trỏ đúng vào src/routes
+    // TanStack Start resolve router paths relative to src.
     router: {
-      routesDirectory: "./src/routes",
-      generatedRouteTree: "./src/routeTree.gen.ts",
+      routesDirectory: "./routes",
+      generatedRouteTree: "./routeTree.gen.ts",
     }
   },
   vite: {

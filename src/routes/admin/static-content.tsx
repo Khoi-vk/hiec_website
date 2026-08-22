@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getHomeContent, updateHomeContent, type HomeContent } from "@/services/hiec-service";
 
-export const Route = createFileRoute("/admin/static-content" as any)({
+export const Route = createFileRoute("/admin/static-content")({
   component: StaticContentPage,
 });
 
