@@ -1,6 +1,5 @@
 /**
- * Component Footer - Chân trang website HIEC.
- * Đã cập nhật Logo đồng bộ bằng Component HiecLogo.
+ * Component Footer - Đã sửa để đồng bộ dữ liệu từ Supabase (hiec-service)
  */
 import { useEffect, useState } from 'react';
 import { Link } from '@tanstack/react-router';
@@ -13,24 +12,26 @@ import {
   Phone 
 } from 'lucide-react';
 
-import { getFooterSettings, type FooterData } from '@/services/setting';
-import { HiecLogo } from "@/components/ui/hiec-logo"; // Import Logo mới
+// SỬA: Import từ hiec-service để lấy dữ liệu bạn đã chỉnh sửa
+import { getHomeContent, type HomeContent, socialLinks } from '@/services/hiec-service';
+import { HiecLogo } from "@/components/ui/hiec-logo";
 
 const iconMap: Record<string, any> = {
   Facebook: Facebook,
   Instagram: Instagram,
-  Music2: Music2,
+  TikTok: Music2, // Map TikTok sang icon Music2
 };
 
 export function Footer() {
-  const [data, setData] = useState<FooterData | null>(null);
+  const [data, setData] = useState<HomeContent | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadFooter() {
       try {
-        const footerData = await getFooterSettings();
-        setData(footerData);
+        // Lấy đúng dữ liệu từ bảng hiec_settings (key: home_content)
+        const homeData = await getHomeContent();
+        setData(homeData);
       } catch (error) {
         console.error('Lỗi tải footer:', error);
       } finally {
@@ -39,6 +40,14 @@ export function Footer() {
     }
     loadFooter();
   }, []);
+
+  // Menu điều hướng mặc định (có thể chỉnh sửa ở đây nếu chưa có trong DB)
+  const navigation = [
+    { label: "Trang chủ", path: "/" },
+    { label: "Dự án", path: "/projects" },
+    { label: "Hoạt động", path: "/activities" },
+    { label: "Thành viên", path: "/members" },
+  ];
 
   if (loading) {
     return (
@@ -49,7 +58,6 @@ export function Footer() {
               <div key={i} className="space-y-4">
                 <div className="h-4 w-24 bg-primary/10 rounded animate-pulse" />
                 <div className="h-3 w-full bg-primary/5 rounded animate-pulse" />
-                <div className="h-3 w-3/4 bg-primary/5 rounded animate-pulse" />
               </div>
             ))}
           </div>
@@ -58,40 +66,39 @@ export function Footer() {
     );
   }
 
+  // Nếu không load được data, dùng dữ liệu mặc định để tránh crash
   if (!data) return null;
 
-  const { brand, description, socials, navigation, contact } = data;
+  const { hero, contact } = data;
 
   return (
     <footer id="lien-he" className="border-t border-border/60 bg-background">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 md:grid-cols-3">
         
-        {/* Cột 1: Logo & Giới thiệu ngắn */}
+        {/* Cột 1: Logo & Giới thiệu */}
         <div>
-          {/* SỬA: Dùng HiecLogo thay cho icon Sparkles cũ */}
           <div className="mb-6">
             <HiecLogo className="scale-110 origin-left" />
           </div>
           
           <p className="mt-4 max-w-sm text-sm text-muted-foreground leading-relaxed">
-            {description}
+            {hero.description}
           </p>
           
           <div className="mt-6 flex gap-3">
-            {socials.map((s) => {
-              const IconComponent = iconMap[s.icon];
-              return IconComponent ? (
+            {socialLinks.map((s) => {
+              const IconComponent = iconMap[s.label] || Facebook;
+              return (
                 <a
                   key={s.label}
                   href={s.href}
                   target="_blank"
                   rel="noreferrer noopener"
-                  aria-label={s.label}
                   className="grid size-10 place-items-center rounded-xl border border-border bg-card text-muted-foreground transition-all hover:border-primary hover:text-primary hover:shadow-glow hover:-translate-y-1"
                 >
                   <IconComponent className="size-5" />
                 </a>
-              ) : null;
+              );
             })}
           </div>
         </div>
@@ -113,13 +120,13 @@ export function Footer() {
           </ul>
         </div>
 
-        {/* Cột 3: Thông tin liên hệ */}
+        {/* Cột 3: Liên hệ nhanh (DỮ LIỆU ĐÃ ĐƯỢC ĐỒNG BỘ) */}
         <div>
           <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/80 mb-6">
             Liên hệ nhanh
           </h3>
-          <ul className="space-y-4 text-sm">
-            <li className="flex items-center gap-3 group">
+          <ul className="space-y-4 text-sm text-left">
+            <li className="flex items-center gap-3 group justify-start">
               <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                 <Mail className="size-4" />
               </div>
@@ -127,7 +134,7 @@ export function Footer() {
                 {contact.email}
               </a>
             </li>
-            <li className="flex items-center gap-3 group">
+            <li className="flex items-center gap-3 group justify-start">
               <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                 <Phone className="size-4" />
               </div>
@@ -135,19 +142,20 @@ export function Footer() {
                 {contact.phone}
               </a>
             </li>
-            <li className="flex items-start gap-3 group">
+            <li className="flex items-start gap-3 group justify-start">
               <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
                 <MapPin className="size-4" />
               </div>
-              <span className="text-muted-foreground leading-relaxed">{contact.address}</span>
+              <span className="text-muted-foreground leading-relaxed text-left">
+                {contact.address}
+              </span>
             </li>
           </ul>
         </div>
       </div>
 
-      {/* Bản quyền */}
       <div className="border-t border-border/40 py-6 text-center text-[11px] font-medium uppercase tracking-widest text-muted-foreground/60">
-        © {new Date().getFullYear()} {brand}. All rights reserved. 
+        © {new Date().getFullYear()} HIEC. All rights reserved. 
         <span className="mx-2">|</span> 
         Design for Impact
       </div>

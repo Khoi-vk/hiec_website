@@ -1,3 +1,5 @@
+import { supabase } from "@/utils/supabase";
+
 /** Dummy data layer for the HIEC website (front-end only demo). */
 
 export type Project = {
@@ -101,7 +103,7 @@ export const history = [
 
 export const adminStats = [
   { label: "Bài viết đã đăng", value: "42", delta: "+6 tháng này" },
-  { label: "Lượt truy cập", value: "18.４K".replace("４", "4"), delta: "+12,5%" },
+  { label: "Lượt truy cập", value: "18.4K", delta: "+12,5%" },
   { label: "Đăng ký tham gia", value: "236", delta: "+38 tuần này" },
   { label: "Thành viên hoạt động", value: "1.048", delta: "+54" },
 ];
@@ -121,10 +123,76 @@ export const socialLinks = [
   { label: "Instagram", href: "https://www.instagram.com/hiec.in.here/" },
 ];
 
-
 export const contactInfo = {
   email: "hiec.hust@gmail.com",
   phone: "0336873705",
   messenger: "https://m.me/hiec.vn",
   address: "Đại học Bách khoa Hà Nội, 1 Đ. Đại Cồ Việt", 
 };
+
+// --- TYPE & SUPABASE HANDLERS ---
+export type HomeContent = {
+  hero: { title: string; description: string };
+  stats: Array<{ number: string; label: string }>;
+  history: Array<{ year: string; title: string; description: string }>;
+  departments: Array<{ code: string; title: string; text: string; iconName: string }>;
+  cta: { title: string; description: string };
+  contact: { email: string; phone: string; messenger: string; address: string };
+};
+
+export const defaultHomeContent: HomeContent = {
+  hero: { 
+    title: "Khơi nguồn sáng tạo, Dẫn lối thành công", 
+    description: "Câu lạc bộ Sáng tạo & Khởi nghiệp HUST — nơi những người trẻ học bằng cách làm, kết nối bằng giá trị và cùng nhau tạo ra điều đáng tự hào." 
+  },
+  stats: [
+    { number: "06+", label: "năm xây cộng đồng" },
+    { number: "04", label: "ban chuyên môn" },
+    { number: "24", label: "dự án đã triển khai" },
+    { number: "∞", label: "ý tưởng được lắng nghe" }
+  ],
+  history,
+  // THAY ĐỔI TẠI ĐÂY: Thêm dữ liệu mặc định cho ban
+  departments: [
+    { code: "01", title: "Ban Phát triển chiến lược", text: "Định hình hướng đi...", iconName: "Network" },
+    { code: "02", title: "Ban Truyền thông", text: "Kể câu chuyện HIEC...", iconName: "Megaphone" },
+    { code: "03", title: "Ban Đối ngoại", text: "Mở rộng mạng lưới...", iconName: "BriefcaseBusiness" },
+    { code: "04", title: "Ban Nhân sự Sự kiện", text: "Xây văn hóa nội bộ...", iconName: "Users" },
+  ],
+  cta: { 
+    title: "Đừng chỉ có ý tưởng. Hãy biến nó thành thật.", 
+    description: "HIEC không hứa hẹn một hành trình dễ dàng, nhưng đây là nơi bạn có đồng đội." 
+  },
+  contact: contactInfo
+};
+
+export async function getHomeContent(): Promise<HomeContent> {
+  try {
+    const { data, error } = await supabase.from("hiec_settings").select("value").eq("key", "home_content").single();
+    if (error || !data) return defaultHomeContent;
+    return data.value as HomeContent;
+  } catch {
+    return defaultHomeContent;
+  }
+}
+
+export async function updateHomeContent(content: HomeContent) {
+  console.log("Dữ liệu chuẩn bị gửi đi:", content); // Debug xem có phần contact chưa
+
+  const { data, error } = await supabase
+    .from("hiec_settings")
+    .upsert(
+      { 
+        key: "home_content", 
+        value: content, 
+        updated_at: new Date().toISOString() 
+      }, 
+      { onConflict: 'key' } // Ép buộc ghi đè nếu trùng key 'home_content'
+    );
+
+  if (error) {
+    console.error("Lỗi Supabase chi tiết:", error);
+    throw new Error(error.message);
+  }
+  return data;
+}
