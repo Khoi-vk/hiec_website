@@ -386,14 +386,11 @@ function MemberLayoutAdminPage() {
                   .filter(Boolean) as Member[],
               }))
               .filter((row) => row.members.length > 0)
-              .map(({ tier, members: tierMembers }, tIdx) => {
+              .map(({ tier, members: tierMembers }) => {
               return (
                 <div key={tier.id} className="space-y-4 text-center">
                   {/* Tier Title */}
                   <div className="inline-flex flex-col items-center">
-                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-600 dark:text-cyan-400">
-                      TẦNG {tIdx + 1}
-                    </span>
                     <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                       {tier.name}
                     </h3>

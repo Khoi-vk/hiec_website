@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, User, ChevronLeft, ArrowRight, Sparkles, Building2 } from "lucide-react";
+import { Loader2, User, ChevronLeft, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -134,11 +134,6 @@ function MembersPage() {
                   <div key={tier.id || tIndex} className="space-y-8 animate-fade-up">
                     {/* TIER HEADER */}
                     <div className="text-center max-w-2xl mx-auto space-y-2">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-100/70 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 text-[10px] font-black uppercase tracking-[0.25em] shadow-sm">
-                        <Sparkles className="size-3 text-cyan-600 dark:text-cyan-400" />
-                        <span>TẦNG {tIndex + 1}</span>
-                      </div>
-
                       <h2 className="text-2xl sm:text-3xl font-black text-[#0f3d3e] dark:text-white tracking-tight">
                         {tier.name}
                       </h2>
@@ -148,8 +143,6 @@ function MembersPage() {
                           {tier.subtitle}
                         </p>
                       )}
-
-                      <div className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-sky-400 rounded-full mx-auto mt-3 opacity-80" />
                     </div>
 
                     {/* TIER CARDS: HIỂN THỊ CÙNG 1 DÒNG, TỐI ĐA 4 CARD, CĂN CHÍNH GIỮA VÀ CÁCH ĐỀU LỀ */}
