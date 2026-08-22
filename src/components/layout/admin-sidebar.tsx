@@ -1,6 +1,9 @@
 /**
  * Component AdminSidebar - Giao diện Dark Mode cao cấp.
- * Đã sửa lỗi: Thiếu import Modal và lỗi cú pháp gạch đỏ.
+ * Tính năng mới: 
+ * 1. Thêm "Chỉnh sửa Trang chủ" vào Management.
+ * 2. Thêm nút "Quay lại Trang chủ" phía trên Đăng xuất.
+ * 3. Tối ưu cursor-pointer cho mọi thao tác.
  */
 import * as React from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
@@ -13,17 +16,20 @@ import {
   UserCheck,
   Rocket,
   Users,
+  Home,
+  Settings2,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
 import { HiecLogo } from "@/components/ui/hiec-logo";
-import { Modal } from "@/components/ui/modal"; // KHẮC PHỤC: Thêm dòng này
+import { Modal } from "@/components/ui/modal";
 
 const navItems = [
   { title: "Tổng quan", url: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Đơn đăng kí", url: "/admin/applications", icon: UserCheck },
+  { title: "Chỉnh sửa Trang chủ", url: "/admin/static-content", icon: Settings2 }, // Nút quản lý nội dung trang chủ
   { title: "Quản lý dự án", url: "/admin/manage-projects", icon: Rocket },
   { title: "Quản lý hoạt động", url: "/admin/manage-activities", icon: FileText },
   { title: "Quản lý Thành viên", url: "/admin/manage-members", icon: Users }, 
@@ -31,7 +37,7 @@ const navItems = [
 
 export function AdminSidebar() {
   const [collapsed, setCollapsed] = React.useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false); // Quản lý đóng mở modal
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
   
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const auth = useAuth() as any;
@@ -70,7 +76,7 @@ export function AdminSidebar() {
                 key={item.url}
                 to={item.url as any}
                 className={cn(
-                  "flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold transition-all duration-300 group",
+                  "flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold transition-all duration-300 group cursor-pointer",
                   active
                     ? "bg-cyan-500 text-[#020817] shadow-[0_0_20px_rgba(6,182,212,0.3)]"
                     : "text-slate-400 hover:bg-white/5 hover:text-white"
@@ -88,17 +94,26 @@ export function AdminSidebar() {
 
         {/* BOTTOM TOOLS */}
         <div className="p-3 space-y-2 mb-4 border-t border-white/5 pt-4">
+          {/* NÚT QUAY LẠI TRANG CHỦ */}
+          <button
+            onClick={() => navigate({ to: "/" })}
+            className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold text-cyan-400 hover:bg-cyan-500/10 transition-colors cursor-pointer"
+          >
+            <Home className="size-5" />
+            {!collapsed && <span>Quay lại Trang chủ</span>}
+          </button>
+
           <button
             onClick={() => setCollapsed((v) => !v)}
-            className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-400 hover:bg-white/5 transition-colors"
+            className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-400 hover:bg-white/5 transition-colors cursor-pointer"
           >
             {collapsed ? <PanelLeftOpen className="size-5" /> : <PanelLeftClose className="size-5" />}
             {!collapsed && <span>Thu gọn</span>}
           </button>
           
           <button
-            onClick={() => setIsLogoutModalOpen(true)} // Mở Modal
-            className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold text-red-400 hover:bg-red-500/10 transition-colors"
+            onClick={() => setIsLogoutModalOpen(true)}
+            className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
           >
             <LogOut className="size-5" />
             {!collapsed && <span>Đăng xuất</span>}
@@ -106,14 +121,14 @@ export function AdminSidebar() {
         </div>
       </aside>
 
-      {/* MODAL XÁC NHẬN ĐĂNG XUẤT - Đặt ở đây để không bị lỗi cú pháp */}
+      {/* MODAL XÁC NHẬN ĐĂNG XUẤT */}
       <Modal 
         open={isLogoutModalOpen} 
         onOpenChange={setIsLogoutModalOpen}
         title="Xác nhận đăng xuất?"
         description="Bạn có chắc chắn muốn rời khỏi hệ thống quản trị không?"
       >
-        <div className="flex flex-col gap-6 py-4 text-center">
+        <div className="flex flex-col gap-6 py-4 text-center font-sans">
           <div className="size-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
             <LogOut className="size-10" />
           </div>
@@ -121,14 +136,14 @@ export function AdminSidebar() {
           <div className="flex gap-3">
             <Button 
               variant="outline" 
-              className="flex-1 rounded-2xl py-6 font-bold" 
+              className="flex-1 rounded-2xl py-6 font-bold cursor-pointer" 
               onClick={() => setIsLogoutModalOpen(false)}
             >
               Hủy bỏ
             </Button>
             <Button 
               variant="destructive" 
-              className="flex-1 rounded-2xl py-6 font-bold uppercase tracking-widest bg-red-600 hover:bg-red-700" 
+              className="flex-1 rounded-2xl py-6 font-bold uppercase tracking-widest bg-red-600 hover:bg-red-700 cursor-pointer" 
               onClick={() => {
                 if (logoutFunc) logoutFunc();
                 setIsLogoutModalOpen(false);
