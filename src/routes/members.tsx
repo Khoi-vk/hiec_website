@@ -133,9 +133,20 @@ function MembersPage() {
                   <div key={tier.id || tIndex} className="space-y-8 animate-fade-up">
                     {/* TIER HEADER */}
                     <div className="text-center max-w-2xl mx-auto space-y-2">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-100/70 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 text-[10px] font-black uppercase tracking-[0.25em] shadow-sm">
+                        <Sparkles className="size-3 text-cyan-600 dark:text-cyan-400" />
+                        <span>TẦNG {tIndex + 1}</span>
+                      </div>
+
                       <h2 className="text-2xl sm:text-3xl font-black text-[#0f3d3e] dark:text-white tracking-tight">
                         {tier.name}
                       </h2>
+
+                      {tier.subtitle && (
+                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                          {tier.subtitle}
+                        </p>
+                      )}
 
                       <div className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-sky-400 rounded-full mx-auto mt-3 opacity-80" />
                     </div>

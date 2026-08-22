@@ -136,26 +136,30 @@ export const DEFAULT_MEMBER_LAYOUT: MemberLayoutConfig = {
   tiers: [
     {
       id: "tier-1",
-      name: "Ban Chủ Nhiệm",
+      name: "Tầng 1: Ban Chủ Nhiệm",
+      subtitle: "Định hướng chiến lược & Điều hành toàn diện",
       memberIds: ["m-1", "m-2"],
     },
     {
       id: "tier-2",
-      name: "Trưởng Ban Chuyên Môn",
+      name: "Tầng 2: Trưởng Ban Chuyên Môn",
+      subtitle: "Quản lý và thực thi các khối hoạt động nòng cốt",
       memberIds: ["m-3", "m-4", "m-5", "m-6"],
     },
     {
       id: "tier-3",
-      name: "Phó Ban Chuyên Môn",
+      name: "Tầng 3: Phó Ban Chuyên Môn",
+      subtitle: "Hỗ trợ điều phối và tổ chức chương trình",
       memberIds: ["m-7", "m-8", "m-9"],
     },
     {
       id: "tier-4",
-      name: "Thành Viên Tiêu Biểu",
+      name: "Tầng 4: Thành Viên Tiêu Biểu",
+      subtitle: "Lực lượng năng động và triển khai dự án",
       memberIds: ["m-10"],
     },
   ],
-  showUnassigned: false,
+  showUnassigned: true,
   unassignedTitle: "Thành viên & Cộng tác viên",
 };
 
