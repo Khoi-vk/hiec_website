@@ -377,7 +377,7 @@ function MemberLayoutAdminPage() {
             </p>
           </div>
 
-          <div className="space-y-12">
+          <div className="flex flex-col">
             {tiers
               .map((tier) => ({
                 tier,
@@ -386,23 +386,36 @@ function MemberLayoutAdminPage() {
                   .filter(Boolean) as Member[],
               }))
               .filter((row) => row.members.length > 0)
-              .map(({ tier, members: tierMembers }, tIdx) => {
+              .map(({ tier, members: tierMembers }, tIndex) => {
+              const name = tier.name?.trim() ?? "";
+              const subtitle = tier.subtitle?.trim() ?? "";
+              const hasHeader = Boolean(name || subtitle);
+
               return (
-                <div key={tier.id} className="space-y-4 text-center">
-                  {/* Tier Title */}
-                  <div className="inline-flex flex-col items-center">
-                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-600 dark:text-cyan-400">
-                      TẦNG {tIdx + 1}
-                    </span>
-                    <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                      {tier.name}
-                    </h3>
-                    {tier.subtitle && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-md">
-                        {tier.subtitle}
-                      </p>
-                    )}
-                  </div>
+                <div
+                  key={tier.id}
+                  className={[
+                    "text-center",
+                    hasHeader ? "space-y-4" : "",
+                    tIndex > 0 ? (hasHeader ? "mt-12" : "mt-6") : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  {hasHeader ? (
+                    <div className="inline-flex flex-col items-center">
+                      {name ? (
+                        <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                          {name}
+                        </h3>
+                      ) : null}
+                      {subtitle ? (
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-md">
+                          {subtitle}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
 
                   {/* Centered Row with evenly distributed cards (Max 4 per row) */}
                   <div className="w-full flex justify-center items-stretch gap-6 md:gap-8 max-w-6xl mx-auto px-4">
