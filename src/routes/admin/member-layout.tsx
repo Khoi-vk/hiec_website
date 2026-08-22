@@ -10,20 +10,18 @@ import {
   RotateCcw,
   Eye,
   Edit3,
-  GripVertical,
   User,
   Search,
   Check,
   X,
-  AlertCircle,
-  Sparkles,
   ArrowRight,
-  ExternalLink,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
@@ -53,16 +51,12 @@ export const Route = createFileRoute("/admin/member-layout")({
 function MemberLayoutAdminPage() {
   const [members, setMembers] = React.useState<Member[]>([]);
   const [tiers, setTiers] = React.useState<MemberTier[]>([]);
-  const [showUnassigned, setShowUnassigned] = React.useState(true);
+  const [showUnassigned, setShowUnassigned] = React.useState(false);
   const [unassignedTitle, setUnassignedTitle] = React.useState("Thành viên & Cộng tác viên");
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [pickerSearchQuery, setPickerSearchQuery] = React.useState("");
   const [isPreviewMode, setIsPreviewMode] = React.useState(false);
-
-  // Drag & drop state
-  const [draggedMemberId, setDraggedMemberId] = React.useState<string | null>(null);
-  const [dragOverTierId, setDragOverTierId] = React.useState<string | null>(null);
 
   // Quick picker modal state
   const [pickerTierId, setPickerTierId] = React.useState<string | null>(null);
@@ -76,8 +70,12 @@ function MemberLayoutAdminPage() {
         getMemberLayoutConfig(),
       ]);
       setMembers(fetchedMembers);
-      setTiers(config.tiers || DEFAULT_MEMBER_LAYOUT.tiers);
-      setShowUnassigned(config.showUnassigned ?? true);
+
+      // Sanitize tiers to ensure memberIds are arrays
+      const rawTiers =
+        config.tiers && config.tiers.length > 0 ? config.tiers : DEFAULT_MEMBER_LAYOUT.tiers;
+      setTiers(rawTiers);
+      setShowUnassigned(config.showUnassigned ?? false);
       setUnassignedTitle(config.unassignedTitle || "Thành viên & Cộng tác viên");
     } catch (err) {
       console.error("Lỗi tải dữ liệu giao diện:", err);
@@ -98,38 +96,16 @@ function MemberLayoutAdminPage() {
     return map;
   }, [members]);
 
-  // Helper: check which tier a member belongs to
-  const memberTierMap = React.useMemo(() => {
-    const map = new Map<string, string>(); // memberId -> tierId
-    tiers.forEach((t) => {
-      t.memberIds.forEach((mId) => map.set(mId, t.id));
-    });
-    return map;
-  }, [tiers]);
-
-  // Filtered members for sidebar search
-  const filteredMembers = React.useMemo(() => {
-    if (!searchQuery.trim()) return members;
-    const q = searchQuery.toLowerCase();
-    return members.filter(
-      (m) =>
-        m.fullName.toLowerCase().includes(q) ||
-        m.position.toLowerCase().includes(q) ||
-        m.department.toLowerCase().includes(q),
-    );
-  }, [members, searchQuery]);
-
   // Add new tier
   const handleAddTier = () => {
     const newTierNumber = tiers.length + 1;
     const newTier: MemberTier = {
       id: `tier-${Date.now()}`,
-      name: `Tầng ${newTierNumber}: Ban chuyên môn`,
-      subtitle: "Mô tả vai trò hoặc nhóm trách nhiệm",
+      name: `Khối / Ban chuyên môn mới`,
       memberIds: [],
     };
     setTiers((prev) => [...prev, newTier]);
-    toast.success(`Đã thêm Tầng ${newTierNumber}`);
+    toast.success(`Đã thêm tầng mới (#${newTierNumber})`);
   };
 
   // Delete tier
@@ -151,9 +127,9 @@ function MemberLayoutAdminPage() {
     setTiers(newTiers);
   };
 
-  // Update tier fields
-  const handleUpdateTier = (tierId: string, field: "name" | "subtitle", value: string) => {
-    setTiers((prev) => prev.map((t) => (t.id === tierId ? { ...t, [field]: value } : t)));
+  // Update tier name
+  const handleUpdateTierName = (tierId: string, name: string) => {
+    setTiers((prev) => prev.map((t) => (t.id === tierId ? { ...t, name } : t)));
   };
 
   // Remove member from tier
@@ -169,34 +145,56 @@ function MemberLayoutAdminPage() {
     );
   };
 
-  // Add member to tier (enforce max 4)
+  // Reorder member inside tier (move left / right)
+  const handleMoveMemberInTier = (
+    tierId: string,
+    memberIndex: number,
+    direction: "left" | "right",
+  ) => {
+    setTiers((prev) =>
+      prev.map((t) => {
+        if (t.id !== tierId) return t;
+        const validIds = t.memberIds.filter((id) => memberMap.has(id));
+        const targetIndex = direction === "left" ? memberIndex - 1 : memberIndex + 1;
+        if (targetIndex < 0 || targetIndex >= validIds.length) return t;
+
+        const newIds = [...validIds];
+        const temp = newIds[memberIndex]!;
+        newIds[memberIndex] = newIds[targetIndex]!;
+        newIds[targetIndex] = temp;
+        return {
+          ...t,
+          memberIds: newIds,
+        };
+      }),
+    );
+  };
+
+  // Add member to tier (guarantee exactly max 4 valid members)
   const handleAddMemberToTier = (tierId: string, memberId: string) => {
     const targetTier = tiers.find((t) => t.id === tierId);
     if (!targetTier) return;
 
-    if (targetTier.memberIds.includes(memberId)) {
+    // Filter out invalid/deleted IDs
+    const currentValidIds = targetTier.memberIds.filter((id) => memberMap.has(id));
+
+    if (currentValidIds.includes(memberId)) {
       toast.info("Thành viên này đã có trong tầng này.");
       return;
     }
 
-    if (targetTier.memberIds.length >= 4) {
+    if (currentValidIds.length >= 4) {
       toast.error("Mỗi tầng chỉ được có tối đa 4 card thành viên!");
       return;
     }
 
-    // Remove from other tiers first if present
     setTiers((prev) =>
       prev.map((t) => {
-        const filtered = t.memberIds.filter((id) => id !== memberId);
-        if (t.id === tierId) {
-          return {
-            ...t,
-            memberIds: [...filtered, memberId].slice(0, 4),
-          };
-        }
+        if (t.id !== tierId) return t;
+        const cleanIds = t.memberIds.filter((id) => memberMap.has(id));
         return {
           ...t,
-          memberIds: filtered,
+          memberIds: [...cleanIds, memberId].slice(0, 4),
         };
       }),
     );
@@ -205,71 +203,18 @@ function MemberLayoutAdminPage() {
     setPickerTierId(null);
   };
 
-  // Drag and Drop Handlers
-  const handleDragStart = (e: React.DragEvent, memberId: string) => {
-    e.dataTransfer.setData("text/plain", memberId);
-    setDraggedMemberId(memberId);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedMemberId(null);
-    setDragOverTierId(null);
-  };
-
-  const handleDragOver = (e: React.DragEvent, tierId: string) => {
-    e.preventDefault();
-    if (dragOverTierId !== tierId) {
-      setDragOverTierId(tierId);
-    }
-  };
-
-  const handleDragLeave = () => {
-    setDragOverTierId(null);
-  };
-
-  const handleDropOnTier = (e: React.DragEvent, tierId: string) => {
-    e.preventDefault();
-    setDragOverTierId(null);
-    const memberId = e.dataTransfer.getData("text/plain") || draggedMemberId;
-    if (!memberId) return;
-
-    const targetTier = tiers.find((t) => t.id === tierId);
-    if (!targetTier) return;
-
-    if (targetTier.memberIds.includes(memberId)) {
-      return; // Already there
-    }
-
-    if (targetTier.memberIds.length >= 4) {
-      toast.error("Mỗi tầng chỉ được có tối đa 4 card thành viên!");
-      return;
-    }
-
-    // Move to this tier
-    setTiers((prev) =>
-      prev.map((t) => {
-        const withoutMember = t.memberIds.filter((id) => id !== memberId);
-        if (t.id === tierId) {
-          return {
-            ...t,
-            memberIds: [...withoutMember, memberId].slice(0, 4),
-          };
-        }
-        return {
-          ...t,
-          memberIds: withoutMember,
-        };
-      }),
-    );
-    toast.success("Đã thêm thành viên vào tầng");
-  };
-
   // Save changes
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Clean all tiers to only keep valid members and max 4
+      const cleanedTiers = tiers.map((t) => ({
+        ...t,
+        memberIds: t.memberIds.filter((id) => memberMap.has(id)).slice(0, 4),
+      }));
+
       const config: MemberLayoutConfig = {
-        tiers,
+        tiers: cleanedTiers,
         showUnassigned,
         unassignedTitle,
       };
@@ -291,10 +236,17 @@ function MemberLayoutAdminPage() {
     toast.info("Đã đặt lại cấu hình mẫu.");
   };
 
-  // Find unassigned members
-  const unassignedMembers = React.useMemo(() => {
-    return members.filter((m) => !memberTierMap.has(m.id));
-  }, [members, memberTierMap]);
+  // Filtered members for modal search
+  const filteredPickerMembers = React.useMemo(() => {
+    if (!pickerSearchQuery.trim()) return members;
+    const q = pickerSearchQuery.toLowerCase();
+    return members.filter(
+      (m) =>
+        m.fullName.toLowerCase().includes(q) ||
+        m.position.toLowerCase().includes(q) ||
+        m.department.toLowerCase().includes(q),
+    );
+  }, [members, pickerSearchQuery]);
 
   if (loading) {
     return (
@@ -320,10 +272,6 @@ function MemberLayoutAdminPage() {
               <h1 className="text-2xl font-black uppercase tracking-tight text-[#0f3d3e] dark:text-white flex items-center gap-2">
                 Giao diện thành viên
               </h1>
-              <p className="text-xs text-muted-foreground dark:text-slate-400 font-medium">
-                Tùy chỉnh cơ cấu các tầng, kéo thả tối đa 4 card/tầng căn chính giữa cho trang{" "}
-                <span className="font-semibold text-cyan-600 dark:text-cyan-400">Cơ cấu CLB</span>.
-              </p>
             </div>
           </div>
         </div>
@@ -373,14 +321,10 @@ function MemberLayoutAdminPage() {
             <h2 className="text-3xl font-bold text-[#0f3d3e] dark:text-white uppercase tracking-tight">
               Cơ cấu tổ chức HIEC
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Giao diện các tầng thành viên hiển thị căn giữa, tối đa 4 người mỗi dòng cách đều
-              nhau.
-            </p>
           </div>
 
           <div className="space-y-12">
-            {tiers.map((tier, tIdx) => {
+            {tiers.map((tier) => {
               const tierMembers = tier.memberIds
                 .map((id) => memberMap.get(id))
                 .filter(Boolean) as Member[];
@@ -389,17 +333,9 @@ function MemberLayoutAdminPage() {
                 <div key={tier.id} className="space-y-4 text-center">
                   {/* Tier Title */}
                   <div className="inline-flex flex-col items-center">
-                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-600 dark:text-cyan-400">
-                      TẦNG {tIdx + 1}
-                    </span>
                     <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                       {tier.name}
                     </h3>
-                    {tier.subtitle && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-md">
-                        {tier.subtitle}
-                      </p>
-                    )}
                   </div>
 
                   {/* Centered Row with evenly distributed cards (Max 4 per row) */}
@@ -455,402 +391,216 @@ function MemberLayoutAdminPage() {
                 </div>
               );
             })}
-
-            {showUnassigned && unassignedMembers.length > 0 && (
-              <div className="pt-8 border-t border-slate-200 dark:border-slate-800 text-center space-y-6">
-                <div>
-                  <Badge className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-none px-3 py-1 text-[10px] font-bold uppercase tracking-widest mb-1">
-                    Danh sách mở rộng
-                  </Badge>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                    {unassignedTitle}
-                  </h3>
-                </div>
-                <div className="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto">
-                  {unassignedMembers.map((m) => (
-                    <div
-                      key={m.id}
-                      className="w-48 p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-3 text-left"
-                    >
-                      <div className="size-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                        {m.avatarUrl ? (
-                          <img src={m.avatarUrl} className="size-full object-cover" />
-                        ) : (
-                          <User className="size-5 m-auto text-slate-400" />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                          {m.fullName}
-                        </p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                          {m.position}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       ) : (
-        /* EDITING MODE: 2 COLUMNS (Pool & Tier Board) */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* LEFT SIDEBAR: MEMBER POOL (col-span-4) */}
-          <div className="lg:col-span-4 space-y-4 sticky top-6">
-            <Card className="border-none shadow-md bg-white dark:bg-slate-900 rounded-3xl overflow-hidden transition-colors">
-              <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <User className="size-4 text-cyan-600 dark:text-cyan-400" />
-                    Thành viên ({members.length})
-                  </CardTitle>
-                  <span className="text-[11px] font-medium text-slate-400">Kéo thẻ sang tầng</span>
-                </div>
-
-                {/* Search Bar */}
-                <div className="relative mt-2">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                  <Input
-                    placeholder="Tìm tên, chức vụ, ban..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 h-9 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="size-3.5" />
-                    </button>
-                  )}
-                </div>
-              </CardHeader>
-
-              <CardContent className="p-3 max-h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar space-y-2">
-                {filteredMembers.length === 0 ? (
-                  <div className="py-8 text-center text-xs text-slate-400">
-                    Không tìm thấy thành viên phù hợp
-                  </div>
-                ) : (
-                  filteredMembers.map((m) => {
-                    const assignedTierId = memberTierMap.get(m.id);
-                    const assignedTier = tiers.find((t) => t.id === assignedTierId);
-
-                    return (
-                      <div
-                        key={m.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, m.id)}
-                        onDragEnd={handleDragEnd}
-                        className={`group p-2.5 rounded-2xl border transition-all cursor-grab active:cursor-grabbing flex items-center justify-between gap-3 ${
-                          draggedMemberId === m.id
-                            ? "opacity-50 scale-95 border-cyan-500 bg-cyan-50/20"
-                            : "bg-slate-50/70 dark:bg-slate-950/60 hover:bg-white dark:hover:bg-slate-800 border-slate-200/80 dark:border-slate-800 hover:shadow-sm"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <GripVertical className="size-4 text-slate-300 dark:text-slate-600 group-hover:text-cyan-500 shrink-0 transition-colors" />
-                          <div className="size-9 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-700">
-                            {m.avatarUrl ? (
-                              <img src={m.avatarUrl} className="size-full object-cover" alt="" />
-                            ) : (
-                              <User className="size-4 m-auto text-slate-400" />
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                              {m.fullName}
-                            </p>
-                            <p className="text-[10px] text-cyan-600 dark:text-cyan-400 font-semibold truncate">
-                              {m.position}
-                            </p>
-                            <p className="text-[9px] text-slate-400 truncate">{m.department}</p>
-                          </div>
-                        </div>
-
-                        {/* Status Badge */}
-                        <div className="shrink-0">
-                          {assignedTier ? (
-                            <Badge
-                              variant="secondary"
-                              className="text-[9px] font-bold px-2 py-0.5 bg-cyan-100/70 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border-none"
-                            >
-                              {assignedTier.name.split(":")[0] || "Đã gán"}
-                            </Badge>
-                          ) : (
-                            <Badge
-                              variant="outline"
-                              className="text-[9px] font-medium px-1.5 py-0.5 text-slate-400 border-slate-200 dark:border-slate-800"
-                            >
-                              Chưa gán
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </CardContent>
-            </Card>
-
-            {/* General Settings for Structure */}
-            <Card className="border-none shadow-sm bg-white dark:bg-slate-900 rounded-3xl p-4 space-y-3">
-              <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                Tùy chọn bổ sung
-              </h4>
-              <div className="flex items-center justify-between gap-2">
-                <label
-                  htmlFor="show-unassigned"
-                  className="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
-                >
-                  Hiện thành viên chưa xếp tầng ở cuối
-                </label>
-                <input
-                  id="show-unassigned"
-                  type="checkbox"
-                  checked={showUnassigned}
-                  onChange={(e) => setShowUnassigned(e.target.checked)}
-                  className="size-4 rounded text-cyan-600 focus:ring-cyan-500 cursor-pointer accent-cyan-600"
-                />
-              </div>
-              {showUnassigned && (
-                <div className="space-y-1 pt-1">
-                  <label className="text-[10px] font-bold uppercase text-slate-400">
-                    Tiêu đề nhóm chưa xếp tầng
-                  </label>
-                  <Input
-                    value={unassignedTitle}
-                    onChange={(e) => setUnassignedTitle(e.target.value)}
-                    className="h-8 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
-                  />
-                </div>
-              )}
-            </Card>
+        /* EDITING MODE: CLEAN FULL-WIDTH TIERS BOARD (No left sidebar, no drag-and-drop) */
+        <div className="space-y-6 max-w-6xl mx-auto">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              Danh sách các tầng ({tiers.length} tầng)
+            </h2>
+            <Button
+              onClick={handleAddTier}
+              className="rounded-2xl font-black uppercase tracking-wider text-xs px-4 py-2.5 bg-[#0f3d3e] dark:bg-cyan-700 hover:bg-[#1a4d4f] text-white shadow-sm"
+            >
+              <Plus className="size-4 mr-1.5 text-cyan-300" /> THÊM TẦNG MỚI
+            </Button>
           </div>
 
-          {/* RIGHT SIDE: TIERS MANAGEMENT BOARD (col-span-8) */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                  Danh sách các tầng ({tiers.length} tầng)
-                </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Kéo thả thành viên vào từng tầng. Mỗi tầng chứa <strong>tối đa 4 card</strong> và
-                  tự động căn đều chính giữa.
-                </p>
-              </div>
+          {tiers.length === 0 ? (
+            <div className="p-12 text-center rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
+              <Layers className="size-10 mx-auto text-slate-400" />
+              <h3 className="font-bold text-slate-700 dark:text-slate-300">
+                Chưa có tầng cơ cấu nào
+              </h3>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Hãy nhấn nút "Thêm tầng mới" hoặc "Đặt lại mẫu" để bắt đầu thiết lập bố cục.
+              </p>
               <Button
                 onClick={handleAddTier}
-                className="rounded-2xl font-black uppercase tracking-wider text-xs px-4 py-2.5 bg-[#0f3d3e] dark:bg-cyan-700 hover:bg-[#1a4d4f] text-white shadow-sm"
+                variant="outline"
+                className="rounded-xl mt-2 text-xs font-bold"
               >
-                <Plus className="size-4 mr-1.5 text-cyan-300" /> THÊM TẦNG MỚI
+                <Plus className="size-4 mr-1" /> Tạo tầng đầu tiên
               </Button>
             </div>
+          ) : (
+            <div className="space-y-6">
+              {tiers.map((tier, index) => {
+                // Get all valid members currently in this tier (up to 4)
+                const validMemberIds = tier.memberIds.filter((id) => memberMap.has(id));
+                const tierMembers = validMemberIds
+                  .map((id) => memberMap.get(id))
+                  .filter(Boolean) as Member[];
+                const currentCount = tierMembers.length;
 
-            {tiers.length === 0 ? (
-              <div className="p-12 text-center rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3">
-                <Layers className="size-10 mx-auto text-slate-400" />
-                <h3 className="font-bold text-slate-700 dark:text-slate-300">
-                  Chưa có tầng cơ cấu nào
-                </h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Hãy nhấn nút "Thêm tầng mới" hoặc "Đặt lại mẫu" để bắt đầu thiết lập bố cục.
-                </p>
-                <Button
-                  onClick={handleAddTier}
-                  variant="outline"
-                  className="rounded-xl mt-2 text-xs font-bold"
-                >
-                  <Plus className="size-4 mr-1" /> Tạo tầng đầu tiên
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {tiers.map((tier, index) => {
-                  const isHovered = dragOverTierId === tier.id;
-                  const currentCount = tier.memberIds.length;
-                  const isFull = currentCount >= 4;
-
-                  return (
-                    <Card
-                      key={tier.id}
-                      onDragOver={(e) => handleDragOver(e, tier.id)}
-                      onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDropOnTier(e, tier.id)}
-                      className={`rounded-3xl border transition-all duration-300 overflow-hidden ${
-                        isHovered
-                          ? "ring-2 ring-cyan-500 border-cyan-400 bg-cyan-50/10 shadow-lg scale-[1.01]"
-                          : "bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md"
-                      }`}
-                    >
-                      {/* Tier Header Controls */}
-                      <div className="p-4 px-6 bg-slate-50/80 dark:bg-slate-950/60 border-b border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <div>
-                            <span className="text-[9px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 block mb-0.5">
-                              Tên tầng #{index + 1}
-                            </span>
-                            <Input
-                              value={tier.name}
-                              onChange={(e) => handleUpdateTier(tier.id, "name", e.target.value)}
-                              className="h-8 text-xs font-bold bg-white dark:bg-slate-900 rounded-xl border-slate-200 dark:border-slate-800"
-                              placeholder="VD: Tầng 1: Ban Chủ Nhiệm"
-                            />
-                          </div>
-                          <div>
-                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block mb-0.5">
-                              Mô tả phụ (Tùy chọn)
-                            </span>
-                            <Input
-                              value={tier.subtitle || ""}
-                              onChange={(e) =>
-                                handleUpdateTier(tier.id, "subtitle", e.target.value)
-                              }
-                              className="h-8 text-xs bg-white dark:bg-slate-900 rounded-xl border-slate-200 dark:border-slate-800 text-slate-500"
-                              placeholder="VD: Định hướng chiến lược & Điều hành"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Actions: Reorder, Count, Delete */}
-                        <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
-                          <Badge
-                            variant="secondary"
-                            className={`text-[10px] font-black px-2.5 py-1 rounded-lg ${
-                              isFull
-                                ? "bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300"
-                                : "bg-cyan-100/60 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300"
-                            }`}
-                          >
-                            {currentCount} / 4 thẻ
-                          </Badge>
-
-                          <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-xl p-0.5 bg-white dark:bg-slate-900">
-                            <button
-                              disabled={index === 0}
-                              onClick={() => handleMoveTier(index, "up")}
-                              title="Di chuyển lên"
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-cyan-600 disabled:opacity-30 disabled:hover:text-slate-500"
-                            >
-                              <MoveUp className="size-3.5" />
-                            </button>
-                            <button
-                              disabled={index === tiers.length - 1}
-                              onClick={() => handleMoveTier(index, "down")}
-                              title="Di chuyển xuống"
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-cyan-600 disabled:opacity-30 disabled:hover:text-slate-500"
-                            >
-                              <MoveDown className="size-3.5" />
-                            </button>
-                          </div>
-
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteTier(tier.id)}
-                            className="size-8 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
-                            title="Xóa tầng này"
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
-                        </div>
+                return (
+                  <Card
+                    key={tier.id}
+                    className="rounded-3xl border transition-all duration-300 overflow-hidden bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 shadow-sm"
+                  >
+                    {/* Tier Header Controls */}
+                    <div className="p-4 px-6 bg-slate-50/80 dark:bg-slate-950/60 border-b border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex-1 max-w-md">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 block mb-0.5">
+                          Tên tầng #{index + 1}
+                        </span>
+                        <Input
+                          value={tier.name}
+                          onChange={(e) => handleUpdateTierName(tier.id, e.target.value)}
+                          className="h-8 text-xs font-bold bg-white dark:bg-slate-900 rounded-xl border-slate-200 dark:border-slate-800"
+                          placeholder="VD: Ban Chủ Nhiệm"
+                        />
                       </div>
 
-                      {/* Tier Content: Row of 4 Slots (Centered) */}
-                      <CardContent className="p-6">
-                        <div className="flex flex-wrap md:flex-nowrap justify-center items-stretch gap-4 sm:gap-6">
-                          {/* Render Assigned Member Cards in this Tier */}
-                          {tier.memberIds.map((mId, slotIndex) => {
-                            const member = memberMap.get(mId);
-                            if (!member) return null;
+                      {/* Actions: Reorder, Delete */}
+                      <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                        <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-xl p-0.5 bg-white dark:bg-slate-900">
+                          <button
+                            disabled={index === 0}
+                            onClick={() => handleMoveTier(index, "up")}
+                            title="Di chuyển lên"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-cyan-600 disabled:opacity-30 disabled:hover:text-slate-500"
+                          >
+                            <MoveUp className="size-3.5" />
+                          </button>
+                          <button
+                            disabled={index === tiers.length - 1}
+                            onClick={() => handleMoveTier(index, "down")}
+                            title="Di chuyển xuống"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-cyan-600 disabled:opacity-30 disabled:hover:text-slate-500"
+                          >
+                            <MoveDown className="size-3.5" />
+                          </button>
+                        </div>
 
-                            return (
-                              <div
-                                key={member.id}
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, member.id)}
-                                onDragEnd={handleDragEnd}
-                                className="group relative w-full sm:w-48 shrink-0 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 shadow-sm hover:shadow-md hover:border-cyan-500 transition-all cursor-grab active:cursor-grabbing text-left flex flex-col justify-between"
-                              >
-                                {/* Remove button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteTier(tier.id)}
+                          className="size-8 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                          title="Xóa tầng này"
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Tier Content: Centered Row of Members & Add Button */}
+                    <CardContent className="p-6">
+                      <div className="flex flex-wrap justify-center items-stretch gap-4 sm:gap-6">
+                        {/* 1. Render Member Cards */}
+                        {tierMembers.map((member, slotIndex) => (
+                          <div
+                            key={member.id}
+                            className="relative w-full sm:w-56 md:w-60 shrink-0 rounded-3xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3.5 shadow-sm hover:shadow-md hover:border-cyan-500/80 transition-all text-left flex flex-col justify-between"
+                          >
+                            {/* Remove button */}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveMemberFromTier(tier.id, member.id)}
+                              className="absolute top-2.5 right-2.5 size-7 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-red-500 hover:text-white text-slate-400 flex items-center justify-center transition-all z-10 shadow-sm"
+                              title="Gỡ khỏi tầng"
+                            >
+                              <X className="size-4" />
+                            </button>
+
+                            <div>
+                              <div className="aspect-square w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 mb-3 relative border border-slate-100 dark:border-slate-800">
+                                {member.avatarUrl ? (
+                                  <img
+                                    src={member.avatarUrl}
+                                    alt={member.fullName}
+                                    className="size-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="size-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                    <User className="size-10" />
+                                  </div>
+                                )}
+                                <span className="absolute bottom-1.5 left-1.5 bg-black/60 backdrop-blur-md text-white text-[9px] font-black px-2 py-0.5 rounded-lg">
+                                  Vị trí {slotIndex + 1}
+                                </span>
+                              </div>
+
+                              <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate mb-0.5">
+                                {member.fullName}
+                              </h4>
+                              <p className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold truncate mb-0.5">
+                                {member.position}
+                              </p>
+                              <p className="text-[11px] text-slate-400 truncate">
+                                {member.department}
+                              </p>
+                            </div>
+
+                            {/* Reorder Slots Controls */}
+                            <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-bold">
+                              <span>Vị trí {slotIndex + 1}/4</span>
+                              <div className="flex items-center gap-1">
                                 <button
                                   type="button"
-                                  onClick={() => handleRemoveMemberFromTier(tier.id, member.id)}
-                                  className="absolute top-2 right-2 size-6 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/60 text-slate-400 hover:text-red-600 dark:hover:text-red-400 flex items-center justify-center transition-colors z-10"
-                                  title="Gỡ khỏi tầng"
+                                  disabled={slotIndex === 0}
+                                  onClick={() => handleMoveMemberInTier(tier.id, slotIndex, "left")}
+                                  className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-cyan-600 disabled:opacity-30 disabled:hover:bg-transparent"
+                                  title="Đổi sang trái"
                                 >
-                                  <X className="size-3.5" />
+                                  <ChevronLeft className="size-3.5" />
                                 </button>
-
-                                <div>
-                                  <div className="aspect-square w-full rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 mb-2.5 relative border border-slate-100 dark:border-slate-800">
-                                    {member.avatarUrl ? (
-                                      <img
-                                        src={member.avatarUrl}
-                                        alt={member.fullName}
-                                        className="size-full object-cover"
-                                      />
-                                    ) : (
-                                      <div className="size-full flex items-center justify-center text-slate-300">
-                                        <User className="size-8" />
-                                      </div>
-                                    )}
-                                    <span className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-md text-white text-[8px] font-black px-1.5 py-0.5 rounded-md">
-                                      Vị trí {slotIndex + 1}
-                                    </span>
-                                  </div>
-
-                                  <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                                    {member.fullName}
-                                  </h4>
-                                  <p className="text-[10px] text-cyan-600 dark:text-cyan-400 font-semibold truncate">
-                                    {member.position}
-                                  </p>
-                                  <p className="text-[9px] text-slate-400 truncate">
-                                    {member.department}
-                                  </p>
-                                </div>
-
-                                <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[8px] text-slate-400 uppercase font-black">
-                                  <span>Kéo để đổi vị trí</span>
-                                  <GripVertical className="size-3" />
-                                </div>
+                                <button
+                                  type="button"
+                                  disabled={slotIndex === tierMembers.length - 1}
+                                  onClick={() =>
+                                    handleMoveMemberInTier(tier.id, slotIndex, "right")
+                                  }
+                                  className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-cyan-600 disabled:opacity-30 disabled:hover:bg-transparent"
+                                  title="Đổi sang phải"
+                                >
+                                  <ChevronRight className="size-3.5" />
+                                </button>
                               </div>
-                            );
-                          })}
-
-                          {/* Empty Slots to reach max 4 or prompt addition */}
-                          {currentCount < 4 && (
-                            <div
-                              onClick={() => setPickerTierId(tier.id)}
-                              className="w-full sm:w-48 shrink-0 min-h-[220px] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-cyan-500/80 dark:hover:border-cyan-500/60 bg-slate-50/40 dark:bg-slate-950/30 flex flex-col items-center justify-center p-4 text-center cursor-pointer transition-all hover:bg-cyan-50/20 group"
-                            >
-                              <div className="size-10 rounded-full bg-cyan-100/50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
-                                <Plus className="size-5" />
-                              </div>
-                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                Thêm thành viên
-                              </span>
-                              <span className="text-[10px] text-slate-400 mt-1">
-                                Kéo vào đây hoặc nhấn để chọn
-                              </span>
-                              <span className="text-[9px] font-mono text-cyan-600 dark:text-cyan-400 mt-2">
-                                Slot {currentCount + 1}/4
-                              </span>
                             </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                          </div>
+                        ))}
+
+                        {/* 2. Add Member Card Slot (Shows whenever count < 4, matching screenshot design) */}
+                        {currentCount < 4 && (
+                          <div
+                            onClick={() => {
+                              setPickerSearchQuery("");
+                              setPickerTierId(tier.id);
+                            }}
+                            className="w-full sm:w-56 md:w-60 min-h-[260px] rounded-3xl border-2 border-dashed border-slate-800 dark:border-slate-800 hover:border-cyan-500 bg-[#09111e] dark:bg-[#070e1a] flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 hover:scale-[1.02] shadow-inner group"
+                          >
+                            {/* Circular Teal Plus Button */}
+                            <div className="size-14 rounded-full bg-[#0d2232] border border-cyan-500/30 text-cyan-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-500 group-hover:text-white transition-all mb-3 shadow-md">
+                              <Plus className="size-6 stroke-[2.5]" />
+                            </div>
+
+                            {/* Label */}
+                            <span className="text-sm font-bold text-white tracking-tight">
+                              Thêm thành viên
+                            </span>
+
+                            {/* Subtitle */}
+                            <span className="text-xs text-slate-400 mt-1">
+                              Nhấn để chọn thành viên
+                            </span>
+
+                            {/* Slot Tag */}
+                            <span className="text-xs font-mono font-bold text-cyan-400 mt-3 px-3 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-800/40">
+                              Slot {currentCount + 1}/4
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -859,23 +609,23 @@ function MemberLayoutAdminPage() {
         open={!!pickerTierId}
         onOpenChange={(open) => !open && setPickerTierId(null)}
         title="Chọn thành viên thêm vào tầng"
-        description="Chọn thành viên để đưa vào tầng này (tối đa 4 người)."
+        description="Nhấn vào thành viên bên dưới để đưa vào tầng này (tối đa 4 người/tầng)."
       >
         <div className="space-y-4 py-2 max-h-[65vh] overflow-y-auto custom-scrollbar">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
             <Input
-              placeholder="Tìm theo tên hoặc chức vụ..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm theo tên, chức vụ, ban..."
+              value={pickerSearchQuery}
+              onChange={(e) => setPickerSearchQuery(e.target.value)}
               className="pl-9 h-10 text-xs rounded-xl"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
-            {filteredMembers.map((m) => {
-              const currentTierId = memberTierMap.get(m.id);
-              const isAlreadyInThisTier = currentTierId === pickerTierId;
+            {filteredPickerMembers.map((m) => {
+              const activeTier = tiers.find((t) => t.id === pickerTierId);
+              const isAlreadyInThisTier = activeTier ? activeTier.memberIds.includes(m.id) : false;
 
               return (
                 <button
@@ -885,33 +635,39 @@ function MemberLayoutAdminPage() {
                   onClick={() => {
                     if (pickerTierId) handleAddMemberToTier(pickerTierId, m.id);
                   }}
-                  className={`p-2.5 rounded-xl border text-left flex items-center justify-between gap-2.5 transition-all ${
+                  className={`p-3 rounded-2xl border text-left flex items-center justify-between gap-3 transition-all ${
                     isAlreadyInThisTier
-                      ? "opacity-40 bg-slate-100 dark:bg-slate-800 border-transparent cursor-not-allowed"
+                      ? "opacity-50 bg-slate-100 dark:bg-slate-800 border-transparent cursor-not-allowed"
                       : "bg-white dark:bg-slate-900 hover:border-cyan-500 hover:bg-cyan-50/30 dark:hover:bg-cyan-950/30 border-slate-200 dark:border-slate-800"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="size-9 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="size-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
                       {m.avatarUrl ? (
                         <img src={m.avatarUrl} className="size-full object-cover" />
                       ) : (
-                        <User className="size-4 m-auto text-slate-400" />
+                        <User className="size-5 m-auto text-slate-400" />
                       )}
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
                         {m.fullName}
                       </p>
-                      <p className="text-[10px] text-cyan-600 dark:text-cyan-400 truncate">
+                      <p className="text-[10px] text-cyan-600 dark:text-cyan-400 font-semibold truncate">
                         {m.position}
                       </p>
+                      <p className="text-[9px] text-slate-400 truncate">{m.department}</p>
                     </div>
                   </div>
                   {isAlreadyInThisTier ? (
-                    <Check className="size-4 text-emerald-500 shrink-0" />
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+                      <Check className="size-4" />
+                      <span>Đã có</span>
+                    </div>
                   ) : (
-                    <Plus className="size-4 text-slate-400 group-hover:text-cyan-600 shrink-0" />
+                    <div className="size-7 rounded-lg bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
+                      <Plus className="size-4" />
+                    </div>
                   )}
                 </button>
               );
