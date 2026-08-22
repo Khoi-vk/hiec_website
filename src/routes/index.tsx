@@ -248,7 +248,7 @@ export function HomePage() {
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg" className="rounded-full">
                 <Link to="/signup">
-                  Đăng ký tham gia <ArrowUpRight className="ml-2 size-4" />
+                  Nhận thông tin từ HIEC <ArrowUpRight className="ml-2 size-4" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="rounded-full">
