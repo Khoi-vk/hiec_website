@@ -18,6 +18,7 @@ import {
   Users,
   Home,
   Settings2,
+  LayoutTemplate,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,8 @@ const navItems = [
   { title: "Chỉnh sửa Trang chủ", url: "/admin/static-content", icon: Settings2 }, // Nút quản lý nội dung trang chủ
   { title: "Quản lý dự án", url: "/admin/manage-projects", icon: Rocket },
   { title: "Quản lý hoạt động", url: "/admin/manage-activities", icon: FileText },
-  { title: "Quản lý Thành viên", url: "/admin/manage-members", icon: Users }, 
+  { title: "Quản lý Thành viên", url: "/admin/manage-members", icon: Users },
+  { title: "Giao diện thành viên", url: "/admin/member-layout", icon: LayoutTemplate },
 ] as const;
 
 export function AdminSidebar() {

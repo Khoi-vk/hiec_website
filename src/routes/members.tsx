@@ -120,15 +120,16 @@ function MembersPage() {
             </div>
           ) : (
             <div className="space-y-16 md:space-y-24">
-              {layoutConfig.tiers.map((tier: MemberTier, tIndex: number) => {
-                // Lấy danh sách thành viên trong tầng (tối đa 4 người)
-                const tierMembers = tier.memberIds
-                  .slice(0, 4)
-                  .map((id) => memberMap.get(id))
-                  .filter(Boolean) as Member[];
-
-                if (tierMembers.length === 0) return null;
-
+              {layoutConfig.tiers
+                .map((tier: MemberTier) => ({
+                  tier,
+                  members: tier.memberIds
+                    .slice(0, 4)
+                    .map((id) => memberMap.get(id))
+                    .filter(Boolean) as Member[],
+                }))
+                .filter((row) => row.members.length > 0)
+                .map(({ tier, members: tierMembers }, tIndex) => {
                 return (
                   <div key={tier.id || tIndex} className="space-y-8 animate-fade-up">
                     {/* TIER HEADER */}

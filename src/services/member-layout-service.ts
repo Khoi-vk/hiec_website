@@ -165,6 +165,17 @@ export const DEFAULT_MEMBER_LAYOUT: MemberLayoutConfig = {
 
 const LOCAL_STORAGE_KEY = "hiec_member_layout_v1";
 
+/** Chỉ giữ tầng có ít nhất 1 thành viên tồn tại — giống trang Cơ cấu CLB. */
+export function sanitizeTiersForDisplay(tiers: MemberTier[], members: Member[]): MemberTier[] {
+  const validIds = new Set(members.map((m) => m.id));
+  return tiers
+    .map((t) => ({
+      ...t,
+      memberIds: (t.memberIds || []).filter((id) => validIds.has(id)).slice(0, 4),
+    }))
+    .filter((t) => t.memberIds.length > 0);
+}
+
 /**
  * Lấy tất cả thành viên từ Supabase (nếu có) hoặc fallback dữ liệu mẫu
  */

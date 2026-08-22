@@ -15,15 +15,12 @@ import {
   Search,
   Check,
   X,
-  AlertCircle,
-  Sparkles,
   ArrowRight,
-  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
@@ -35,6 +32,7 @@ import {
   type MemberTier,
   type MemberLayoutConfig,
   DEFAULT_MEMBER_LAYOUT,
+  sanitizeTiersForDisplay,
 } from "@/services/member-layout-service";
 
 export const Route = createFileRoute("/admin/member-layout")({
@@ -58,7 +56,7 @@ function MemberLayoutAdminPage() {
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [isPreviewMode, setIsPreviewMode] = React.useState(false);
+  const [isPreviewMode, setIsPreviewMode] = React.useState(true);
 
   // Drag & drop state
   const [draggedMemberId, setDraggedMemberId] = React.useState<string | null>(null);
@@ -76,7 +74,7 @@ function MemberLayoutAdminPage() {
         getMemberLayoutConfig(),
       ]);
       setMembers(fetchedMembers);
-      setTiers(config.tiers || DEFAULT_MEMBER_LAYOUT.tiers);
+      setTiers(sanitizeTiersForDisplay(config.tiers || DEFAULT_MEMBER_LAYOUT.tiers, fetchedMembers));
       setShowUnassigned(config.showUnassigned ?? true);
       setUnassignedTitle(config.unassignedTitle || "Thành viên & Cộng tác viên");
     } catch (err) {
@@ -285,7 +283,7 @@ function MemberLayoutAdminPage() {
   // Reset to default
   const handleReset = () => {
     if (!confirm("Bạn có chắc chắn muốn đặt lại cấu hình phân tầng về mặc định?")) return;
-    setTiers(DEFAULT_MEMBER_LAYOUT.tiers);
+    setTiers(sanitizeTiersForDisplay(DEFAULT_MEMBER_LAYOUT.tiers, members));
     setShowUnassigned(DEFAULT_MEMBER_LAYOUT.showUnassigned);
     setUnassignedTitle(DEFAULT_MEMBER_LAYOUT.unassignedTitle);
     toast.info("Đã đặt lại cấu hình mẫu.");
@@ -380,11 +378,15 @@ function MemberLayoutAdminPage() {
           </div>
 
           <div className="space-y-12">
-            {tiers.map((tier, tIdx) => {
-              const tierMembers = tier.memberIds
-                .map((id) => memberMap.get(id))
-                .filter(Boolean) as Member[];
-
+            {tiers
+              .map((tier) => ({
+                tier,
+                members: tier.memberIds
+                  .map((id) => memberMap.get(id))
+                  .filter(Boolean) as Member[],
+              }))
+              .filter((row) => row.members.length > 0)
+              .map(({ tier, members: tierMembers }, tIdx) => {
               return (
                 <div key={tier.id} className="space-y-4 text-center">
                   {/* Tier Title */}
@@ -404,12 +406,7 @@ function MemberLayoutAdminPage() {
 
                   {/* Centered Row with evenly distributed cards (Max 4 per row) */}
                   <div className="w-full flex justify-center items-stretch gap-6 md:gap-8 max-w-6xl mx-auto px-4">
-                    {tierMembers.length === 0 ? (
-                      <div className="py-8 px-12 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-400 text-xs font-medium">
-                        Tầng này chưa có thành viên nào.
-                      </div>
-                    ) : (
-                      tierMembers.map((member) => (
+                    {tierMembers.map((member) => (
                         <div
                           key={member.id}
                           className="w-full max-w-[240px] sm:max-w-[260px] md:w-64 shrink-0 transition-all duration-300 hover:-translate-y-1"
@@ -449,8 +446,7 @@ function MemberLayoutAdminPage() {
                             </CardContent>
                           </Card>
                         </div>
-                      ))
-                    )}
+                    ))}
                   </div>
                 </div>
               );
@@ -499,8 +495,8 @@ function MemberLayoutAdminPage() {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Danh sách các tầng ({tiers.length} tầng)
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                Danh sách các tầng ({tiers.filter((t) => t.memberIds.some((id) => memberMap.has(id)) || t.memberIds.length === 0).length} tầng)
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Mỗi tầng chứa <strong>tối đa 4 card</strong> và tự động căn đều chính giữa. Nhấn vào
@@ -535,8 +531,16 @@ function MemberLayoutAdminPage() {
           ) : (
             <div className="space-y-6">
               {tiers.map((tier, index) => {
+                const resolvedMembers = tier.memberIds
+                  .map((id) => memberMap.get(id))
+                  .filter(Boolean) as Member[];
+                // Ẩn tầng trống giống trang công khai; tầng mới tạo (chưa gán ai) vẫn hiện để chỉnh.
+                if (resolvedMembers.length === 0 && tier.memberIds.length > 0) {
+                  return null;
+                }
+
                 const isHovered = dragOverTierId === tier.id;
-                const currentCount = tier.memberIds.length;
+                const currentCount = resolvedMembers.length;
                 const isFull = currentCount >= 4;
 
                 return (
@@ -622,14 +626,9 @@ function MemberLayoutAdminPage() {
                       </div>
                     </div>
 
-                    {/* Tier Content: Row of 4 Slots (Centered) */}
                     <CardContent className="p-6">
                       <div className="flex flex-wrap md:flex-nowrap justify-center items-stretch gap-4 sm:gap-6">
-                        {/* Render Assigned Member Cards in this Tier */}
-                        {tier.memberIds.map((mId, slotIndex) => {
-                          const member = memberMap.get(mId);
-                          if (!member) return null;
-
+                        {resolvedMembers.map((member, slotIndex) => {
                           return (
                             <div
                               key={member.id}
@@ -638,7 +637,6 @@ function MemberLayoutAdminPage() {
                               onDragEnd={handleDragEnd}
                               className="group relative w-full sm:w-48 shrink-0 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 shadow-sm hover:shadow-md hover:border-cyan-500 transition-all cursor-grab active:cursor-grabbing text-left flex flex-col justify-between"
                             >
-                              {/* Remove button */}
                               <button
                                 type="button"
                                 onClick={() => handleRemoveMemberFromTier(tier.id, member.id)}
@@ -684,28 +682,21 @@ function MemberLayoutAdminPage() {
                             </div>
                           );
                         })}
-
-                        {/* Empty Slots to reach max 4 or prompt addition */}
-                        {currentCount < 4 && (
-                          <div
-                            onClick={() => setPickerTierId(tier.id)}
-                            className="w-full sm:w-48 shrink-0 min-h-[220px] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-cyan-500/80 dark:hover:border-cyan-500/60 bg-slate-50/40 dark:bg-slate-950/30 flex flex-col items-center justify-center p-4 text-center cursor-pointer transition-all hover:bg-cyan-50/20 group"
-                          >
-                            <div className="size-10 rounded-full bg-cyan-100/50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
-                              <Plus className="size-5" />
-                            </div>
-                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                              Thêm thành viên
-                            </span>
-                            <span className="text-[10px] text-slate-400 mt-1">
-                              Nhấn để chọn thành viên
-                            </span>
-                            <span className="text-[9px] font-mono text-cyan-600 dark:text-cyan-400 mt-2">
-                              Slot {currentCount + 1}/4
-                            </span>
-                          </div>
-                        )}
                       </div>
+
+                      {currentCount < 4 && (
+                        <div className="mt-4 flex justify-center">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setPickerTierId(tier.id)}
+                            className="rounded-xl text-xs font-bold gap-1.5"
+                          >
+                            <Plus className="size-4" />
+                            Thêm thành viên
+                          </Button>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 );
