@@ -119,7 +119,7 @@ function MembersPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-16 md:space-y-24">
+            <div className="flex flex-col">
               {layoutConfig.tiers
                 .map((tier: MemberTier) => ({
                   tier,
@@ -130,20 +130,36 @@ function MembersPage() {
                 }))
                 .filter((row) => row.members.length > 0)
                 .map(({ tier, members: tierMembers }, tIndex) => {
-                return (
-                  <div key={tier.id || tIndex} className="space-y-8 animate-fade-up">
-                    {/* TIER HEADER */}
-                    <div className="text-center max-w-2xl mx-auto space-y-2">
-                      <h2 className="text-2xl sm:text-3xl font-black text-[#0f3d3e] dark:text-white tracking-tight">
-                        {tier.name}
-                      </h2>
+                const name = tier.name?.trim() ?? "";
+                const subtitle = tier.subtitle?.trim() ?? "";
+                const hasHeader = Boolean(name || subtitle);
 
-                      {tier.subtitle && (
-                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
-                          {tier.subtitle}
-                        </p>
-                      )}
-                    </div>
+                return (
+                  <div
+                    key={tier.id || tIndex}
+                    className={[
+                      "animate-fade-up",
+                      hasHeader ? "space-y-8" : "",
+                      tIndex > 0 ? (hasHeader ? "mt-16 md:mt-24" : "mt-8 md:mt-10") : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    {hasHeader ? (
+                      <div className="text-center max-w-2xl mx-auto space-y-2">
+                        {name ? (
+                          <h2 className="text-2xl sm:text-3xl font-black text-[#0f3d3e] dark:text-white tracking-tight">
+                            {name}
+                          </h2>
+                        ) : null}
+
+                        {subtitle ? (
+                          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                            {subtitle}
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : null}
 
                     {/* TIER CARDS: HIỂN THỊ CÙNG 1 DÒNG, TỐI ĐA 4 CARD, CĂN CHÍNH GIỮA VÀ CÁCH ĐỀU LỀ */}
                     <div className="w-full flex flex-wrap md:flex-nowrap justify-center items-stretch gap-6 md:gap-8 lg:gap-10 max-w-[1300px] mx-auto">
