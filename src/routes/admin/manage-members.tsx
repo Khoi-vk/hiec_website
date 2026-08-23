@@ -6,7 +6,6 @@ import {
   Trash2,
   Loader2,
   Save,
-  Users,
   UserCircle,
   X,
   ChevronDown,
@@ -127,13 +126,10 @@ function MembersManagementPage() {
 
   return (
     <div className="space-y-6 text-left animate-fade-up">
-      <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-4 transition-colors">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="text-2xl font-black uppercase tracking-tighter text-[#0f3d3e] dark:text-white flex items-center gap-2 transition-colors">
-            <Users className="text-cyan-600 dark:text-cyan-400 size-6 transition-colors" /> Quản lý
-            Thành viên
-          </h1>
-          <p className="text-xs text-muted-foreground dark:text-slate-400 mt-1 font-medium italic transition-colors">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Quản lý Thành viên</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Nhân sự nòng cốt của HIEC HUST.
           </p>
         </div>

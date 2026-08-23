@@ -29,7 +29,7 @@ export function Footer() {
   useEffect(() => {
     async function loadFooter() {
       try {
-        // Lấy đúng dữ liệu từ bảng hiec_settings (key: home_content)
+        // Lấy nội dung trang chủ từ static_content (id: home_content)
         const homeData = await getHomeContent();
         setData(homeData);
       } catch (error) {

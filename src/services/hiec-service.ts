@@ -132,18 +132,41 @@ export const contactInfo = {
 
 // --- TYPE & SUPABASE HANDLERS ---
 export type HomeContent = {
-  hero: { title: string; description: string };
-  stats: Array<{ number: string; label: string }>;
+  hero: {
+    badge: string;
+    title: string;
+    description: string;
+    primaryBtnText: string;
+    secondaryBtnText: string;
+  };
+  historySection: { badge: string; title: string; description: string };
   history: Array<{ year: string; title: string; description: string }>;
-  departments: Array<{ code: string; title: string; text: string; iconName: string }>;
-  cta: { title: string; description: string };
+  deptSection: { badge: string; title: string; description: string };
+  departments: Array<{ code: string; title: string; text: string }>;
+  actionSection: { badge: string; title: string; allActivitiesText: string; allProjectsText: string };
+  stats: Array<{ number: string; label: string }>;
+  cta: {
+    tagline: string;
+    title: string;
+    description: string;
+    primaryBtnText: string;
+    secondaryBtnText: string;
+  };
   contact: { email: string; phone: string; messenger: string; address: string };
 };
 
 export const defaultHomeContent: HomeContent = {
-  hero: { 
-    title: "Khơi nguồn sáng tạo, Dẫn lối thành công", 
-    description: "Câu lạc bộ Sáng tạo & Khởi nghiệp HUST — nơi những người trẻ học bằng cách làm, kết nối bằng giá trị và cùng nhau tạo ra điều đáng tự hào." 
+  hero: {
+    badge: "HIEC / Since 2019",
+    title: "Khơi nguồn sáng tạo, Dẫn lối thành công",
+    description: "Câu lạc bộ Sáng tạo & Khởi nghiệp HUST — nơi những người trẻ học bằng cách làm, kết nối bằng giá trị và cùng nhau tạo ra điều đáng tự hào.",
+    primaryBtnText: "Quan tâm",
+    secondaryBtnText: "Khám phá câu chuyện",
+  },
+  historySection: {
+    badge: "01 / Lịch sử",
+    title: "Mỗi chặng đường là một lần trưởng thành.",
+    description: "Từ một nhóm sinh viên có chung sự tò mò, HIEC lớn lên nhờ những người dám bắt đầu, dám thử và dám làm lại.",
   },
   stats: [
     { number: "06+", label: "năm xây cộng đồng" },
@@ -152,42 +175,66 @@ export const defaultHomeContent: HomeContent = {
     { number: "∞", label: "ý tưởng được lắng nghe" }
   ],
   history,
-  // THAY ĐỔI TẠI ĐÂY: Thêm dữ liệu mặc định cho ban
+  deptSection: {
+    badge: "02 / Cơ cấu phòng ban",
+    title: "Một đội ngũ. Bốn cách tạo giá trị.",
+    description: "Mỗi ban là một mảnh ghép độc lập, nhưng cùng vận hành để HIEC trở thành một hệ sinh thái học tập và hành động.",
+  },
   departments: [
-    { code: "01", title: "Ban Phát triển chiến lược", text: "Định hình hướng đi...", iconName: "Network" },
-    { code: "02", title: "Ban Truyền thông", text: "Kể câu chuyện HIEC...", iconName: "Megaphone" },
-    { code: "03", title: "Ban Đối ngoại", text: "Mở rộng mạng lưới...", iconName: "BriefcaseBusiness" },
-    { code: "04", title: "Ban Nhân sự Sự kiện", text: "Xây văn hóa nội bộ...", iconName: "Users" },
+    { code: "01", title: "Ban Phát triển chiến lược", text: "Định hình hướng đi..." },
+    { code: "02", title: "Ban Truyền thông", text: "Kể câu chuyện HIEC..." },
+    { code: "03", title: "Ban Đối ngoại", text: "Mở rộng mạng lưới..." },
+    { code: "04", title: "Ban Nhân sự Sự kiện", text: "Xây văn hóa nội bộ..." },
   ],
-  cta: { 
-    title: "Đừng chỉ có ý tưởng. Hãy biến nó thành thật.", 
-    description: "HIEC không hứa hẹn một hành trình dễ dàng, nhưng đây là nơi bạn có đồng đội." 
+  actionSection: {
+    badge: "03 / HIEC in action",
+    title: "Học bằng cách làm.",
+    allActivitiesText: "Tất cả hoạt động",
+    allProjectsText: "Tất cả dự án",
+  },
+  cta: {
+    tagline: "Make your move",
+    title: "Đừng chỉ có ý tưởng. Hãy biến nó thành thật.",
+    description: "HIEC không hứa hẹn một hành trình dễ dàng, nhưng đây là nơi bạn có đồng đội.",
+    primaryBtnText: "Nhận thông tin từ HIEC",
+    secondaryBtnText: "Liên hệ",
   },
   contact: contactInfo
 };
 
 export async function getHomeContent(): Promise<HomeContent> {
   try {
-    const { data, error } = await supabase.from("hiec_settings").select("value").eq("key", "home_content").single();
-    if (error || !data) return defaultHomeContent;
-    return data.value as HomeContent;
+    const { data, error } = await supabase.from("static_content").select("content").eq("id", "home_content").single();
+    if (error || !data?.content) return defaultHomeContent;
+    const content = data.content as Partial<HomeContent>;
+    return {
+      ...defaultHomeContent,
+      ...content,
+      hero: { ...defaultHomeContent.hero, ...content.hero },
+      historySection: { ...defaultHomeContent.historySection, ...content.historySection },
+      deptSection: { ...defaultHomeContent.deptSection, ...content.deptSection },
+      actionSection: { ...defaultHomeContent.actionSection, ...content.actionSection },
+      cta: { ...defaultHomeContent.cta, ...content.cta },
+      contact: { ...defaultHomeContent.contact, ...content.contact },
+      stats: content.stats?.length ? content.stats : defaultHomeContent.stats,
+      history: content.history?.length ? content.history : defaultHomeContent.history,
+      departments: content.departments?.length ? content.departments : defaultHomeContent.departments,
+    };
   } catch {
     return defaultHomeContent;
   }
 }
 
-export async function updateHomeContent(content: HomeContent) {
-  console.log("Dữ liệu chuẩn bị gửi đi:", content); // Debug xem có phần contact chưa
-
+export async function updateHomeContent(payload: HomeContent) {
   const { data, error } = await supabase
-    .from("hiec_settings")
+    .from("static_content")
     .upsert(
       { 
-        key: "home_content", 
-        value: content, 
+        id: "home_content",
+        content: payload,
         updated_at: new Date().toISOString() 
       }, 
-      { onConflict: 'key' } // Ép buộc ghi đè nếu trùng key 'home_content'
+      { onConflict: "id" }
     );
 
   if (error) {

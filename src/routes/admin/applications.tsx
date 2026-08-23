@@ -265,9 +265,9 @@ function ApplicationsPage() {
       {/* =========================
           TIÊU ĐỀ TRANG
       ========================= */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="font-display text-2xl md:text-3xl font-extrabold tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
             Quản lý đơn đăng ký
           </h1>
           <p className="text-sm text-muted-foreground mt-1">

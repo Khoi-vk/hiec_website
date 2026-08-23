@@ -99,9 +99,11 @@ function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Tổng quan</h1>
-        <p className="text-sm text-muted-foreground">Số liệu demo cho website hiec.vn</p>
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Tổng quan</h1>
+          <p className="text-sm text-muted-foreground mt-1">Số liệu demo cho website hiec.vn</p>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

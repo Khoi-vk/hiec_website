@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Pencil, Trash2, Loader2, Save, Rocket, Image as ImageIcon, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Save, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -114,12 +114,10 @@ function ProjectsManagementPage() {
 
   return (
     <div className="space-y-6 animate-fade-up text-left">
-      <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-6 transition-colors">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="text-2xl font-black uppercase tracking-tighter text-[#0f3d3e] dark:text-white flex items-center gap-2 transition-colors">
-            <Rocket className="text-blue-600 dark:text-blue-400 size-6 transition-colors" /> Quản lý Dự án
-          </h1>
-          <p className="text-xs text-muted-foreground dark:text-slate-400 mt-1 font-medium italic transition-colors">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Quản lý Dự án</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Công bố những dự án đột phá của HIEC HUST.
           </p>
         </div>

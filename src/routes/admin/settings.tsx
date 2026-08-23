@@ -43,11 +43,13 @@ function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Thay đổi giao diện</h1>
-        <p className="text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Thay đổi giao diện</h1>
+          <p className="text-sm text-muted-foreground mt-1">
           FDD 2.2 — màu chủ đạo, font chữ, căn lề, logo và ảnh nền banner.
-        </p>
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

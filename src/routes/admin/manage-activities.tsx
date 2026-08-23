@@ -135,8 +135,11 @@ function AdminManageActivitiesPage() {
 
   return (
     <div className="space-y-6 text-left animate-fade-up">
-      <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-4 transition-colors">
-        <h1 className="text-2xl font-black uppercase tracking-tighter text-[#0f3d3e] dark:text-white transition-colors">Quản lý Hoạt động</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Quản lý Hoạt động</h1>
+          <p className="text-sm text-muted-foreground mt-1">Quản lý và công bố các hoạt động của HIEC HUST.</p>
+        </div>
         <Button onClick={() => { setEditingId(null);
                                 setFormData({
                                   title: "",

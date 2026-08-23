@@ -308,22 +308,13 @@ function MemberLayoutAdminPage() {
   return (
     <div className="space-y-6 text-left animate-fade-up max-w-[1400px] mx-auto pb-16">
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
         <div>
-          <div className="flex items-center gap-2.5">
-            <div className="size-10 rounded-2xl bg-cyan-500/10 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shadow-inner">
-              <Layers className="size-5" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-black uppercase tracking-tight text-[#0f3d3e] dark:text-white flex items-center gap-2">
-                Giao diện thành viên
-              </h1>
-              <p className="text-xs text-muted-foreground dark:text-slate-400 font-medium">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Giao diện thành viên</h1>
+          <p className="text-sm text-muted-foreground mt-1">
                 Tùy chỉnh cơ cấu các tầng, tối đa 4 card/tầng căn chính giữa cho trang{" "}
                 <span className="font-semibold text-cyan-600 dark:text-cyan-400">Cơ cấu CLB</span>.
-              </p>
-            </div>
-          </div>
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
