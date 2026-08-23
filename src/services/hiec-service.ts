@@ -159,6 +159,12 @@ export type HomeContent = {
     tiktokUrl?: string;
     instagramUrl?: string;
   };
+  gallery?: Array<{
+    id?: string;
+    imageUrl: string;
+    tag: string;
+    caption?: string;
+  }>;
 };
 
 export const defaultHomeContent: HomeContent = {
@@ -212,6 +218,26 @@ export const defaultHomeContent: HomeContent = {
     tiktokUrl: socialLinks.find((link) => link.label === "TikTok")?.href ?? "",
     instagramUrl: socialLinks.find((link) => link.label === "Instagram")?.href ?? "",
   },
+  gallery: [
+    {
+      id: "default-1",
+      imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+      tag: "Thực chiến",
+      caption: "Học bằng cách làm.",
+    },
+    {
+      id: "default-2",
+      imageUrl: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=800&q=80",
+      tag: "Workshop",
+      caption: "Kết nối để cùng tiến xa.",
+    },
+    {
+      id: "default-3",
+      imageUrl: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=800&q=80",
+      tag: "Hackathon",
+      caption: "Biến ý tưởng thành tác động.",
+    },
+  ],
 };
 
 export async function getHomeContent(): Promise<HomeContent> {
@@ -229,6 +255,7 @@ export async function getHomeContent(): Promise<HomeContent> {
       cta: { ...defaultHomeContent.cta, ...content.cta },
       contact: { ...defaultHomeContent.contact, ...content.contact },
       footer: { ...defaultHomeContent.footer, ...content.footer },
+      gallery: content.gallery?.length ? content.gallery : defaultHomeContent.gallery ?? [],
       stats: content.stats?.length ? content.stats : defaultHomeContent.stats,
       history: content.history?.length ? content.history : defaultHomeContent.history,
       departments: content.departments?.length ? content.departments : defaultHomeContent.departments,
@@ -255,4 +282,16 @@ export async function updateHomeContent(payload: HomeContent) {
     throw new Error(error.message);
   }
   return data;
+}
+
+export async function uploadImageToStorage(file: File): Promise<string> {
+  const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+  const filePath = `gallery/${fileName}`;
+
+  const { error } = await supabase.storage.from("images").upload(filePath, file);
+  if (error) throw error;
+
+  const { data } = supabase.storage.from("images").getPublicUrl(filePath);
+  return data.publicUrl;
 }

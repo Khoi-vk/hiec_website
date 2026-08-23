@@ -1,46 +1,10 @@
 import * as React from "react";
-import { supabase } from "@/utils/supabase";
+import type { HomeContent } from "@/services/hiec-service";
 
-type GalleryItem = {
-  id: string;
-  label: string;
-  src: string;
-};
+type GalleryItem = NonNullable<HomeContent["gallery"]>[number];
 
-export function MovementGallery() {
-  const [gallery, setGallery] = React.useState<GalleryItem[]>([]);
+export function MovementGallery({ gallery = [] }: { gallery?: GalleryItem[] }) {
   const [active, setActive] = React.useState(0);
-
-  React.useEffect(() => {
-    async function loadGallery() {
-      const { data, error } = await supabase
-        .from("movement_gallery_images")
-        .select("id, label, image_path")
-        .eq("is_active", true)
-        .order("display_order", { ascending: true });
-
-      if (error) {
-        console.error("Không thể tải ảnh gallery:", error.message);
-        return;
-      }
-
-      const items = (data ?? []).map((item) => {
-        const { data: publicUrl } = supabase.storage
-          .from("movement-gallery")
-          .getPublicUrl(item.image_path);
-
-        return {
-          id: item.id,
-          label: item.label,
-          src: publicUrl.publicUrl,
-        };
-      });
-
-      setGallery(items);
-    }
-
-    loadGallery();
-  }, []);
 
   React.useEffect(() => {
     if (gallery.length < 2) return;
@@ -87,14 +51,17 @@ export function MovementGallery() {
       >
         <div className="overflow-hidden rounded-[2rem] border-8 border-card bg-card shadow-elevated">
           <img
-            src={currentItem.src}
-            alt={currentItem.label}
+            src={currentItem.imageUrl}
+            alt={currentItem.caption || currentItem.tag}
             className="aspect-[4/5] w-full object-cover"
           />
         </div>
 
-        <div className="mt-4 flex items-center justify-between rounded-full border border-border bg-card px-4 py-2 text-xs font-bold shadow-sm">
-          <span>{currentItem.label}</span>
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-full border border-border bg-card px-4 py-2 text-xs font-bold shadow-sm">
+          <span className="min-w-0 truncate">
+            {currentItem.tag}
+            {currentItem.caption ? ` - ${currentItem.caption}` : ""}
+          </span>
           <span className="text-primary">
             {String(active + 1).padStart(2, "0")} /{" "}
             {String(gallery.length).padStart(2, "0")}
@@ -120,7 +87,7 @@ function GalleryCard({
     >
       <div className="overflow-hidden rounded-2xl border-4 border-card bg-card shadow-lg">
         <img
-          src={item.src}
+          src={item.imageUrl}
           alt=""
           className="aspect-[4/5] w-full object-cover"
         />

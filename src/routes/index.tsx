@@ -76,7 +76,7 @@ export function HomePage() {
                   ))}
                 </div>
               </div>
-              <MovementGallery />
+              <MovementGallery gallery={data.gallery ?? []} />
             </div>
           </section>
 
