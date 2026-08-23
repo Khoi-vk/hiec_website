@@ -16,6 +16,7 @@ import {
   Check,
   X,
   ArrowRight,
+  Columns2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -30,10 +31,18 @@ import {
   saveMemberLayoutConfig,
   type Member,
   type MemberTier,
+  type MemberBoard,
   type MemberLayoutConfig,
   DEFAULT_MEMBER_LAYOUT,
   sanitizeTiersForDisplay,
+  sanitizeBoards,
 } from "@/services/member-layout-service";
+import { MemberOrgBoard } from "@/components/members/member-org-board";
+
+type PickerTarget =
+  | { kind: "tier"; id: string }
+  | { kind: "board-featured"; id: string }
+  | { kind: "board-members"; id: string };
 
 export const Route = createFileRoute("/admin/member-layout")({
   head: () => ({
@@ -51,6 +60,7 @@ export const Route = createFileRoute("/admin/member-layout")({
 function MemberLayoutAdminPage() {
   const [members, setMembers] = React.useState<Member[]>([]);
   const [tiers, setTiers] = React.useState<MemberTier[]>([]);
+  const [boards, setBoards] = React.useState<MemberBoard[]>([]);
   const [showUnassigned, setShowUnassigned] = React.useState(true);
   const [unassignedTitle, setUnassignedTitle] = React.useState("Thành viên & Cộng tác viên");
   const [loading, setLoading] = React.useState(true);
@@ -61,9 +71,13 @@ function MemberLayoutAdminPage() {
   // Drag & drop state
   const [draggedMemberId, setDraggedMemberId] = React.useState<string | null>(null);
   const [dragOverTierId, setDragOverTierId] = React.useState<string | null>(null);
+  const [dragOverBoardSlot, setDragOverBoardSlot] = React.useState<{
+    boardId: string;
+    slot: "featured" | "members";
+  } | null>(null);
 
   // Quick picker modal state
-  const [pickerTierId, setPickerTierId] = React.useState<string | null>(null);
+  const [pickerTarget, setPickerTarget] = React.useState<PickerTarget | null>(null);
 
   // Load initial data
   const loadData = React.useCallback(async () => {
@@ -74,7 +88,14 @@ function MemberLayoutAdminPage() {
         getMemberLayoutConfig(),
       ]);
       setMembers(fetchedMembers);
-      setTiers(sanitizeTiersForDisplay(config.tiers || DEFAULT_MEMBER_LAYOUT.tiers, fetchedMembers));
+      const validIds = new Set(fetchedMembers.map((m) => m.id));
+      setTiers(
+        (config.tiers || DEFAULT_MEMBER_LAYOUT.tiers).map((t) => ({
+          ...t,
+          memberIds: (t.memberIds || []).filter((id) => validIds.has(id)).slice(0, 4),
+        })),
+      );
+      setBoards(sanitizeBoards(config.boards, fetchedMembers));
       setShowUnassigned(config.showUnassigned ?? true);
       setUnassignedTitle(config.unassignedTitle || "Thành viên & Cộng tác viên");
     } catch (err) {
@@ -200,7 +221,83 @@ function MemberLayoutAdminPage() {
     );
 
     toast.success("Đã thêm thành viên vào tầng");
-    setPickerTierId(null);
+    setPickerTarget(null);
+  };
+
+  const handleAddBoard = () => {
+    const newBoard: MemberBoard = {
+      id: `board-${Date.now()}`,
+      name: `Bảng ${boards.length + 1}`,
+      featuredMemberId: null,
+      memberIds: [],
+    };
+    setBoards((prev) => [...prev, newBoard]);
+    toast.success("Đã thêm bảng mới");
+  };
+
+  const handleDeleteBoard = (boardId: string) => {
+    setBoards((prev) => prev.filter((b) => b.id !== boardId));
+    toast.info("Đã xóa bảng");
+  };
+
+  const handleMoveBoard = (index: number, direction: "up" | "down") => {
+    if (direction === "up" && index === 0) return;
+    if (direction === "down" && index === boards.length - 1) return;
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    const next = [...boards];
+    const temp = next[index]!;
+    next[index] = next[targetIndex]!;
+    next[targetIndex] = temp;
+    setBoards(next);
+  };
+
+  const handleUpdateBoardName = (boardId: string, name: string) => {
+    setBoards((prev) => prev.map((b) => (b.id === boardId ? { ...b, name } : b)));
+  };
+
+  const placeMemberOnBoards = (
+    current: MemberBoard[],
+    boardId: string,
+    memberId: string,
+    slot: "featured" | "members",
+  ): MemberBoard[] => {
+    return current.map((b) => {
+      const featured = b.featuredMemberId === memberId ? null : b.featuredMemberId;
+      const memberIds = b.memberIds.filter((id) => id !== memberId);
+      if (b.id !== boardId) {
+        return { ...b, featuredMemberId: featured, memberIds };
+      }
+      if (slot === "featured") {
+        return { ...b, featuredMemberId: memberId, memberIds };
+      }
+      return { ...b, featuredMemberId: featured, memberIds: [...memberIds, memberId] };
+    });
+  };
+
+  const handleAddMemberToBoard = (
+    boardId: string,
+    memberId: string,
+    slot: "featured" | "members",
+  ) => {
+    setBoards((prev) => placeMemberOnBoards(prev, boardId, memberId, slot));
+    toast.success(slot === "featured" ? "Đã đặt card cột trái" : "Đã thêm thành viên vào bảng");
+    setPickerTarget(null);
+  };
+
+  const handleRemoveMemberFromBoard = (
+    boardId: string,
+    memberId: string,
+    slot: "featured" | "members",
+  ) => {
+    setBoards((prev) =>
+      prev.map((b) => {
+        if (b.id !== boardId) return b;
+        if (slot === "featured") {
+          return { ...b, featuredMemberId: b.featuredMemberId === memberId ? null : b.featuredMemberId };
+        }
+        return { ...b, memberIds: b.memberIds.filter((id) => id !== memberId) };
+      }),
+    );
   };
 
   // Drag and Drop Handlers
@@ -212,6 +309,7 @@ function MemberLayoutAdminPage() {
   const handleDragEnd = () => {
     setDraggedMemberId(null);
     setDragOverTierId(null);
+    setDragOverBoardSlot(null);
   };
 
   const handleDragOver = (e: React.DragEvent, tierId: string) => {
@@ -262,12 +360,25 @@ function MemberLayoutAdminPage() {
     toast.success("Đã thêm thành viên vào tầng");
   };
 
+  const handleDropOnBoard = (
+    e: React.DragEvent,
+    boardId: string,
+    slot: "featured" | "members",
+  ) => {
+    e.preventDefault();
+    setDragOverBoardSlot(null);
+    const memberId = e.dataTransfer.getData("text/plain") || draggedMemberId;
+    if (!memberId) return;
+    handleAddMemberToBoard(boardId, memberId, slot);
+  };
+
   // Save changes
   const handleSave = async () => {
     setSaving(true);
     try {
       const config: MemberLayoutConfig = {
         tiers,
+        boards,
         showUnassigned,
         unassignedTitle,
       };
@@ -284,6 +395,7 @@ function MemberLayoutAdminPage() {
   const handleReset = () => {
     if (!confirm("Bạn có chắc chắn muốn đặt lại cấu hình phân tầng về mặc định?")) return;
     setTiers(sanitizeTiersForDisplay(DEFAULT_MEMBER_LAYOUT.tiers, members));
+    setBoards(sanitizeBoards(DEFAULT_MEMBER_LAYOUT.boards, members));
     setShowUnassigned(DEFAULT_MEMBER_LAYOUT.showUnassigned);
     setUnassignedTitle(DEFAULT_MEMBER_LAYOUT.unassignedTitle);
     toast.info("Đã đặt lại cấu hình mẫu.");
@@ -291,8 +403,14 @@ function MemberLayoutAdminPage() {
 
   // Find unassigned members
   const unassignedMembers = React.useMemo(() => {
-    return members.filter((m) => !memberTierMap.has(m.id));
-  }, [members, memberTierMap]);
+    const assigned = new Set<string>();
+    tiers.forEach((t) => t.memberIds.forEach((id) => assigned.add(id)));
+    boards.forEach((b) => {
+      if (b.featuredMemberId) assigned.add(b.featuredMemberId);
+      b.memberIds.forEach((id) => assigned.add(id));
+    });
+    return members.filter((m) => !assigned.has(m.id));
+  }, [members, tiers, boards]);
 
   if (loading) {
     return (
@@ -312,7 +430,7 @@ function MemberLayoutAdminPage() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Giao diện thành viên</h1>
           <p className="text-sm text-muted-foreground mt-1">
-                Tùy chỉnh cơ cấu các tầng, tối đa 4 card/tầng căn chính giữa cho trang{" "}
+                Tùy chỉnh các tầng (tối đa 4 card/tầng) và các bảng hai cột cho trang{" "}
                 <span className="font-semibold text-cyan-600 dark:text-cyan-400">Cơ cấu CLB</span>.
           </p>
         </div>
@@ -455,6 +573,23 @@ function MemberLayoutAdminPage() {
                 </div>
               );
             })}
+
+            {boards.some((b) => b.featuredMemberId || b.memberIds.length > 0) ? (
+              <div className="mt-12 space-y-10 pt-8 border-t border-slate-200 dark:border-slate-800">
+                {boards.map((board) => (
+                  <MemberOrgBoard
+                    key={board.id}
+                    name={board.name}
+                    featured={
+                      board.featuredMemberId ? memberMap.get(board.featuredMemberId) ?? null : null
+                    }
+                    members={board.memberIds
+                      .map((id) => memberMap.get(id))
+                      .filter(Boolean) as Member[]}
+                  />
+                ))}
+              </div>
+            ) : null}
 
             {showUnassigned && unassignedMembers.length > 0 && (
               <div className="pt-8 border-t border-slate-200 dark:border-slate-800 text-center space-y-6">
@@ -693,7 +828,7 @@ function MemberLayoutAdminPage() {
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => setPickerTierId(tier.id)}
+                            onClick={() => setPickerTarget({ kind: "tier", id: tier.id })}
                             className="rounded-xl text-xs font-bold gap-1.5"
                           >
                             <Plus className="size-4" />
@@ -707,15 +842,268 @@ function MemberLayoutAdminPage() {
               })}
             </div>
           )}
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                Các bảng cơ cấu ({boards.length} bảng)
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Mỗi bảng có tên riêng, cột trái đủ chỗ cho <strong>1 card</strong>, cột phải chứa
+                nhiều card thành viên.
+              </p>
+            </div>
+            <Button
+              onClick={handleAddBoard}
+              variant="outline"
+              className="rounded-2xl font-black uppercase tracking-wider text-xs px-4 py-2.5 border-cyan-600/40 text-cyan-800 dark:text-cyan-300 self-start sm:self-auto"
+            >
+              <Columns2 className="size-4 mr-1.5" /> THÊM BẢNG
+            </Button>
+          </div>
+
+          {boards.length === 0 ? (
+            <div className="p-10 text-center rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2">
+              <Columns2 className="size-9 mx-auto text-slate-400" />
+              <h3 className="font-bold text-slate-700 dark:text-slate-300">Chưa có bảng nào</h3>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Tạo bảng để nhóm thành viên theo khối (ví dụ Hội đồng cố vấn) với card nổi bật bên
+                trái.
+              </p>
+              <Button
+                onClick={handleAddBoard}
+                variant="outline"
+                className="rounded-xl mt-2 text-xs font-bold"
+              >
+                <Plus className="size-4 mr-1" /> Tạo bảng đầu tiên
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {boards.map((board, index) => {
+                const featured = board.featuredMemberId
+                  ? memberMap.get(board.featuredMemberId)
+                  : undefined;
+                const rightMembers = board.memberIds
+                  .map((id) => memberMap.get(id))
+                  .filter(Boolean) as Member[];
+                const featuredHover =
+                  dragOverBoardSlot?.boardId === board.id && dragOverBoardSlot.slot === "featured";
+                const membersHover =
+                  dragOverBoardSlot?.boardId === board.id && dragOverBoardSlot.slot === "members";
+
+                return (
+                  <Card
+                    key={board.id}
+                    className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden"
+                  >
+                    <div className="p-4 px-6 bg-slate-50/80 dark:bg-slate-950/60 border-b border-slate-100 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex-1">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-red-600 dark:text-red-400 block mb-0.5">
+                          Tên bảng #{index + 1}
+                        </span>
+                        <Input
+                          value={board.name}
+                          onChange={(e) => handleUpdateBoardName(board.id, e.target.value)}
+                          className="h-8 text-xs font-bold bg-white dark:bg-slate-900 rounded-xl border-slate-200 dark:border-slate-800 max-w-md"
+                          placeholder="VD: Hội đồng quản trị"
+                        />
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                        >
+                          {(featured ? 1 : 0) + rightMembers.length} thẻ
+                        </Badge>
+                        <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-xl p-0.5 bg-white dark:bg-slate-900">
+                          <button
+                            type="button"
+                            disabled={index === 0}
+                            onClick={() => handleMoveBoard(index, "up")}
+                            title="Di chuyển lên"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-cyan-600 disabled:opacity-30"
+                          >
+                            <MoveUp className="size-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index === boards.length - 1}
+                            onClick={() => handleMoveBoard(index, "down")}
+                            title="Di chuyển xuống"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-cyan-600 disabled:opacity-30"
+                          >
+                            <MoveDown className="size-3.5" />
+                          </button>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteBoard(board.id)}
+                          className="size-8 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                          title="Xóa bảng này"
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <CardContent className="p-5">
+                      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)]">
+                        <div
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setDragOverBoardSlot({ boardId: board.id, slot: "featured" });
+                          }}
+                          onDragLeave={() => setDragOverBoardSlot(null)}
+                          onDrop={(e) => handleDropOnBoard(e, board.id, "featured")}
+                          className={`rounded-2xl border-2 border-dashed p-3 min-h-[220px] transition-colors ${
+                            featuredHover
+                              ? "border-cyan-500 bg-cyan-50/40 dark:bg-cyan-950/20"
+                              : "border-slate-200 dark:border-slate-800"
+                          }`}
+                        >
+                          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                            Cột trái — 1 card
+                          </p>
+                          {featured ? (
+                            <div className="relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-4 text-center">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleRemoveMemberFromBoard(board.id, featured.id, "featured")
+                                }
+                                className="absolute top-2 right-2 size-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-red-600 flex items-center justify-center"
+                                title="Gỡ khỏi cột trái"
+                              >
+                                <X className="size-3.5" />
+                              </button>
+                              <div className="size-20 mx-auto rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 mb-2">
+                                {featured.avatarUrl ? (
+                                  <img
+                                    src={featured.avatarUrl}
+                                    alt={featured.fullName}
+                                    className="size-full object-cover"
+                                  />
+                                ) : (
+                                  <User className="size-8 m-auto text-slate-300" />
+                                )}
+                              </div>
+                              <p className="text-sm font-bold text-cyan-700 dark:text-cyan-400">
+                                {featured.fullName}
+                              </p>
+                              <p className="text-xs font-semibold text-slate-900 dark:text-white mt-0.5">
+                                {featured.position}
+                              </p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">{featured.department}</p>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPickerTarget({ kind: "board-featured", id: board.id })
+                              }
+                              className="flex h-[180px] w-full flex-col items-center justify-center gap-2 rounded-xl text-slate-400 hover:text-cyan-600 hover:bg-cyan-50/40 dark:hover:bg-cyan-950/20"
+                            >
+                              <Plus className="size-6" />
+                              <span className="text-xs font-bold">Chèn card cột trái</span>
+                            </button>
+                          )}
+                        </div>
+
+                        <div
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setDragOverBoardSlot({ boardId: board.id, slot: "members" });
+                          }}
+                          onDragLeave={() => setDragOverBoardSlot(null)}
+                          onDrop={(e) => handleDropOnBoard(e, board.id, "members")}
+                          className={`rounded-2xl border-2 border-dashed p-3 min-h-[220px] transition-colors ${
+                            membersHover
+                              ? "border-cyan-500 bg-cyan-50/40 dark:bg-cyan-950/20"
+                              : "border-slate-200 dark:border-slate-800"
+                          }`}
+                        >
+                          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                            Cột phải — nhiều card
+                          </p>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
+                            {rightMembers.map((member) => (
+                              <div
+                                key={member.id}
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, member.id)}
+                                onDragEnd={handleDragEnd}
+                                className="relative rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-3 text-center cursor-grab"
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleRemoveMemberFromBoard(board.id, member.id, "members")
+                                  }
+                                  className="absolute top-1.5 right-1.5 size-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-red-600 flex items-center justify-center"
+                                >
+                                  <X className="size-3" />
+                                </button>
+                                <div className="size-14 mx-auto rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 mb-2">
+                                  {member.avatarUrl ? (
+                                    <img
+                                      src={member.avatarUrl}
+                                      alt={member.fullName}
+                                      className="size-full object-cover"
+                                    />
+                                  ) : (
+                                    <User className="size-6 m-auto text-slate-300" />
+                                  )}
+                                </div>
+                                <p className="text-xs font-bold text-cyan-700 dark:text-cyan-400 truncate">
+                                  {member.fullName}
+                                </p>
+                                <p className="text-[10px] font-semibold text-slate-800 dark:text-slate-200 truncate">
+                                  {member.position}
+                                </p>
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPickerTarget({ kind: "board-members", id: board.id })
+                              }
+                              className="flex min-h-[140px] flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-400 hover:text-cyan-600 hover:border-cyan-400"
+                            >
+                              <Plus className="size-5" />
+                              <span className="text-[10px] font-bold">Thêm card</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
       {/* QUICK MEMBER PICKER MODAL */}
       <Modal
-        open={!!pickerTierId}
-        onOpenChange={(open) => !open && setPickerTierId(null)}
-        title="Chọn thành viên thêm vào tầng"
-        description="Chọn thành viên để đưa vào tầng này (tối đa 4 người)."
+        open={!!pickerTarget}
+        onOpenChange={(open) => !open && setPickerTarget(null)}
+        title={
+          pickerTarget?.kind === "board-featured"
+            ? "Chọn card cột trái"
+            : pickerTarget?.kind === "board-members"
+              ? "Chọn thành viên thêm vào bảng"
+              : "Chọn thành viên thêm vào tầng"
+        }
+        description={
+          pickerTarget?.kind === "tier"
+            ? "Chọn thành viên để đưa vào tầng này (tối đa 4 người)."
+            : pickerTarget?.kind === "board-featured"
+              ? "Card này sẽ hiển thị ở cột trái của bảng."
+              : "Các card này sẽ nằm ở cột phải, có thể thêm nhiều người."
+        }
       >
         <div className="space-y-4 py-2 max-h-[65vh] overflow-y-auto custom-scrollbar">
           <div className="relative">
@@ -731,18 +1119,37 @@ function MemberLayoutAdminPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
             {filteredMembers.map((m) => {
               const currentTierId = memberTierMap.get(m.id);
-              const isAlreadyInThisTier = currentTierId === pickerTierId;
+              const isAlreadyInThisTier =
+                pickerTarget?.kind === "tier" && currentTierId === pickerTarget.id;
+              const targetBoard =
+                pickerTarget?.kind === "board-featured" || pickerTarget?.kind === "board-members"
+                  ? boards.find((b) => b.id === pickerTarget.id)
+                  : undefined;
+              const isAlreadyFeatured =
+                pickerTarget?.kind === "board-featured" && targetBoard?.featuredMemberId === m.id;
+              const isAlreadyInBoardMembers =
+                pickerTarget?.kind === "board-members" && targetBoard?.memberIds.includes(m.id);
+              const isDisabled = isAlreadyInThisTier || isAlreadyFeatured || isAlreadyInBoardMembers;
 
               return (
                 <button
                   key={m.id}
                   type="button"
-                  disabled={isAlreadyInThisTier}
+                  disabled={isDisabled}
                   onClick={() => {
-                    if (pickerTierId) handleAddMemberToTier(pickerTierId, m.id);
+                    if (!pickerTarget) return;
+                    if (pickerTarget.kind === "tier") {
+                      handleAddMemberToTier(pickerTarget.id, m.id);
+                      return;
+                    }
+                    handleAddMemberToBoard(
+                      pickerTarget.id,
+                      m.id,
+                      pickerTarget.kind === "board-featured" ? "featured" : "members",
+                    );
                   }}
                   className={`p-2.5 rounded-xl border text-left flex items-center justify-between gap-2.5 transition-all ${
-                    isAlreadyInThisTier
+                    isDisabled
                       ? "opacity-40 bg-slate-100 dark:bg-slate-800 border-transparent cursor-not-allowed"
                       : "bg-white dark:bg-slate-900 hover:border-cyan-500 hover:bg-cyan-50/30 dark:hover:bg-cyan-950/30 border-slate-200 dark:border-slate-800"
                   }`}
@@ -764,7 +1171,7 @@ function MemberLayoutAdminPage() {
                       </p>
                     </div>
                   </div>
-                  {isAlreadyInThisTier ? (
+                  {isDisabled ? (
                     <Check className="size-4 text-emerald-500 shrink-0" />
                   ) : (
                     <Plus className="size-4 text-slate-400 group-hover:text-cyan-600 shrink-0" />

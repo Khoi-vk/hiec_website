@@ -22,8 +22,17 @@ export interface MemberTier {
   memberIds: string[]; // Tối đa 4 ID thành viên
 }
 
+/** Bảng cơ cấu: cột trái 1 card nổi bật, cột phải lưới nhiều card. */
+export interface MemberBoard {
+  id: string;
+  name: string;
+  featuredMemberId: string | null;
+  memberIds: string[];
+}
+
 export interface MemberLayoutConfig {
   tiers: MemberTier[];
+  boards: MemberBoard[];
   showUnassigned: boolean;
   unassignedTitle: string;
   updatedAt?: string;
@@ -159,6 +168,14 @@ export const DEFAULT_MEMBER_LAYOUT: MemberLayoutConfig = {
       memberIds: ["m-10"],
     },
   ],
+  boards: [
+    {
+      id: "board-1",
+      name: "Hội đồng cố vấn",
+      featuredMemberId: null,
+      memberIds: [],
+    },
+  ],
   showUnassigned: true,
   unassignedTitle: "Thành viên & Cộng tác viên",
 };
@@ -174,6 +191,48 @@ export function sanitizeTiersForDisplay(tiers: MemberTier[], members: Member[]):
       memberIds: (t.memberIds || []).filter((id) => validIds.has(id)).slice(0, 4),
     }))
     .filter((t) => t.memberIds.length > 0);
+}
+
+export function sanitizeBoards(boards: MemberBoard[] | undefined, members: Member[]): MemberBoard[] {
+  const validIds = new Set(members.map((m) => m.id));
+  return (boards || []).map((b) => {
+    const featured =
+      b.featuredMemberId && validIds.has(b.featuredMemberId) ? b.featuredMemberId : null;
+    const memberIds = Array.from(
+      new Set((b.memberIds || []).filter((id) => validIds.has(id) && id !== featured)),
+    );
+    return {
+      id: b.id,
+      name: b.name || "",
+      featuredMemberId: featured,
+      memberIds,
+    };
+  });
+}
+
+export function normalizeMemberLayoutConfig(
+  raw: Partial<MemberLayoutConfig> | null | undefined,
+): MemberLayoutConfig {
+  if (!raw || !Array.isArray(raw.tiers)) {
+    return DEFAULT_MEMBER_LAYOUT;
+  }
+  return {
+    tiers: raw.tiers,
+    boards: Array.isArray(raw.boards) ? raw.boards : [],
+    showUnassigned: raw.showUnassigned ?? true,
+    unassignedTitle: raw.unassignedTitle || "Thành viên & Cộng tác viên",
+    updatedAt: raw.updatedAt,
+  };
+}
+
+export function collectAssignedMemberIds(config: MemberLayoutConfig): Set<string> {
+  const set = new Set<string>();
+  config.tiers.forEach((t) => t.memberIds.forEach((id) => set.add(id)));
+  (config.boards || []).forEach((b) => {
+    if (b.featuredMemberId) set.add(b.featuredMemberId);
+    b.memberIds.forEach((id) => set.add(id));
+  });
+  return set;
 }
 
 /**
@@ -218,9 +277,9 @@ export async function getMemberLayoutConfig(): Promise<MemberLayoutConfig> {
       .maybeSingle();
 
     if (!error && data?.value && Array.isArray(data.value.tiers)) {
-      // Lưu lại local storage làm cache
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data.value));
-      return data.value as MemberLayoutConfig;
+      const normalized = normalizeMemberLayoutConfig(data.value);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(normalized));
+      return normalized;
     }
   } catch (err) {
     console.warn("Lỗi khi tải cấu hình member_layout từ Supabase:", err);
@@ -232,7 +291,7 @@ export async function getMemberLayoutConfig(): Promise<MemberLayoutConfig> {
     if (local) {
       const parsed = JSON.parse(local);
       if (parsed && Array.isArray(parsed.tiers)) {
-        return parsed as MemberLayoutConfig;
+        return normalizeMemberLayoutConfig(parsed);
       }
     }
   } catch (err) {
@@ -253,9 +312,22 @@ export async function saveMemberLayoutConfig(config: MemberLayoutConfig): Promis
     memberIds: t.memberIds.slice(0, 4),
   }));
 
+  const sanitizedBoards = (config.boards || []).map((b) => {
+    const featured = b.featuredMemberId || null;
+    return {
+      id: b.id,
+      name: b.name.trim(),
+      featuredMemberId: featured,
+      memberIds: Array.from(
+        new Set((b.memberIds || []).filter((id) => id && id !== featured)),
+      ),
+    };
+  });
+
   const payload: MemberLayoutConfig = {
     ...config,
     tiers: sanitizedTiers,
+    boards: sanitizedBoards,
     updatedAt: new Date().toISOString(),
   };
 

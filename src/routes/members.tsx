@@ -6,9 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { MemberOrgBoard } from "@/components/members/member-org-board";
 import {
   getAllMembers,
   getMemberLayoutConfig,
+  collectAssignedMemberIds,
+  sanitizeBoards,
   type Member,
   type MemberLayoutConfig,
   type MemberTier,
@@ -60,14 +63,15 @@ function MembersPage() {
     return map;
   }, [members]);
 
-  // Set of assigned member IDs
-  const assignedMemberIds = React.useMemo(() => {
-    const set = new Set<string>();
-    layoutConfig.tiers.forEach((t) => {
-      t.memberIds.forEach((id) => set.add(id));
-    });
-    return set;
-  }, [layoutConfig]);
+  const assignedMemberIds = React.useMemo(
+    () => collectAssignedMemberIds(layoutConfig),
+    [layoutConfig],
+  );
+
+  const displayBoards = React.useMemo(
+    () => sanitizeBoards(layoutConfig.boards, members),
+    [layoutConfig.boards, members],
+  );
 
   // Unassigned members list
   const unassignedMembers = React.useMemo(() => {
@@ -217,6 +221,26 @@ function MembersPage() {
                   </div>
                 );
               })}
+
+              {displayBoards.some((b) => b.featuredMemberId || b.memberIds.length > 0) ? (
+                <div className="mt-16 space-y-12 md:mt-24">
+                  {displayBoards.map((board) => (
+                    <MemberOrgBoard
+                      key={board.id}
+                      name={board.name}
+                      featured={
+                        board.featuredMemberId
+                          ? memberMap.get(board.featuredMemberId) ?? null
+                          : null
+                      }
+                      members={board.memberIds
+                        .map((id) => memberMap.get(id))
+                        .filter(Boolean) as Member[]}
+                      onSelectMember={setSelectedMember}
+                    />
+                  ))}
+                </div>
+              ) : null}
 
               {/* 3. NHÓM THÀNH VIÊN MỞ RỘNG (NẾU ĐƯỢC BẬT TRONG CẤU HÌNH ADMIN) */}
               {layoutConfig.showUnassigned && unassignedMembers.length > 0 && (
