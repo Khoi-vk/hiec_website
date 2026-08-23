@@ -66,7 +66,7 @@ export function NewsletterCard() {
     <section className="px-5 pb-20 pt-4 lg:px-8 lg:pb-28">
       <div className="mx-auto flex justify-center">
         {/* CARD CONTAINER WITH EXACT PRESERVED SIZE & STYLING */}
-        <div className="relative w-full max-w-lg rounded-[2.5rem] bg-[#07191d] p-7 text-white shadow-2xl border border-white/10 sm:p-10 dark:bg-[#061418]">
+        <div className="relative w-full max-w-lg rounded-3xl border border-border bg-card p-7 text-card-foreground shadow-2xl sm:p-10">
           {/* NÚT QUAY LẠI TRANG CHỦ */}
           
 
@@ -77,18 +77,18 @@ export function NewsletterCard() {
                 <CheckCircle className="size-12" />
               </div>
 
-              <h3 className="mb-4 font-display text-2xl font-black tracking-tight text-white sm:text-3xl">
+              <h3 className="mb-4 text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
                 Đăng ký nhận tin thành công!
               </h3>
 
-              <p className="mb-8 text-base font-medium leading-relaxed text-slate-300">
+              <p className="mb-8 text-sm font-medium leading-relaxed text-muted-foreground">
                 Cảm ơn bạn đã quan tâm đến HIEC! Chúng mình sẽ sớm gửi thông tin mới nhất tới bạn.
               </p>
 
               <Button
                 type="button"
-                variant="shimmer"
-                className="w-full rounded-2xl bg-white py-6 text-xs font-black uppercase tracking-widest text-[#07191d] transition-all hover:bg-slate-200"
+                variant="outline"
+                className="w-full rounded-2xl py-6 text-xs font-bold uppercase tracking-wider text-foreground transition-all"
                 onClick={() => {
                   setIsSubmitted(false);
                   reset();
@@ -101,11 +101,11 @@ export function NewsletterCard() {
             /* FORM ĐĂNG KÝ NHẬN THÔNG TIN */
             <>
               <div className="mb-8 text-center">
-                <h3 className="font-display text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
+                <h3 className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
                   ĐĂNG KÝ NHẬN THÔNG TIN
                 </h3>
 
-                <p className="mt-2 text-xs font-bold italic text-slate-300">
+                <p className="mt-2 text-sm text-muted-foreground">
                   Hãy để chúng mình giúp bạn hiểu rõ hơn về HIEC nhé!
                 </p>
               </div>
@@ -113,14 +113,14 @@ export function NewsletterCard() {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* HỌ VÀ TÊN */}
                 <div className="space-y-2 text-left">
-                  <Label className="ml-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
-                    Họ và tên <span className="text-red-400">*</span>
+                  <Label className="ml-1 text-xs font-bold uppercase tracking-wider text-foreground">
+                    Họ và tên <span className="text-destructive">*</span>
                   </Label>
 
                   <Input
                     {...register("fullName")}
                     placeholder="Nguyễn Văn A"
-                    className="h-12 rounded-full border-none bg-slate-50 px-5 font-bold text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/50"
+                    className="h-12 rounded-2xl border border-border bg-background px-5 font-bold text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                   />
 
                   <FieldError message={errors.fullName?.message} />
@@ -128,15 +128,15 @@ export function NewsletterCard() {
 
                 {/* EMAIL */}
                 <div className="space-y-2 text-left">
-                  <Label className="ml-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
-                    Email <span className="text-red-400">*</span>
+                  <Label className="ml-1 text-xs font-bold uppercase tracking-wider text-foreground">
+                    Email <span className="text-destructive">*</span>
                   </Label>
 
                   <Input
                     {...register("email")}
                     type="email"
                     placeholder="name@example.com"
-                    className="h-12 rounded-full border-none bg-slate-50 px-5 font-bold text-slate-900 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/50"
+                    className="h-12 rounded-2xl border border-border bg-background px-5 font-bold text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                   />
 
                   <FieldError message={errors.email?.message} />
@@ -144,17 +144,17 @@ export function NewsletterCard() {
 
                 {/* ĐỐI TƯỢNG */}
                 <div className="space-y-2 text-left">
-                  <Label className="ml-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
-                    Đối tượng <span className="text-red-400">*</span>
+                  <Label className="ml-1 text-xs font-bold uppercase tracking-wider text-foreground">
+                    Đối tượng <span className="text-destructive">*</span>
                   </Label>
 
                   <div className="relative">
                     <select
                       {...register("audience")}
                       defaultValue=""
-                      className="h-12 w-full appearance-none rounded-full border-none bg-slate-50 px-5 pr-10 text-sm font-bold text-slate-900 outline-none focus:ring-2 focus:ring-primary/50"
+                      className="h-12 w-full appearance-none rounded-2xl border border-border bg-background px-5 pr-10 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary"
                     >
-                      <option value="" disabled className="text-slate-400">
+                      <option value="" disabled className="bg-background text-muted-foreground">
                         Chọn đối tượng
                       </option>
 
@@ -162,21 +162,21 @@ export function NewsletterCard() {
                         <option
                           key={option}
                           value={option}
-                          className="text-slate-900 font-semibold"
+                          className="bg-background font-semibold text-foreground"
                         >
                           {option}
                         </option>
                       ))}
                     </select>
 
-                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-slate-500" />
+                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   </div>
 
                   <FieldError message={errors.audience?.message} />
                 </div>
 
                 {/* XÁC NHẬN */}
-                <p className="pt-1 text-center text-[11px] font-bold leading-5 text-slate-400">
+                <p className="pt-1 text-center text-sm leading-5 text-muted-foreground">
                   Khi ấn vào nút đăng ký, bạn đồng ý với việc nhận tin từ chúng tôi qua email.
                 </p>
 
@@ -185,11 +185,7 @@ export function NewsletterCard() {
                   <Button
                     type="submit"
                     disabled={!isValid || isSubmitting}
-                    className={`w-full rounded-2xl py-7 text-sm font-black uppercase tracking-[0.15em] shadow-xl transition-all ${
-                      isValid && !isSubmitting
-                        ? "bg-[#6c868c] text-white hover:bg-[#5b7379] active:scale-[0.99]"
-                        : "cursor-not-allowed bg-[#586b70]/60 text-slate-300"
-                    }`}
+                    className="h-12 w-full cursor-pointer rounded-2xl bg-primary text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-xl transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>
