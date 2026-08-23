@@ -153,6 +153,12 @@ export type HomeContent = {
     secondaryBtnText: string;
   };
   contact: { email: string; phone: string; messenger: string; address: string };
+  footer?: {
+    description?: string;
+    facebookUrl?: string;
+    tiktokUrl?: string;
+    instagramUrl?: string;
+  };
 };
 
 export const defaultHomeContent: HomeContent = {
@@ -199,7 +205,13 @@ export const defaultHomeContent: HomeContent = {
     primaryBtnText: "Nhận thông tin từ HIEC",
     secondaryBtnText: "Liên hệ",
   },
-  contact: contactInfo
+  contact: contactInfo,
+  footer: {
+    description: "Câu lạc bộ Sáng tạo & Khởi nghiệp HUST - học bằng cách làm, kết nối bằng giá trị.",
+    facebookUrl: socialLinks.find((link) => link.label === "Facebook")?.href ?? "",
+    tiktokUrl: socialLinks.find((link) => link.label === "TikTok")?.href ?? "",
+    instagramUrl: socialLinks.find((link) => link.label === "Instagram")?.href ?? "",
+  },
 };
 
 export async function getHomeContent(): Promise<HomeContent> {
@@ -216,6 +228,7 @@ export async function getHomeContent(): Promise<HomeContent> {
       actionSection: { ...defaultHomeContent.actionSection, ...content.actionSection },
       cta: { ...defaultHomeContent.cta, ...content.cta },
       contact: { ...defaultHomeContent.contact, ...content.contact },
+      footer: { ...defaultHomeContent.footer, ...content.footer },
       stats: content.stats?.length ? content.stats : defaultHomeContent.stats,
       history: content.history?.length ? content.history : defaultHomeContent.history,
       departments: content.departments?.length ? content.departments : defaultHomeContent.departments,

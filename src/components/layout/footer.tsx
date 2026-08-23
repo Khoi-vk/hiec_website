@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 // SỬA: Import từ hiec-service để lấy dữ liệu bạn đã chỉnh sửa
-import { getHomeContent, type HomeContent, socialLinks } from '@/services/hiec-service';
+import { getHomeContent, type HomeContent } from '@/services/hiec-service';
 import { HiecLogo } from "@/components/ui/hiec-logo";
 
 const iconMap: Record<string, any> = {
@@ -69,7 +69,12 @@ export function Footer() {
   // Nếu không load được data, dùng dữ liệu mặc định để tránh crash
   if (!data) return null;
 
-  const { hero, contact } = data;
+  const { hero, contact, footer } = data;
+  const socialLinks = [
+    { label: "Facebook", href: footer?.facebookUrl },
+    { label: "TikTok", href: footer?.tiktokUrl },
+    { label: "Instagram", href: footer?.instagramUrl },
+  ];
 
   return (
     <footer id="lien-he" className="border-t border-border/60 bg-background">
@@ -82,7 +87,7 @@ export function Footer() {
           </div>
           
           <p className="mt-4 max-w-sm text-sm text-muted-foreground leading-relaxed">
-            {hero.description}
+            {footer?.description || hero.description}
           </p>
           
           <div className="mt-6 flex gap-3">
@@ -91,7 +96,8 @@ export function Footer() {
               return (
                 <a
                   key={s.label}
-                  href={s.href}
+                  href={s.href || "#"}
+                  aria-label={s.label}
                   target="_blank"
                   rel="noreferrer noopener"
                   className="grid size-10 place-items-center rounded-xl border border-border bg-card text-muted-foreground transition-all hover:border-primary hover:text-primary hover:shadow-glow hover:-translate-y-1"

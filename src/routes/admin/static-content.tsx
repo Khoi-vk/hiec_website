@@ -66,6 +66,10 @@ function StaticContentPage() {
             ...defaultHomeContent.contact,
             ...res?.contact,
           },
+          footer: {
+            ...defaultHomeContent.footer,
+            ...res?.footer,
+          },
         };
         reset(safeData);
       })
@@ -467,6 +471,44 @@ function StaticContentPage() {
                 <Label className="text-foreground font-semibold text-xs">Địa chỉ</Label>
                 <Input {...register("contact.address")} className="bg-background border-border text-foreground placeholder:text-muted-foreground/60 h-11" />
               </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[2rem] border-border shadow-sm bg-card overflow-hidden">
+              <CardHeader className="bg-muted/30 border-b border-border">
+                <CardTitle className="font-bold text-foreground">Footer</CardTitle>
+                <CardDescription>Cập nhật mô tả và liên kết mạng xã hội.</CardDescription>
+              </CardHeader>
+              <CardContent className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <Label className="text-foreground font-semibold text-xs">Mô tả ngắn Footer</Label>
+                  <Textarea
+                    {...register("footer.description")}
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground/60"
+                  />
+                </div>
+                <div className="grid gap-6 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label className="text-foreground font-semibold text-xs">Link Facebook</Label>
+                    <Input
+                      {...register("footer.facebookUrl")}
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground/60"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-foreground font-semibold text-xs">Link TikTok</Label>
+                    <Input
+                      {...register("footer.tiktokUrl")}
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground/60"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-foreground font-semibold text-xs">Link Instagram</Label>
+                    <Input
+                      {...register("footer.instagramUrl")}
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground/60"
+                    />
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
