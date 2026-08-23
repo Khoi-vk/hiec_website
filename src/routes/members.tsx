@@ -10,7 +10,6 @@ import { MemberOrgBoard } from "@/components/members/member-org-board";
 import {
   getAllMembers,
   getMemberLayoutConfig,
-  collectAssignedMemberIds,
   sanitizeBoards,
   type Member,
   type MemberLayoutConfig,
@@ -63,20 +62,10 @@ function MembersPage() {
     return map;
   }, [members]);
 
-  const assignedMemberIds = React.useMemo(
-    () => collectAssignedMemberIds(layoutConfig),
-    [layoutConfig],
-  );
-
   const displayBoards = React.useMemo(
     () => sanitizeBoards(layoutConfig.boards, members),
     [layoutConfig.boards, members],
   );
-
-  // Unassigned members list
-  const unassignedMembers = React.useMemo(() => {
-    return members.filter((m) => !assignedMemberIds.has(m.id));
-  }, [members, assignedMemberIds]);
 
   return (
     <PublicLayout>
@@ -88,10 +77,14 @@ function MembersPage() {
         <div className="max-w-[1300px] mx-auto px-6 md:px-12 text-left">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-12">
             <div className="flex-shrink-0 animate-fade-up">
-              
+              <Badge className="bg-cyan-100/80 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-300 border-none mb-3 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] transition-colors">
+                Organizational Structure
+              </Badge>
               <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl font-black text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.95] transition-colors">
-                Cơ cấu Câu lạc bộ <br className="hidden sm:block" />
-                
+                Cơ cấu <br className="hidden sm:block" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-sky-500 dark:from-cyan-400 dark:to-sky-300">
+                  Câu Lạc Bộ
+                </span>
               </h1>
             </div>
 
@@ -130,93 +123,93 @@ function MembersPage() {
                 }))
                 .filter((row) => row.members.length > 0)
                 .map(({ tier, members: tierMembers }, tIndex) => {
-                const name = tier.name?.trim() ?? "";
-                const subtitle = tier.subtitle?.trim() ?? "";
-                const hasHeader = Boolean(name || subtitle);
+                  const name = tier.name?.trim() ?? "";
+                  const subtitle = tier.subtitle?.trim() ?? "";
+                  const hasHeader = Boolean(name || subtitle);
 
-                return (
-                  <div
-                    key={tier.id || tIndex}
-                    className={[
-                      "animate-fade-up",
-                      hasHeader ? "space-y-8" : "",
-                      tIndex > 0 ? (hasHeader ? "mt-16 md:mt-24" : "mt-8 md:mt-10") : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    {hasHeader ? (
-                      <div className="text-center max-w-2xl mx-auto space-y-2">
-                        {name ? (
-                          <h2 className="text-2xl sm:text-3xl font-black text-[#0f3d3e] dark:text-white tracking-tight">
-                            {name}
-                          </h2>
-                        ) : null}
+                  return (
+                    <div
+                      key={tier.id || tIndex}
+                      className={[
+                        "animate-fade-up",
+                        hasHeader ? "space-y-8" : "",
+                        tIndex > 0 ? (hasHeader ? "mt-16 md:mt-24" : "mt-8 md:mt-10") : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {hasHeader ? (
+                        <div className="text-center max-w-2xl mx-auto space-y-2">
+                          {name ? (
+                            <h2 className="text-2xl sm:text-3xl font-black text-[#0f3d3e] dark:text-white tracking-tight">
+                              {name}
+                            </h2>
+                          ) : null}
 
-                        {subtitle ? (
-                          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
-                            {subtitle}
-                          </p>
-                        ) : null}
-                      </div>
-                    ) : null}
-
-                    {/* TIER CARDS: HIỂN THỊ CÙNG 1 DÒNG, TỐI ĐA 4 CARD, CĂN CHÍNH GIỮA VÀ CÁCH ĐỀU LỀ */}
-                    <div className="w-full flex flex-wrap md:flex-nowrap justify-center items-stretch gap-6 md:gap-8 lg:gap-10 max-w-[1300px] mx-auto">
-                      {tierMembers.map((member) => (
-                        <div
-                          key={member.id}
-                          onClick={() => setSelectedMember(member)}
-                          className="w-full max-w-[240px] sm:max-w-[260px] md:w-64 shrink-0 cursor-pointer group"
-                        >
-                          <Card className="flex flex-col h-full border-none shadow-sm hover:shadow-2xl transition-all duration-500 rounded-[1.6rem] overflow-hidden bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 group-hover:-translate-y-1.5">
-                            {/* CONTAINER ẢNH VUÔNG BO TRÒN */}
-                            <div className="aspect-square overflow-hidden m-2 rounded-[1.2rem] shrink-0 bg-slate-100 dark:bg-slate-800 relative">
-                              {member.avatarUrl ? (
-                                <img
-                                  src={member.avatarUrl}
-                                  alt={member.fullName}
-                                  className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                />
-                              ) : (
-                                <div className="size-full flex items-center justify-center text-slate-300 dark:text-slate-600">
-                                  <User className="size-12" />
-                                </div>
-                              )}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            </div>
-
-                            {/* NỘI DUNG CARD */}
-                            <CardContent className="flex flex-col grow p-4 pt-2 text-left">
-                              <h3 className="font-sans text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors leading-tight mb-1 line-clamp-1">
-                                {member.fullName}
-                              </h3>
-
-                              <p className="text-cyan-600 dark:text-cyan-400 text-xs font-bold mb-1 line-clamp-1">
-                                {member.position}
-                              </p>
-
-                              <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium line-clamp-1 mb-3">
-                                {member.department}
-                              </p>
-
-                              {/* FOOTER NẰM DƯỚI CÙNG */}
-                              <div className="flex items-center justify-between mt-auto pt-2.5 border-t border-slate-100 dark:border-slate-800/60 transition-colors">
-                                <span className="text-[9px] font-black tracking-wider text-slate-400 dark:text-slate-500 uppercase group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-                                  Xem hồ sơ
-                                </span>
-                                <div className="size-6 rounded-lg bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white dark:group-hover:bg-cyan-500 dark:group-hover:text-white transition-all">
-                                  <ArrowRight className="size-3" />
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
+                          {subtitle ? (
+                            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                              {subtitle}
+                            </p>
+                          ) : null}
                         </div>
-                      ))}
+                      ) : null}
+
+                      {/* TIER CARDS: HIỂN THỊ CÙNG 1 DÒNG, TỐI ĐA 4 CARD, CĂN CHÍNH GIỮA VÀ CÁCH ĐỀU LỀ */}
+                      <div className="w-full flex flex-wrap md:flex-nowrap justify-center items-stretch gap-6 md:gap-8 lg:gap-10 max-w-[1300px] mx-auto">
+                        {tierMembers.map((member) => (
+                          <div
+                            key={member.id}
+                            onClick={() => setSelectedMember(member)}
+                            className="w-full max-w-[240px] sm:max-w-[260px] md:w-64 shrink-0 cursor-pointer group"
+                          >
+                            <Card className="flex flex-col h-full border-none shadow-sm hover:shadow-2xl transition-all duration-500 rounded-[1.6rem] overflow-hidden bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800/80 group-hover:-translate-y-1.5">
+                              {/* CONTAINER ẢNH VUÔNG BO TRÒN */}
+                              <div className="aspect-square overflow-hidden m-2 rounded-[1.2rem] shrink-0 bg-slate-100 dark:bg-slate-800 relative">
+                                {member.avatarUrl ? (
+                                  <img
+                                    src={member.avatarUrl}
+                                    alt={member.fullName}
+                                    className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                  />
+                                ) : (
+                                  <div className="size-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                    <User className="size-12" />
+                                  </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                              </div>
+
+                              {/* NỘI DUNG CARD */}
+                              <CardContent className="flex flex-col grow p-4 pt-2 text-left">
+                                <h3 className="font-sans text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors leading-tight mb-1 line-clamp-1">
+                                  {member.fullName}
+                                </h3>
+
+                                <p className="text-cyan-600 dark:text-cyan-400 text-xs font-bold mb-1 line-clamp-1">
+                                  {member.position}
+                                </p>
+
+                                <p className="text-slate-500 dark:text-slate-400 text-[11px] font-medium line-clamp-1 mb-3">
+                                  {member.department}
+                                </p>
+
+                                {/* FOOTER NẰM DƯỚI CÙNG */}
+                                <div className="flex items-center justify-between mt-auto pt-2.5 border-t border-slate-100 dark:border-slate-800/60 transition-colors">
+                                  <span className="text-[9px] font-black tracking-wider text-slate-400 dark:text-slate-500 uppercase group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                                    Xem hồ sơ
+                                  </span>
+                                  <div className="size-6 rounded-lg bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white dark:group-hover:bg-cyan-500 dark:group-hover:text-white transition-all">
+                                    <ArrowRight className="size-3" />
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
 
               {displayBoards.some((b) => b.featuredMemberId || b.memberIds.length > 0) ? (
                 <div className="mt-16 space-y-12 md:mt-24">
@@ -226,65 +219,17 @@ function MembersPage() {
                       name={board.name}
                       featured={
                         board.featuredMemberId
-                          ? memberMap.get(board.featuredMemberId) ?? null
+                          ? (memberMap.get(board.featuredMemberId) ?? null)
                           : null
                       }
-                      members={board.memberIds
-                        .map((id) => memberMap.get(id))
-                        .filter(Boolean) as Member[]}
+                      members={
+                        board.memberIds.map((id) => memberMap.get(id)).filter(Boolean) as Member[]
+                      }
                       onSelectMember={setSelectedMember}
                     />
                   ))}
                 </div>
               ) : null}
-
-              {/* 3. NHÓM THÀNH VIÊN MỞ RỘNG (NẾU ĐƯỢC BẬT TRONG CẤU HÌNH ADMIN) */}
-              {layoutConfig.showUnassigned && unassignedMembers.length > 0 && (
-                <div className="pt-12 border-t border-slate-200 dark:border-slate-800 space-y-8 animate-fade-up">
-                  <div className="text-center max-w-xl mx-auto space-y-2">
-                    <Badge className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-none px-3 py-1 text-[10px] font-black uppercase tracking-widest">
-                      Đội ngũ thành viên
-                    </Badge>
-                    <h3 className="text-2xl font-bold text-[#0f3d3e] dark:text-white">
-                      {layoutConfig.unassignedTitle || "Thành viên & Cộng tác viên"}
-                    </h3>
-                  </div>
-
-                  <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 max-w-[1300px] mx-auto">
-                    {unassignedMembers.map((member) => (
-                      <div
-                        key={member.id}
-                        onClick={() => setSelectedMember(member)}
-                        className="cursor-pointer group"
-                      >
-                        <Card className="flex flex-col h-full border-none shadow-sm hover:shadow-xl transition-all duration-300 rounded-[1.3rem] overflow-hidden bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 text-left">
-                          <div className="aspect-square overflow-hidden m-1.5 rounded-[1rem] shrink-0 bg-slate-100 dark:bg-slate-800 relative">
-                            {member.avatarUrl ? (
-                              <img
-                                src={member.avatarUrl}
-                                alt={member.fullName}
-                                className="size-full object-cover group-hover:scale-105 transition-transform duration-500"
-                              />
-                            ) : (
-                              <div className="size-full flex items-center justify-center text-slate-300 dark:text-slate-600">
-                                <User className="size-8" />
-                              </div>
-                            )}
-                          </div>
-                          <CardContent className="p-3 pt-1 flex flex-col grow">
-                            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate group-hover:text-cyan-600">
-                              {member.fullName}
-                            </h4>
-                            <p className="text-[10px] text-cyan-600 dark:text-cyan-400 font-semibold truncate">
-                              {member.position}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
