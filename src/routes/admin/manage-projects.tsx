@@ -27,7 +27,8 @@ function ProjectsManagementPage() {
     year: "2025",
     excerpt: "",
     content: "",
-    imageUrl: ""
+    imageUrl: "",
+    is_featured: false,
   });
 
   const fetchProjects = async () => {
@@ -124,7 +125,7 @@ function ProjectsManagementPage() {
         
         {/* NÚT THÊM */}
         <Button 
-          onClick={() => { setEditingId(null); setFormData({title:"", year:"2025", excerpt:"", content:"", imageUrl:""}); setIsOpen(true); }} 
+          onClick={() => { setEditingId(null); setFormData({title:"", year:"2025", excerpt:"", content:"", imageUrl:"", is_featured: false}); setIsOpen(true); }}
           className="rounded-full font-black uppercase tracking-widest px-8 py-6 bg-[#0f3d3e] dark:bg-cyan-700 text-white hover:bg-[#1a4d4f] dark:hover:bg-cyan-600 shadow-lg shadow-blue-900/20 dark:shadow-cyan-900/40 transition-all active:scale-95"
         >
           <Plus className="mr-2 h-5 w-5 text-cyan-400 dark:text-cyan-200" /> 
@@ -193,6 +194,19 @@ function ProjectsManagementPage() {
         description="Điền thông tin chi tiết để dự án hiển thị trên trang Showcase."
       >
         <div className="space-y-4 py-4 max-h-[75vh] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-4 text-left">
+            <input
+              id="project-featured"
+              type="checkbox"
+              checked={formData.is_featured}
+              onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
+              className="size-4 accent-primary"
+            />
+            <label htmlFor="project-featured" className="text-sm font-semibold text-foreground">
+              Gắn tag Nổi bật (Featured)
+            </label>
+          </div>
+
           <div className="space-y-1 text-left">
             <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest pl-1 transition-colors">Tên dự án chiến lược</label>
             <Input 

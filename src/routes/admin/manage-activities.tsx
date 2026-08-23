@@ -55,6 +55,7 @@ function AdminManageActivitiesPage() {
     imageUrl: "",
     tags: [] as string[],
     status: "draft",
+    is_featured: false,
   });
 
   const fetchActs = async () => {
@@ -149,6 +150,7 @@ function AdminManageActivitiesPage() {
                                   imageUrl: "",
                                   tags: [],
                                   status: "draft",
+                                  is_featured: false,
                                 });
                                 setIsOpen(true); }} className="rounded-xl font-bold bg-cyan-600 dark:bg-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white transition-colors">
           <Plus className="mr-2 h-4 w-4" /> ĐĂNG BÀI MỚI
@@ -274,6 +276,19 @@ function AdminManageActivitiesPage() {
               <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 transition-colors">Ảnh bài viết</label>
               <Input type="file" accept="image/*" onChange={handleFileUpload} className="rounded-xl bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 cursor-pointer transition-colors" />
             </div>
+          </div>
+
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-4">
+            <input
+              id="activity-featured"
+              type="checkbox"
+              checked={formData.is_featured}
+              onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
+              className="size-4 accent-primary"
+            />
+            <label htmlFor="activity-featured" className="text-sm font-semibold text-foreground">
+              Gắn tag Nổi bật (Featured)
+            </label>
           </div>
 
           <div className="space-y-2">

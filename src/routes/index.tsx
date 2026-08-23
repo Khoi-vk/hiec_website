@@ -25,16 +25,6 @@ export const Route = createFileRoute("/")({
 export function HomePage() {
   const data = Route.useLoaderData();
   const titleParts = data.hero.title.split(",");
-  const timelinePoints = data.history.map((_, index) => ({
-    x: ((index + 0.5) / Math.max(data.history.length, 1)) * 1000,
-    y: index % 2 === 0 ? 70 : 130,
-  }));
-  const timelinePath = timelinePoints.reduce((path, point, index) => {
-    if (index === 0) return `M ${point.x} ${point.y}`;
-    const previous = timelinePoints[index - 1]!;
-    const midpoint = (previous.x + point.x) / 2;
-    return `${path} C ${midpoint} ${previous.y}, ${midpoint} ${point.y}, ${point.x} ${point.y}`;
-  }, "");
 
   return (
     <PublicLayout>
@@ -83,9 +73,9 @@ export function HomePage() {
             </div>
           </section>
 
-          <section id="lich-su" className="border-b border-border bg-card px-5 py-20 lg:px-8 lg:py-28">
+          <section id="lich-su" className="border-b border-border bg-card px-5 py-10 lg:px-8 lg:py-10">
             <div className="mx-auto max-w-6xl">
-              <div className="mb-16 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+              <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                 <div>
                   <p className="mb-3 text-xs font-bold uppercase tracking-widest text-primary">{data.historySection.badge}</p>
                   <h2 className="text-3xl font-extrabold leading-[1.15] tracking-tight text-foreground sm:text-4xl md:text-5xl">
@@ -96,42 +86,39 @@ export function HomePage() {
               </div>
               <div className="-mx-5 touch-pan-x select-none overflow-x-auto px-5 pb-4 scrollbar-none md:mx-0 md:px-0">
                 <div
-                  className="relative h-[22rem] w-full"
+                  className="relative min-w-[760px] py-8 md:min-w-0"
                   style={{
-                    minWidth: data.history.length > 5 ? `${data.history.length * 220}px` : undefined,
+                    width: data.history.length > 5 ? `${data.history.length * 220}px` : "100%",
                   }}
                 >
-                  <svg aria-hidden="true" viewBox="0 0 1000 200" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 top-1/2 h-28 w-full -translate-y-1/2 overflow-visible md:h-36">
-                    <defs>
-                      <linearGradient id="timeline-road-gradient" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0" stopColor="var(--color-primary)" stopOpacity="0.3" />
-                        <stop offset="0.5" stopColor="var(--color-primary)" stopOpacity="1" />
-                        <stop offset="1" stopColor="var(--color-primary)" stopOpacity="0.3" />
-                      </linearGradient>
-                    </defs>
-                    <path d={timelinePath} fill="none" stroke="var(--color-primary)" strokeOpacity="0.15" strokeWidth="8" />
-                    <path d={timelinePath} fill="none" stroke="url(#timeline-road-gradient)" strokeWidth="1.5" strokeDasharray="2 1.5" />
-                  </svg>
-                  <div
-                    className="absolute inset-x-0 inset-y-0 grid grid-cols-5 gap-2 md:gap-4"
-                    style={{
-                      gridTemplateColumns: `repeat(${Math.max(data.history.length, 5)}, minmax(0, 1fr))`,
-                    }}
-                  >
+                  <div className="pointer-events-none absolute left-0 right-0 top-1/2 z-0 h-[2px] -translate-y-1/2 bg-primary/30" />
+                  <div className="relative z-10 grid grid-cols-4 gap-4 md:grid-cols-5 md:gap-4" style={{ gridTemplateColumns: `repeat(${Math.max(data.history.length, 4)}, minmax(0, 1fr))` }}>
                   {data.history.map((item, index) => {
-                    const point = timelinePoints[index]!;
                     const isAbove = index % 2 === 0;
                     return (
-                      <article key={item.year + item.title} className="group relative min-w-0">
-                        <div className={`absolute left-1/2 z-10 -translate-x-1/2 ${isAbove ? "top-[27%]" : "top-[53%]"}`}>
-                          <span className="grid size-12 place-items-center rounded-full border-2 border-dashed border-primary bg-background/90 text-sm font-bold text-primary shadow-[0_0_0_8px_color-mix(in_oklab,var(--color-primary)_12%,transparent),0_0_28px_color-mix(in_oklab,var(--color-primary)_40%,transparent)] transition-transform group-hover:scale-110 md:size-16 md:text-base">
-                            {item.year}
-                          </span>
+                      <article key={item.year + item.title} className="group flex min-h-[22rem] min-w-0 flex-col items-center text-center">
+                        <div className="flex w-full flex-1 flex-col items-center justify-end">
+                          {isAbove && (
+                            <>
+                              <div className="w-full rounded-xl border border-border bg-card/90 p-3.5 text-left shadow-md transition-all group-hover:-translate-y-1 group-hover:border-primary/50 md:p-4">
+                                <h3 className="text-sm font-bold text-foreground group-hover:text-primary-deep md:text-base dark:group-hover:text-primary">{item.title}</h3>
+                                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground md:text-sm">{item.description}</p>
+                              </div>
+                              <span className="h-5 w-[2px] shrink-0 bg-primary/50" />
+                            </>
+                          )}
                         </div>
-                        <span className={`absolute left-1/2 w-px -translate-x-1/2 bg-primary/50 ${isAbove ? "top-[18%] h-[9%]" : "top-[62%] h-[9%]"}`} />
-                        <div className={`absolute left-0 right-0 rounded-xl border border-border bg-card/90 p-3.5 transition-all group-hover:-translate-y-1 group-hover:border-primary/50 group-hover:shadow-elevated md:p-4 ${isAbove ? "top-0" : "bottom-0"}`}>
-                          <h3 className="line-clamp-2 text-xs font-bold text-foreground group-hover:text-primary-deep md:text-sm dark:group-hover:text-primary">{item.title}</h3>
-                          <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-muted-foreground md:text-sm">{item.description}</p>
+                        <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-full border-2 border-primary bg-background text-xs font-mono font-bold text-primary shadow-[0_0_12px_rgba(6,182,212,0.3)] transition-transform group-hover:scale-110 md:size-14 md:text-sm">{item.year}</span>
+                        <div className="flex w-full flex-1 flex-col items-center justify-start">
+                          {!isAbove && (
+                            <>
+                              <span className="h-5 w-[2px] shrink-0 bg-primary/50" />
+                              <div className="w-full rounded-xl border border-border bg-card/90 p-3.5 text-left shadow-md transition-all group-hover:translate-y-1 group-hover:border-primary/50 md:p-4">
+                                <h3 className="text-sm font-bold text-foreground group-hover:text-primary-deep md:text-base dark:group-hover:text-primary">{item.title}</h3>
+                                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground md:text-sm">{item.description}</p>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </article>
                     );

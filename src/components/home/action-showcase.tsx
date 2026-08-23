@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import {
-  ArrowRight,
   ArrowUpRight,
   Calendar,
   ChevronLeft,
@@ -26,6 +25,7 @@ export interface ActionItem {
   imageUrl?: string;
   date?: string;
   year?: string | number;
+  is_featured?: boolean;
 }
 
 const FALLBACK_ITEMS: ActionItem[] = [
@@ -88,7 +88,9 @@ export function ActionShowcase() {
   const [loading, setLoading] = React.useState(true);
   const [selectedItem, setSelectedItem] = React.useState<ActionItem | null>(null);
   const [activeTab, setActiveTab] = React.useState<"all" | "activities" | "projects">("all");
-  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [isPaused, setIsPaused] = React.useState(false);
+  const [autoplayResetKey, setAutoplayResetKey] = React.useState(0);
 
   React.useEffect(() => {
     async function fetchData() {
@@ -99,8 +101,13 @@ export function ActionShowcase() {
             .from("activities")
             .select("*")
             .eq("status", "published")
+            .eq("is_featured", true)
             .order("event_date", { ascending: false }),
-          supabase.from("projects").select("*").order("displayOrder", { ascending: true }),
+          supabase
+            .from("projects")
+            .select("*")
+            .eq("is_featured", true)
+            .order("displayOrder", { ascending: true }),
         ]);
 
         const fetchedItems: ActionItem[] = [];
@@ -118,6 +125,7 @@ export function ActionShowcase() {
               imageUrl:
                 act.imageUrl ||
                 "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+              is_featured: true,
             });
           });
         }
@@ -134,6 +142,7 @@ export function ActionShowcase() {
               content: proj.content || "",
               imageUrl:
                 proj.imageUrl || "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80",
+              is_featured: true,
             });
           });
         }
@@ -164,15 +173,52 @@ export function ActionShowcase() {
     return items;
   }, [items, activeTab]);
 
-  const handleScroll = (direction: "left" | "right") => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 380;
-      scrollContainerRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
-      });
+  const moveSlide = React.useCallback((direction: "left" | "right") => {
+    setCurrentIndex((index) => {
+      if (filteredItems.length === 0) return 0;
+      const offset = direction === "left" ? -1 : 1;
+      return (index + offset + filteredItems.length) % filteredItems.length;
+    });
+  }, [filteredItems.length]);
+
+  const handleNext = React.useCallback(() => {
+    setAutoplayResetKey((key) => key + 1);
+    moveSlide("right");
+  }, [moveSlide]);
+
+  const handlePrev = React.useCallback(() => {
+    setAutoplayResetKey((key) => key + 1);
+    moveSlide("left");
+  }, [moveSlide]);
+
+  React.useEffect(() => {
+    if (filteredItems.length < 2) return;
+
+    const timer = window.setInterval(() => {
+      if (isPaused) return;
+      moveSlide("right");
+    }, 5000);
+
+    return () => window.clearInterval(timer);
+  }, [filteredItems.length, activeTab, autoplayResetKey, isPaused, moveSlide]);
+
+  React.useEffect(() => {
+    setCurrentIndex(0);
+  }, [activeTab]);
+
+  React.useEffect(() => {
+    if (currentIndex >= filteredItems.length && filteredItems.length > 0) {
+      setCurrentIndex(0);
     }
-  };
+  }, [currentIndex, filteredItems.length]);
+
+  const currentItem = filteredItems[currentIndex];
+  const previousItem = filteredItems.length > 1
+    ? filteredItems[(currentIndex - 1 + filteredItems.length) % filteredItems.length]
+    : undefined;
+  const nextItem = filteredItems.length > 1
+    ? filteredItems[(currentIndex + 1) % filteredItems.length]
+    : undefined;
 
   return (
     <div className="mt-8 space-y-6">
@@ -219,7 +265,7 @@ export function ActionShowcase() {
             type="button"
             variant="outline"
             size="icon"
-            onClick={() => handleScroll("left")}
+            onClick={handlePrev}
             className="size-9 rounded-full border-border bg-background transition-colors hover:bg-accent"
             aria-label="Cuộn sang trái"
           >
@@ -229,7 +275,7 @@ export function ActionShowcase() {
             type="button"
             variant="outline"
             size="icon"
-            onClick={() => handleScroll("right")}
+            onClick={handleNext}
             className="size-9 rounded-full border-border bg-background transition-colors hover:bg-accent"
             aria-label="Cuộn sang phải"
           >
@@ -238,7 +284,7 @@ export function ActionShowcase() {
         </div>
       </div>
 
-      {/* Horizontal Scroll Track */}
+      {/* Center spotlight */}
       {loading ? (
         <div className="flex h-72 items-center justify-center">
           <Loader2 className="size-8 animate-spin text-primary" />
@@ -249,73 +295,30 @@ export function ActionShowcase() {
         </div>
       ) : (
         <div
-          ref={scrollContainerRef}
-          className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 pt-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/30"
-          style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onFocus={() => setIsPaused(true)}
+          onBlur={() => setIsPaused(false)}
+          className="relative mx-auto flex h-[32rem] max-w-6xl items-center justify-center overflow-hidden md:h-[34rem]"
         >
-          {filteredItems.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setSelectedItem(item)}
-              className="group w-75 shrink-0 cursor-pointer snap-start transition-transform duration-300 hover:-translate-y-1 sm:w-85"
-            >
-              <Card className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-border bg-background shadow-sm transition-all duration-500 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
-                {/* Image Container */}
-                <div className="relative aspect-16/10 shrink-0 overflow-hidden m-2 rounded-[1.4rem] bg-muted">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider shadow-sm backdrop-blur-md ${
-                        item.type === "activity"
-                          ? "bg-cyan-500/90 text-white dark:bg-cyan-600/90"
-                          : "bg-emerald-500/90 text-white dark:bg-emerald-600/90"
-                      }`}
-                    >
-                      {item.type === "activity" ? (
-                        <>
-                          <Calendar className="size-3" /> Hoạt động
-                        </>
-                      ) : (
-                        <>
-                          <Rocket className="size-3" /> Dự án
-                        </>
-                      )}
-                    </span>
-                  </div>
-                </div>
+          {previousItem && (
+            <ShowcaseSideCard item={previousItem} position="previous" />
+          )}
+          {currentItem && (
+            <ShowcaseActiveCard item={currentItem} onSelect={() => setSelectedItem(currentItem)} />
+          )}
+          {nextItem && (
+            <ShowcaseSideCard item={nextItem} position="next" />
+          )}
+        </div>
+      )}
 
-                {/* Content */}
-                <CardContent className="flex grow flex-col p-6 pt-3">
-                  <div className="mb-3 flex items-center">
-                    <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary-deep dark:text-primary">
-                      {item.badge}
-                    </span>
-                  </div>
-
-                  <h3 className="mb-2 line-clamp-2 min-h-11 font-display text-base font-black leading-snug uppercase tracking-tight text-slate-900 transition-colors group-hover:text-primary-deep dark:text-slate-100 dark:group-hover:text-primary">
-                    {item.title}
-                  </h3>
-
-                  <p className="mb-5 line-clamp-2 text-[11px] font-medium leading-relaxed text-slate-600 dark:text-slate-400">
-                    {item.excerpt}
-                  </p>
-
-                  <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 transition-colors group-hover:text-primary-deep dark:text-slate-500 dark:group-hover:text-primary">
-                      {item.type === "activity" ? "Chi tiết hoạt động" : "Chi tiết dự án"}
-                    </span>
-                    <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary-deep transition-all group-hover:bg-primary group-hover:text-primary-foreground dark:text-primary">
-                      <ArrowRight className="size-3.5" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
+      {currentItem && filteredItems.length > 0 && (
+        <div className="mx-auto flex max-w-md items-center justify-between gap-6 rounded-full border border-border bg-background/80 px-6 py-2 backdrop-blur-md">
+          <span className="truncate text-xs font-bold text-foreground sm:text-sm">{currentItem.badge} · {currentItem.title}</span>
+          <span className="shrink-0 text-xs font-bold tabular-nums text-primary sm:text-sm">
+            {String(currentIndex + 1).padStart(2, "0")} / {String(filteredItems.length).padStart(2, "0")}
+          </span>
         </div>
       )}
 
@@ -400,6 +403,68 @@ export function ActionShowcase() {
           </div>
         )}
       </Modal>
+    </div>
+  );
+}
+
+function ShowcaseActiveCard({
+  item,
+  onSelect,
+}: {
+  item: ActionItem;
+  onSelect: () => void;
+}) {
+  return (
+    <div onClick={onSelect} className="group relative z-20 w-[320px] shrink-0 cursor-pointer text-center sm:w-[480px] md:w-[600px]">
+      <Card className="relative h-[280px] overflow-hidden rounded-2xl border-border bg-card shadow-xl ring-2 ring-primary/40 transition-all duration-700 ease-out md:h-[340px]">
+        <img
+          src={item.imageUrl}
+          alt={item.title}
+          className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <span
+          className={`absolute left-4 top-4 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm backdrop-blur-md ${
+            item.type === "activity" ? "bg-cyan-500/90" : "bg-emerald-500/90"
+          }`}
+        >
+          {item.type === "activity" ? <Calendar className="size-3" /> : <Rocket className="size-3" />}
+          {item.type === "activity" ? "Hoạt động" : "Dự án"}
+        </span>
+      </Card>
+      <div className="mx-auto mt-4 max-w-xl text-center">
+        <p className="text-xs font-semibold text-primary">[{item.type === "activity" ? "Hoạt động" : "Dự án"}] • {item.date || item.year || item.badge}</p>
+        <h3 className="mt-1 line-clamp-1 text-lg font-bold text-foreground md:text-xl">{item.title}</h3>
+        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground md:text-sm">{item.excerpt}</p>
+        <Link
+          to={item.type === "activity" ? "/activities" : "/projects"}
+          onClick={(event) => event.stopPropagation()}
+          className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80"
+        >
+          Xem chi tiết <ArrowUpRight className="size-3.5" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function ShowcaseSideCard({
+  item,
+  position,
+}: {
+  item: ActionItem;
+  position: "previous" | "next";
+}) {
+  return (
+    <div
+      className={`pointer-events-none absolute top-1/2 hidden w-[260px] -translate-y-1/2 scale-90 opacity-35 blur-[0.5px] transition-all duration-700 ease-out sm:block md:w-[320px] ${
+        position === "previous" ? "left-0" : "right-0"
+      }`}
+    >
+      <Card className="overflow-hidden rounded-2xl border-border bg-card shadow-xl">
+        <div className="h-[200px] overflow-hidden rounded-xl md:h-[240px]">
+          <img src={item.imageUrl} alt={item.title} className="size-full object-cover" />
+        </div>
+      </Card>
     </div>
   );
 }
