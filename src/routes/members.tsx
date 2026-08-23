@@ -88,14 +88,10 @@ function MembersPage() {
         <div className="max-w-[1300px] mx-auto px-6 md:px-12 text-left">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-12">
             <div className="flex-shrink-0 animate-fade-up">
-              <Badge className="bg-cyan-100/80 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-300 border-none mb-3 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] transition-colors">
-                Organizational Structure
-              </Badge>
+              
               <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl font-black text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.95] transition-colors">
-                Cơ cấu <br className="hidden sm:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-sky-500 dark:from-cyan-400 dark:to-sky-300">
-                  Câu Lạc Bộ
-                </span>
+                Cơ cấu Câu lạc bộ <br className="hidden sm:block" />
+                
               </h1>
             </div>
 
