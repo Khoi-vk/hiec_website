@@ -3,7 +3,6 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   Mail,
-  Sparkles,
 } from "lucide-react";
 import * as Icons from "lucide-react";
 
@@ -53,12 +52,12 @@ export function HomePage() {
           <div className="pointer-events-none absolute -right-24 top-0 size-80 rounded-full border-40 border-primary/20" />
           <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.88fr_1.12fr]">
             <div className="relative z-10 animate-fade-up">
-              <p className="mb-6 flex items-center gap-2 text-xs font-black uppercase tracking-[0.25em] text-primary-deep dark:text-primary">
-                <Sparkles className="size-4" /> HIEC / Since 2019
+              <p className="mb-6 text-xs font-black uppercase tracking-[0.25em] text-primary-deep dark:text-primary">
+                HIEC / Since 2019
               </p>
-              <h1 className="max-w-3xl font-sans text-5xl font-bold leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
-                {titleParts[0]},{" "}
-                <span className="text-primary-deep dark:text-primary">
+              <h1 className="w-full max-w-4xl text-3xl font-extrabold leading-[1.15] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-[56px]">
+                <span className="block whitespace-normal sm:whitespace-nowrap">{titleParts[0]},</span>
+                <span className="block whitespace-normal sm:whitespace-nowrap text-primary-deep dark:text-primary">
                   {titleParts[1]?.trim() || "Dẫn lối thành công"}
                 </span>
               </h1>
@@ -68,7 +67,7 @@ export function HomePage() {
               <div className="mt-9 flex flex-wrap gap-3">
                 <Button asChild size="lg" className="rounded-full px-7">
                   <Link to="/signup">
-                    Tham gia HIEC <ArrowUpRight className="ml-2 size-4" />
+                    Quan tâm <ArrowUpRight className="ml-2 size-4" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="rounded-full px-7">
@@ -96,7 +95,10 @@ export function HomePage() {
             <div className="grid gap-12 lg:grid-cols-[0.7fr_1.3fr]">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.22em] text-primary-deep dark:text-primary">01 / Lịch sử</p>
-                <h2 className="mt-4 max-w-md text-4xl font-black leading-tight sm:text-5xl">Mỗi chặng đường là một lần trưởng thành.</h2>
+                <h2 className="mt-4 max-w-4xl text-2xl font-extrabold leading-[1.2] tracking-tight text-foreground sm:text-3xl md:text-4xl lg:text-[44px]">
+                  <span className="block whitespace-normal sm:whitespace-nowrap">Mỗi chặng đường</span>
+                  <span className="block whitespace-normal sm:whitespace-nowrap">là một lần trưởng thành.</span>
+                </h2>
                 <p className="mt-6 max-w-sm leading-7 text-muted-foreground">Từ một nhóm sinh viên có chung sự tò mò, HIEC lớn lên nhờ những người dám bắt đầu, dám thử và dám làm lại.</p>
               </div>
               <div className="grid gap-0 border-l border-border">
@@ -121,7 +123,7 @@ export function HomePage() {
             <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.22em] text-primary-deep dark:text-primary">02 / Cơ cấu phòng ban</p>
-                <h2 className="mt-4 text-4xl font-black sm:text-5xl">Một đội ngũ.<br />Bốn cách tạo giá trị.</h2>
+                <h2 className="mt-4 max-w-3xl text-3xl font-extrabold leading-[1.15] tracking-tight text-balance sm:text-5xl">Một đội ngũ. Bốn cách tạo giá trị.</h2>
               </div>
               <p className="max-w-sm text-sm leading-7 text-muted-foreground">Mỗi ban là một mảnh ghép độc lập, nhưng cùng vận hành để HIEC trở thành một hệ sinh thái học tập và hành động.</p>
             </div>
@@ -149,7 +151,7 @@ export function HomePage() {
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.22em] text-primary-deep dark:text-primary">03 / HIEC in action</p>
-                <h2 className="mt-4 text-4xl font-black sm:text-5xl">Học bằng cách làm.</h2>
+                <h2 className="mt-4 max-w-3xl text-3xl font-extrabold leading-[1.15] tracking-tight text-balance sm:text-5xl">Học bằng cách làm.</h2>
               </div>
               <div className="flex items-center gap-4">
                 <Link to="/activities" className="flex items-center gap-1.5 text-sm font-black text-primary-deep hover:underline dark:text-primary">Tất cả hoạt động <ArrowUpRight className="size-4" /></Link>
@@ -166,7 +168,7 @@ export function HomePage() {
           <div className="mx-auto grid max-w-7xl gap-10 rounded-[2rem] border border-border bg-primary/20 p-8 sm:p-12 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.22em] text-primary-deep dark:text-primary">Make your move</p>
-              <h2 className="mt-4 max-w-2xl text-4xl font-black leading-tight sm:text-6xl">{data?.cta?.title || "Ý tưởng thành tiền thật"}</h2>
+              <h2 className="mt-4 max-w-3xl text-3xl font-extrabold leading-[1.15] tracking-tight text-balance sm:text-5xl md:text-6xl">{data?.cta?.title || "Ý tưởng thành tiền thật"}</h2>
               <p className="mt-5 max-w-xl text-muted-foreground">{data?.cta?.description || "HIEC đang chờ bạn."}</p>
             </div>
             <div className="flex flex-wrap gap-3">

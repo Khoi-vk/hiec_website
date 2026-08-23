@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, ArrowRight, ChevronLeft, Calendar, Sparkles } from "lucide-react";
+import { Loader2, ArrowRight, ChevronLeft, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -99,9 +99,8 @@ function ActivitiesPage() {
                     
                     {/* THÊM 'flex flex-col grow' vào CardContent */}
                     <CardContent className="flex flex-col grow p-6 pt-2">
-                      <div className="flex justify-between items-center mb-3">
+                      <div className="mb-3 flex items-center">
                         <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">{act.date}</span>
-                        <Sparkles className="size-3 text-primary/20" />
                       </div>
                       
                       {/* TIÊU ĐỀ CARD: Sáng đen - Tối trắng */}

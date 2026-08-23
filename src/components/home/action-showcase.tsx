@@ -8,7 +8,6 @@ import {
   ChevronRight,
   Loader2,
   Rocket,
-  Sparkles,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -291,11 +290,10 @@ export function ActionShowcase() {
 
                 {/* Content */}
                 <CardContent className="flex grow flex-col p-6 pt-3">
-                  <div className="mb-3 flex items-center justify-between">
+                  <div className="mb-3 flex items-center">
                     <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary-deep dark:text-primary">
                       {item.badge}
                     </span>
-                    <Sparkles className="size-3 text-primary/40" />
                   </div>
 
                   <h3 className="mb-2 line-clamp-2 min-h-11 font-display text-base font-black leading-snug uppercase tracking-tight text-slate-900 transition-colors group-hover:text-primary-deep dark:text-slate-100 dark:group-hover:text-primary">

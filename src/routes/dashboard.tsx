@@ -5,7 +5,6 @@ import {
   CalendarDays,
   FolderKanban,
   Images,
-  Sparkles,
   User,
 } from "lucide-react";
 
@@ -55,7 +54,6 @@ function UserDashboardPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <Badge variant="secondary" className="mb-3">
-              <Sparkles className="mr-1 size-3" />
               Thành viên HIEC
             </Badge>
             <h1 className="font-display text-3xl font-bold">
