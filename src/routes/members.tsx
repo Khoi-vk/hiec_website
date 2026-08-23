@@ -81,10 +81,8 @@ function MembersPage() {
                 Organizational Structure
               </Badge>
               <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl font-black text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.95] transition-colors">
-                Cơ cấu <br className="hidden sm:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-sky-500 dark:from-cyan-400 dark:to-sky-300">
-                  Câu Lạc Bộ
-                </span>
+                Cơ cấu Câu Lạc Bộ <br className="hidden sm:block" />
+              
               </h1>
             </div>
 
