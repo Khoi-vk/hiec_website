@@ -142,7 +142,7 @@ export type HomeContent = {
   historySection: { badge: string; title: string; description: string };
   history: Array<{ year: string; title: string; description: string }>;
   deptSection: { badge: string; title: string; description: string };
-  departments: Array<{ code: string; title: string; text: string }>;
+  departments: Array<{ code: string; title: string; text: string; imageUrl?: string }>;
   actionSection: { badge: string; title: string; allActivitiesText: string; allProjectsText: string };
   stats: Array<{ number: string; label: string }>;
   cta: {
@@ -193,10 +193,10 @@ export const defaultHomeContent: HomeContent = {
     description: "Mỗi ban là một mảnh ghép độc lập, nhưng cùng vận hành để HIEC trở thành một hệ sinh thái học tập và hành động.",
   },
   departments: [
-    { code: "01", title: "Ban Phát triển chiến lược", text: "Định hình hướng đi..." },
-    { code: "02", title: "Ban Truyền thông", text: "Kể câu chuyện HIEC..." },
-    { code: "03", title: "Ban Đối ngoại", text: "Mở rộng mạng lưới..." },
-    { code: "04", title: "Ban Nhân sự Sự kiện", text: "Xây văn hóa nội bộ..." },
+    { code: "01", title: "Ban Phát triển chiến lược", text: "Định hình hướng đi...", imageUrl: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=80" },
+    { code: "02", title: "Ban Truyền thông", text: "Kể câu chuyện HIEC...", imageUrl: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80" },
+    { code: "03", title: "Ban Nhân sự - Sự kiện", text: "Xây văn hóa nội bộ và tạo nên những trải nghiệm đáng nhớ...", imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=900&q=80" },
+    { code: "04", title: "Ban Đối ngoại", text: "Mở rộng mạng lưới và kết nối HIEC với những đối tác đồng hành...", imageUrl: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80" },
   ],
   actionSection: {
     badge: "03 / HIEC in action",
@@ -258,7 +258,12 @@ export async function getHomeContent(): Promise<HomeContent> {
       gallery: content.gallery?.length ? content.gallery : defaultHomeContent.gallery ?? [],
       stats: content.stats?.length ? content.stats : defaultHomeContent.stats,
       history: content.history?.length ? content.history : defaultHomeContent.history,
-      departments: content.departments?.length ? content.departments : defaultHomeContent.departments,
+      departments: content.departments?.length
+        ? content.departments.map((department, index) => ({
+            ...defaultHomeContent.departments[index],
+            ...department,
+          }))
+        : defaultHomeContent.departments,
     };
   } catch {
     return defaultHomeContent;

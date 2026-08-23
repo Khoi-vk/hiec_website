@@ -26,12 +26,14 @@ function StaticContentPage() {
   const [loading, setLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
   const [uploadingGalleryId, setUploadingGalleryId] = React.useState<string | null>(null);
+  const [uploadingDeptId, setUploadingDeptId] = React.useState<string | null>(null);
 
   const { register, control, handleSubmit, reset, setValue } = useForm<HomeContent>();
 
   const { fields: statFields, append: appendStat, remove: removeStat } = useFieldArray({ control, name: "stats" });
   const { fields: historyFields, append: appendHistory, remove: removeHistory } = useFieldArray({ control, name: "history" });
   const { fields: deptFields, append: appendDept, remove: removeDept } = useFieldArray({ control, name: "departments" });
+  const deptValues = useWatch({ control, name: "departments" });
   const { fields: galleryFields, append: appendGallery, remove: removeGallery } = useFieldArray({ control, name: "gallery" });
   const galleryValues = useWatch({ control, name: "gallery" });
 
@@ -45,6 +47,19 @@ function StaticContentPage() {
       toast.error(error instanceof Error ? error.message : "Không thể tải ảnh lên");
     } finally {
       setUploadingGalleryId(null);
+    }
+  };
+
+  const handleDepartmentUpload = async (file: File, index: number, fieldId: string) => {
+    setUploadingDeptId(fieldId);
+    try {
+      const publicUrl = await uploadImageToStorage(file);
+      setValue(`departments.${index}.imageUrl`, publicUrl, { shouldDirty: true, shouldValidate: true });
+      toast.success("Đã tải ảnh phòng ban lên thành công");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Không thể tải ảnh phòng ban lên");
+    } finally {
+      setUploadingDeptId(null);
     }
   };
 
@@ -74,7 +89,12 @@ function StaticContentPage() {
           },
           stats: res?.stats?.length ? res.stats : defaultHomeContent.stats,
           history: res?.history?.length ? res.history : defaultHomeContent.history,
-          departments: res?.departments?.length ? res.departments : defaultHomeContent.departments,
+          departments: res?.departments?.length
+            ? res.departments.map((department, index) => ({
+                ...defaultHomeContent.departments[index],
+                ...department,
+              }))
+            : defaultHomeContent.departments,
           cta: {
             ...defaultHomeContent.cta,
             ...res?.cta,
@@ -394,6 +414,51 @@ function StaticContentPage() {
                   </Button>
                 </CardHeader>
                 <CardContent className="p-6 space-y-3">
+                  <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-border bg-background">
+                    {deptValues?.[i]?.imageUrl ? (
+                      <img
+                        src={deptValues[i].imageUrl}
+                        alt={deptValues[i].title || `Ảnh ban ${i + 1}`}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
+                        Chưa có ảnh phòng ban
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    id={`department-upload-${field.id}`}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) void handleDepartmentUpload(file, i, field.id);
+                      event.target.value = "";
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full border-border bg-background text-foreground"
+                    disabled={uploadingDeptId === field.id}
+                    onClick={() => document.getElementById(`department-upload-${field.id}`)?.click()}
+                  >
+                    {uploadingDeptId === field.id ? (
+                      <><Loader2 className="size-4 animate-spin" /> Đang tải ảnh...</>
+                    ) : (
+                      <><Upload className="size-4" /> Tải ảnh phòng ban</>
+                    )}
+                  </Button>
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground font-semibold text-xs tracking-wider uppercase">URL ảnh</Label>
+                    <Input
+                      {...register(`departments.${i}.imageUrl`)}
+                      placeholder="https://..."
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground/60"
+                    />
+                  </div>
                   <div className="space-y-1">
                     <Label className="text-muted-foreground font-semibold text-xs tracking-wider uppercase">Tên ban</Label>
                     <Input
