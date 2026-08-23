@@ -2,7 +2,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle, ChevronDown, Loader2 } from "lucide-react";
+import { CheckCircle, ChevronDown, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import { supabase } from "@/utils/supabase";
 
 const audienceOptions = ["Sinh viên", "Phụ huynh", "Doanh nghiệp"] as const;
 
-export function NewsletterCard() {
+export function NewsletterCard({ popup = false }: { popup?: boolean }) {
   const [isSubmitted, setIsSubmitted] = React.useState(false);
 
   const {
@@ -58,15 +58,8 @@ export function NewsletterCard() {
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  return (
-    <section className="px-5 pb-20 pt-4 lg:px-8 lg:pb-28">
-      <div className="mx-auto flex justify-center">
-        {/* CARD CONTAINER WITH EXACT PRESERVED SIZE & STYLING */}
-        <div className="relative w-full max-w-lg rounded-3xl border border-border bg-card p-7 text-card-foreground shadow-2xl sm:p-10">
+  const card = (
+    <div className="relative w-full max-w-lg rounded-3xl border border-border bg-card p-7 text-card-foreground shadow-2xl sm:p-10">
           {/* NÚT QUAY LẠI TRANG CHỦ */}
           
 
@@ -200,8 +193,12 @@ export function NewsletterCard() {
               </form>
             </>
           )}
-        </div>
-      </div>
+    </div>
+  );
+
+  return popup ? card : (
+    <section className="px-5 pb-20 pt-4 lg:px-8 lg:pb-28">
+      <div className="mx-auto flex justify-center">{card}</div>
     </section>
   );
 }

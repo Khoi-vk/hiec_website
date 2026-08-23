@@ -3,7 +3,9 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { LogIn, LogOut, Menu, UserPlus, X } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NewsletterCard } from "@/components/home/newsletter-card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { HiecLogo } from "@/components/ui/hiec-logo";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/store/auth-store";
@@ -20,6 +22,7 @@ const navItems = [
 
 export function Header() {
   const [open, setOpen] = React.useState(false);
+  const [followOpen, setFollowOpen] = React.useState(false);
   const auth = useAuth() as any;
   const user = auth.user;
   const navigate = useNavigate();
@@ -84,7 +87,7 @@ export function Header() {
               </>
             ) : (
               <>
-                <Button variant="default" size="sm" onClick={() => navigate({ to: "/signup" })}>
+                <Button variant="default" size="sm" onClick={() => setFollowOpen(true)}>
                   <UserPlus className="mr-2 size-4" /> Theo dõi
                 </Button>
                 <Button variant="default" size="sm" onClick={() => navigate({ to: "/login" })}>
@@ -131,13 +134,16 @@ export function Header() {
             )}
             {!user && (
               <div className="mt-2 grid grid-cols-2 gap-2">
-                <Link
-                  to="/signup"
-                  onClick={() => setOpen(false)}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    setFollowOpen(true);
+                  }}
                   className="rounded-xl bg-primary px-3 py-3 text-center text-sm font-bold text-primary-foreground"
                 >
-                  Tham gia HIEC
-                </Link>
+                  Theo dõi
+                </button>
                 <Link
                   to="/login"
                   onClick={() => setOpen(false)}
@@ -150,6 +156,13 @@ export function Header() {
           </div>
         </nav>
       )}
+
+      <Dialog open={followOpen} onOpenChange={setFollowOpen}>
+        <DialogContent className="max-h-[calc(100vh-2rem)] max-w-lg overflow-y-auto border-none bg-transparent p-0 shadow-none">
+          <DialogTitle className="sr-only">Đăng ký nhận thông tin</DialogTitle>
+          <NewsletterCard popup />
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
