@@ -49,9 +49,7 @@ function ProjectsPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             {/* Cột trái: Tiêu đề khổng lồ kiểu chữ "công" */}
             <div className="flex-shrink-0 animate-fade-up">
-              <Badge className="bg-cyan-100/50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 border-none mb-4 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.2em]">
-                HIEC Showcase
-              </Badge>
+              
               <h1 className="font-sans text-5xl md:text-6xl font-bold text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.9] transition-colors">
                 Dự án
               </h1>
