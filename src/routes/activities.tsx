@@ -143,6 +143,22 @@ function ActivitiesPage() {
                 </option>
               ))}
             </select>
+
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+            >
+              <option value="Tất cả">
+                Tất cả thời gian
+              </option>
+            
+              {allPeriods.map((period) => (
+                <option key={period} value={period}>
+                  {period}
+              </option>
+              ))}
+            </select>
           </div>
           {loading ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin size-8 text-primary" /></div>
@@ -179,22 +195,6 @@ function ActivitiesPage() {
                           </Badge>
                         ))}
                       </div>
-                      
-            <select
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-            >
-              <option value="Tất cả">
-                Tất cả thời gian
-              </option>
-            
-              {allPeriods.map((period) => (
-                <option key={period} value={period}>
-                  {period}
-                </option>
-              ))}
-            </select>
                       
                       {/* TIÊU ĐỀ CARD: Sáng đen - Tối trắng */}
                       <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
