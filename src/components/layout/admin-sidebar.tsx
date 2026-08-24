@@ -19,6 +19,7 @@ import {
   Home,
   Settings2,
   LayoutTemplate,
+  BookOpen,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ const navItems = [
   { title: "Quản lý hoạt động", url: "/admin/manage-activities", icon: FileText },
   { title: "Quản lý Thành viên", url: "/admin/manage-members", icon: Users },
   { title: "Giao diện thành viên", url: "/admin/member-layout", icon: LayoutTemplate },
+  { title: "Quản lý học liệu", url: "/admin/learning-resources", icon: BookOpen },
 ] as const;
 
 export function AdminSidebar() {
