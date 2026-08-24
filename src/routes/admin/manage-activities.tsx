@@ -53,14 +53,37 @@ function AdminManageActivitiesPage() {
   const [newCategory, setNewCategory] = React.useState("");
   const [isAddingCategory, setIsAddingCategory] = React.useState(false);  
 
+  const fetchCategories = async () => {
+    const { data, error } = await supabase
+      .from("categories")
+      .select("id, name")
+      .order("name", { ascending: true });
+  
+    if (error) {
+      console.error("Lỗi lấy chuyên mục:", error);
+      return;
+    }
+  
+    setCategories(data ?? []);
+  };
+
   const fetchActs = async () => {
     setLoading(true);
-    const { data } = await supabase.from("activities").select("*").order("created_at", { ascending: false });
+  
+    const { data } = await supabase
+      .from("activities")
+      .select("*")
+      .order("created_at", { ascending: false });
+  
     if (data) setActs(data);
+  
     setLoading(false);
   };
 
-  React.useEffect(() => { fetchActs(); }, []);
+  React.useEffect(() => {
+    fetchActs();
+    fetchCategories();
+  }, []);
 
   // --- HÀM TẢI ẢNH LÊN KHI CHỌN FILE ---
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,16 +116,73 @@ function AdminManageActivitiesPage() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.title) return toast.error("Vui lòng nhập tiêu đề");
+    if (!formData.title.trim()) {
+      return toast.error("Vui lòng nhập tiêu đề");
+    }
+  
+    if (!formData.event_date) {
+      return toast.error("Vui lòng chọn ngày diễn ra");
+    }
+  
+    if (selectedCategories.length === 0) {
+      return toast.error("Vui lòng chọn ít nhất một chuyên mục");
+    }
+  
     setIsSubmitting(true);
+  
     try {
-      const { error } = editingId 
-        ? await supabase.from("activities").update(formData).eq("id", editingId)
-        : await supabase.from("activities").insert([formData]);
-      
-      if (error) throw error;
+      let activityId = editingId;
+  
+      if (editingId) {
+        const { error } = await supabase
+          .from("activities")
+          .update(formData)
+          .eq("id", editingId);
+  
+        if (error) throw error;
+  
+        await supabase
+          .from("activity_categories")
+          .delete()
+          .eq("activity_id", editingId);
+      } else {
+        const { data, error } = await supabase
+          .from("activities")
+          .insert([formData])
+          .select("id")
+          .single();
+  
+        if (error) throw error;
+  
+        activityId = data.id;
+      }
+  
+      const categoryRows = selectedCategories.map((categoryId) => ({
+        activity_id: activityId,
+        category_id: categoryId,
+      }));
+  
+      const { error: categoryError } = await supabase
+        .from("activity_categories")
+        .insert(categoryRows);
+  
+      if (categoryError) throw categoryError;
+  
       toast.success("Thành công!");
+  
       setIsOpen(false);
+      setSelectedCategories([]);
+  
+      setFormData({
+        title: "",
+        event_date: "",
+        excerpt: "",
+        content: "",
+        imageUrl: "",
+        status: "draft",
+        is_featured: false,
+      });
+  
       fetchActs();
     } catch (e: any) {
       toast.error(e.message);
@@ -136,36 +216,22 @@ function AdminManageActivitiesPage() {
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Quản lý Hoạt động</h1>
           <p className="text-sm text-muted-foreground mt-1">Quản lý và công bố các hoạt động của HIEC HUST.</p>
         </div>
-        <Button onClick={() => { setEditingId(null);
-                                setFormData({
-                                  title: "",
-                                  event_date: "",
-                                  excerpt: "",
-                                  content: "",
-                                  imageUrl: "",
-                                  status: "draft",
-                                  is_featured: false,
-                                });
-                                
-                                setSelectedCategories([]);
-                                const fetchCategories = async () => {
-                                  const { data, error } = await supabase
-                                    .from("categories")
-                                    .select("id, name")
-                                    .order("name", { ascending: true });
-                                
-                                  if (error) {
-                                    console.error("Lỗi lấy chuyên mục:", error);
-                                    return;
-                                  }
-                                
-                                  setCategories(data ?? []);
-                                };
-                                React.useEffect(() => {
-                                  fetchActs();
-                                  fetchCategories();
-                                }, []);
-                                setIsOpen(true); }} className="rounded-xl font-bold bg-cyan-600 dark:bg-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white transition-colors">
+        <Button onClick={() => {
+                  setEditingId(null);
+                
+                  setFormData({
+                    title: "",
+                    event_date: "",
+                    excerpt: "",
+                    content: "",
+                    imageUrl: "",
+                    status: "draft",
+                    is_featured: false,
+                  });
+                
+                  setSelectedCategories([]);
+                  setIsOpen(true);
+                }} className="rounded-xl font-bold bg-cyan-600 dark:bg-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white transition-colors">
           <Plus className="mr-2 h-4 w-4" /> ĐĂNG BÀI MỚI
         </Button>
       </div>
@@ -234,18 +300,28 @@ function AdminManageActivitiesPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => {
+                      onClick={async () => {
                         setFormData({
                           title: a.title ?? "",
                           event_date: a.event_date ?? "",
                           excerpt: a.excerpt ?? "",
                           content: a.content ?? "",
                           imageUrl: a.imageUrl ?? "",
-                          tags: Array.isArray(a.tags) ? a.tags : [],
                           status: a.status ?? "draft",
                           is_featured: Boolean(a.is_featured),
                         });
-                      
+                    
+                        const { data: categoryLinks, error } = await supabase
+                          .from("activity_categories")
+                          .select("category_id")
+                          .eq("activity_id", a.id);
+                    
+                        if (!error) {
+                          setSelectedCategories(
+                            (categoryLinks ?? []).map((item) => item.category_id)
+                          );
+                        }
+                    
                         setEditingId(a.id);
                         setIsOpen(true);
                       }}
@@ -320,20 +396,19 @@ function AdminManageActivitiesPage() {
             </label>
           
             <div className="flex flex-wrap gap-2">
-              {activityTags.map((tag) => {
-                const checked = formData.tags.includes(tag);
+              {categories.map((category) => {
+                const checked = selectedCategories.includes(category.id);
           
                 return (
                   <button
-                    key={tag}
+                    key={category.id}
                     type="button"
                     onClick={() => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        tags: checked
-                          ? prev.tags.filter((item) => item !== tag)
-                          : [...prev.tags, tag],
-                      }));
+                      setSelectedCategories((prev) =>
+                        checked
+                          ? prev.filter((id) => id !== category.id)
+                          : [...prev, category.id]
+                      );
                     }}
                     className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all ${
                       checked
@@ -341,7 +416,7 @@ function AdminManageActivitiesPage() {
                         : "bg-slate-100 text-slate-500 hover:bg-cyan-50"
                     }`}
                   >
-                    {tag}
+                    {category.name}
                   </button>
                 );
               })}
@@ -350,6 +425,82 @@ function AdminManageActivitiesPage() {
             <p className="text-[10px] text-slate-400">
               Có thể chọn nhiều chuyên mục.
             </p>
+            {isAddingCategory ? (
+              <div className="mt-3 flex gap-2">
+                <Input
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Tên chuyên mục mới"
+                  className="rounded-xl"
+                />
+            
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    const name = newCategory.trim();
+            
+                    if (!name) {
+                      toast.error("Vui lòng nhập tên chuyên mục.");
+                      return;
+                    }
+            
+                    const { data, error } = await supabase
+                      .from("categories")
+                      .insert({ name })
+                      .select("id, name")
+                      .single();
+            
+                    if (error) {
+                      if (error.code === "23505") {
+                        toast.error("Chuyên mục này đã tồn tại.");
+                      } else {
+                        toast.error(error.message);
+                      }
+            
+                      return;
+                    }
+            
+                    setCategories((prev) =>
+                      [...prev, data].sort((a, b) =>
+                        a.name.localeCompare(b.name)
+                      )
+                    );
+            
+                    setSelectedCategories((prev) => [
+                      ...prev,
+                      data.id,
+                    ]);
+            
+                    setNewCategory("");
+                    setIsAddingCategory(false);
+            
+                    toast.success("Đã thêm chuyên mục.");
+                  }}
+                >
+                  Thêm
+                </Button>
+            
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setNewCategory("");
+                    setIsAddingCategory(false);
+                  }}
+                >
+                  Huỷ
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-3 rounded-full"
+                onClick={() => setIsAddingCategory(true)}
+              >
+                + Thêm chuyên mục
+              </Button>
+            )}
           </div>
 
           <div className="space-y-2">
