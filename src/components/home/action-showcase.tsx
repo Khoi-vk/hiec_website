@@ -9,7 +9,6 @@ import {
   Loader2,
   Rocket,
   Sparkles,
-  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
@@ -71,6 +70,19 @@ const FALLBACK_FEATURED_ITEMS: ActionItem[] = [
       "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
     is_featured: true,
   },
+  {
+    id: "proj-featured-2",
+    type: "project",
+    title: "EcoHarvest – Nền tảng chuỗi cung ứng nông sản tuần hoàn",
+    badge: "2024",
+    year: "2024",
+    excerpt: "Dự án nghiên cứu đổi mới công nghệ thu hoạch và kết nối nông sản sạch",
+    content:
+      "EcoHarvest mang đến giải pháp kết nối trực tiếp nhà vườn với người tiêu dùng thông qua thuật toán định tuyến và quản lý độ tươi theo thời gian thực.",
+    imageUrl:
+      "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80",
+    is_featured: true,
+  },
 ];
 
 type FilterCategory = "all" | "activity" | "project";
@@ -82,6 +94,9 @@ export function ActionShowcase() {
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [selectedItem, setSelectedItem] = React.useState<ActionItem | null>(null);
   const [isHovered, setIsHovered] = React.useState(false);
+
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const itemRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
   // Fetch data from Supabase (chỉ lấy các mục is_featured = true)
   React.useEffect(() => {
@@ -148,12 +163,12 @@ export function ActionShowcase() {
               .select("*")
               .eq("status", "published")
               .order("event_date", { ascending: false })
-              .limit(5),
+              .limit(6),
             supabase
               .from("projects")
               .select("*")
               .order("created_at", { ascending: false })
-              .limit(5),
+              .limit(6),
           ]);
 
           if (
@@ -237,16 +252,38 @@ export function ActionShowcase() {
     setCurrentIndex(0);
   }, [selectedFilter]);
 
+  // Scroll active item into center view
+  const scrollToIndex = React.useCallback((index: number, smooth = true) => {
+    const container = scrollContainerRef.current;
+    const targetElement = itemRefs.current[index];
+    if (!container || !targetElement) return;
+
+    const containerWidth = container.clientWidth;
+    const targetLeft = targetElement.offsetLeft;
+    const targetWidth = targetElement.clientWidth;
+
+    const scrollDestination = targetLeft - (containerWidth / 2 - targetWidth / 2);
+
+    container.scrollTo({
+      left: Math.max(0, scrollDestination),
+      behavior: smooth ? "smooth" : "auto",
+    });
+  }, []);
+
   // Handle Carousel navigation
   const handlePrev = () => {
     if (filteredItems.length === 0) return;
-    setCurrentIndex((prev) => (prev === 0 ? filteredItems.length - 1 : prev - 1));
+    const nextIdx = currentIndex === 0 ? filteredItems.length - 1 : currentIndex - 1;
+    setCurrentIndex(nextIdx);
+    scrollToIndex(nextIdx);
   };
 
   const handleNext = React.useCallback(() => {
     if (filteredItems.length === 0) return;
-    setCurrentIndex((prev) => (prev === filteredItems.length - 1 ? 0 : prev + 1));
-  }, [filteredItems.length]);
+    const nextIdx = currentIndex === filteredItems.length - 1 ? 0 : currentIndex + 1;
+    setCurrentIndex(nextIdx);
+    scrollToIndex(nextIdx);
+  }, [currentIndex, filteredItems.length, scrollToIndex]);
 
   // Auto-play timer
   React.useEffect(() => {
@@ -259,27 +296,35 @@ export function ActionShowcase() {
     return () => window.clearInterval(interval);
   }, [isHovered, loading, filteredItems.length, handleNext]);
 
-  // Active items for 3-card presentation
+  // Listen to user scroll to update active center card
+  const handleScroll = React.useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container || filteredItems.length === 0) return;
+
+    const containerCenter = container.scrollLeft + container.clientWidth / 2;
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    itemRefs.current.forEach((el, index) => {
+      if (!el) return;
+      const elCenter = el.offsetLeft + el.clientWidth / 2;
+      const distance = Math.abs(containerCenter - elCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    if (closestIndex !== currentIndex) {
+      setCurrentIndex(closestIndex);
+    }
+  }, [currentIndex, filteredItems.length]);
+
   const currentItem = filteredItems[currentIndex] || null;
-
-  const getPrevItem = () => {
-    if (filteredItems.length <= 1) return null;
-    const prevIdx = (currentIndex - 1 + filteredItems.length) % filteredItems.length;
-    return filteredItems[prevIdx];
-  };
-
-  const getNextItem = () => {
-    if (filteredItems.length <= 1) return null;
-    const nextIdx = (currentIndex + 1) % filteredItems.length;
-    return filteredItems[nextIdx];
-  };
-
-  const prevItem = getPrevItem();
-  const nextItem = getNextItem();
 
   return (
     <div
-      className="mt-8 space-y-8"
+      className="mt-8 space-y-6"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -331,7 +376,7 @@ export function ActionShowcase() {
             type="button"
             onClick={handlePrev}
             aria-label="Previous slide"
-            className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95"
+            className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95 cursor-pointer"
           >
             <ChevronLeft className="size-4 sm:size-5" />
           </button>
@@ -339,7 +384,7 @@ export function ActionShowcase() {
             type="button"
             onClick={handleNext}
             aria-label="Next slide"
-            className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95"
+            className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95 cursor-pointer"
           >
             <ChevronRight className="size-4 sm:size-5" />
           </button>
@@ -355,84 +400,93 @@ export function ActionShowcase() {
           Chưa có mục nổi bật nào thuộc danh mục này.
         </div>
       ) : (
-        <div className="relative overflow-hidden py-4">
-          {/* 3D Coverflow Slider Layout */}
-          <div className="relative flex items-center justify-center min-h-[300px] sm:min-h-[380px] md:min-h-[440px] px-2 sm:px-8">
-            {/* Left Card (Prev) */}
-            {prevItem && (
-              <div
-                onClick={handlePrev}
-                aria-label="Xem mục trước"
-                className="hidden md:block absolute left-0 lg:left-4 z-10 w-[42%] lg:w-[45%] max-w-lg aspect-[16/10] -translate-x-[20%] scale-80 opacity-40 hover:opacity-75 transition-all duration-700 cursor-pointer rounded-[2rem] overflow-hidden shadow-md select-none"
-              >
-                <img
-                  src={prevItem.imageUrl}
-                  alt={prevItem.title}
-                  className="size-full object-cover rounded-[2rem]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-background/40 to-transparent pointer-events-none" />
-              </div>
-            )}
+        <div className="relative overflow-hidden py-2">
+          {/* Scrollable Horizontal Slider Container (Aligned at bottom) */}
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="flex items-end gap-4 sm:gap-6 overflow-x-auto pb-4 pt-10 scrollbar-none snap-x snap-mandatory px-[15vw] sm:px-[20vw] md:px-[25vw] scroll-smooth"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
+            {filteredItems.map((item, index) => {
+              const isCenter = index === currentIndex;
 
-            {/* Center Active Card */}
-            {currentItem && (
-              <div
-                onClick={() => setSelectedItem(currentItem)}
-                className="relative z-20 w-full md:w-[68%] lg:w-[62%] max-w-3xl aspect-[16/10] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-700 cursor-pointer group select-none border-2 border-white/20 dark:border-white/10"
-              >
-                <img
-                  src={currentItem.imageUrl}
-                  alt={currentItem.title}
-                  className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-
-                {/* Badge on Top-Left (e.g. 🚀 DỰ ÁN / 🎯 HOẠT ĐỘNG) */}
-                <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-30">
-                  <span
+              return (
+                <div
+                  key={item.id}
+                  ref={(el) => {
+                    itemRefs.current[index] = el;
+                  }}
+                  onClick={() => {
+                    if (isCenter) {
+                      setSelectedItem(item);
+                    } else {
+                      setCurrentIndex(index);
+                      scrollToIndex(index);
+                    }
+                  }}
+                  className={cn(
+                    "snap-center shrink-0 transition-all duration-500 cursor-pointer select-none origin-bottom flex flex-col justify-end",
+                    isCenter
+                      ? "w-[85vw] sm:w-[580px] md:w-[680px] z-20 opacity-100 scale-100"
+                      : "w-[65vw] sm:w-[420px] md:w-[480px] z-10 opacity-40 hover:opacity-75 scale-90",
+                  )}
+                >
+                  <div
                     className={cn(
-                      "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-lg backdrop-blur-md",
-                      currentItem.type === "project"
-                        ? "bg-[#10b981]" // Green badge as in image
-                        : "bg-[#06b6d4]",
+                      "relative aspect-[16/10] w-full rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden transition-all duration-500",
+                      isCenter
+                        ? "shadow-2xl ring-2 ring-white/30 dark:ring-white/10"
+                        : "shadow-md hover:shadow-lg",
                     )}
                   >
-                    {currentItem.type === "project" ? (
-                      <>
-                        <Rocket className="size-3.5" /> DỰ ÁN
-                      </>
-                    ) : (
-                      <>
-                        <Calendar className="size-3.5" /> HOẠT ĐỘNG
-                      </>
-                    )}
-                  </span>
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className={cn(
+                        "size-full object-cover transition-transform duration-700",
+                        isCenter && "hover:scale-105",
+                      )}
+                    />
+
+                    {/* Badge on Top-Left */}
+                    <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-30">
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-lg backdrop-blur-md",
+                          item.type === "project" ? "bg-[#10b981]" : "bg-[#06b6d4]",
+                        )}
+                      >
+                        {item.type === "project" ? (
+                          <>
+                            <Rocket className="size-3.5" /> DỰ ÁN
+                          </>
+                        ) : (
+                          <>
+                            <Calendar className="size-3.5" /> HOẠT ĐỘNG
+                          </>
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Gradient overlay */}
+                    <div
+                      className={cn(
+                        "absolute inset-0 transition-opacity duration-300 pointer-events-none",
+                        isCenter
+                          ? "bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 hover:opacity-100"
+                          : "bg-black/20",
+                      )}
+                    />
+                  </div>
                 </div>
-
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-              </div>
-            )}
-
-            {/* Right Card (Next) */}
-            {nextItem && (
-              <div
-                onClick={handleNext}
-                aria-label="Xem mục tiếp"
-                className="hidden md:block absolute right-0 lg:right-4 z-10 w-[42%] lg:w-[45%] max-w-lg aspect-[16/10] translate-x-[20%] scale-80 opacity-40 hover:opacity-75 transition-all duration-700 cursor-pointer rounded-[2rem] overflow-hidden shadow-md select-none"
-              >
-                <img
-                  src={nextItem.imageUrl}
-                  alt={nextItem.title}
-                  className="size-full object-cover rounded-[2rem]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-l from-background/40 to-transparent pointer-events-none" />
-              </div>
-            )}
+              );
+            })}
           </div>
 
           {/* Underneath Content Block */}
           {currentItem && (
-            <div className="mt-6 text-center space-y-2 max-w-3xl mx-auto px-4 animate-fade-up">
+            <div className="mt-4 text-center space-y-2 max-w-3xl mx-auto px-4 animate-fade-up">
               {/* Meta: [Dự án] • 2024 */}
               <p className="text-xs sm:text-sm font-bold text-[#38bdf8] dark:text-[#7dd3fc] tracking-wide">
                 [{currentItem.type === "project" ? "Dự án" : "Hoạt động"}] •{" "}
@@ -459,7 +513,7 @@ export function ActionShowcase() {
                 <button
                   type="button"
                   onClick={() => setSelectedItem(currentItem)}
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#38bdf8] dark:text-[#7dd3fc] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#38bdf8] dark:text-[#7dd3fc] hover:underline cursor-pointer"
                 >
                   Xem chi tiết <ArrowUpRight className="size-4" />
                 </button>
