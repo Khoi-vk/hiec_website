@@ -133,44 +133,88 @@ function AdminManageActivitiesPage() {
     try {
       let activityId = editingId;
   
+      // 1. Tạo mới hoặc cập nhật bài viết
       if (editingId) {
-        const { error } = await supabase
+        const { error: activityError } = await supabase
           .from("activities")
           .update(formData)
           .eq("id", editingId);
   
-        if (error) throw error;
-  
-        await supabase
-          .from("activity_categories")
-          .delete()
-          .eq("activity_id", editingId);
+        if (activityError) {
+          throw activityError;
+        }
       } else {
-        const { data, error } = await supabase
+        const { data, error: activityError } = await supabase
           .from("activities")
           .insert([formData])
           .select("id")
           .single();
   
-        if (error) throw error;
+        if (activityError) {
+          throw activityError;
+        }
   
         activityId = data.id;
       }
   
-      const categoryRows = selectedCategories.map((categoryId) => ({
-        activity_id: activityId,
-        category_id: categoryId,
-      }));
+      if (!activityId) {
+        throw new Error("Không xác định được ID bài viết.");
+      }
   
-      const { error: categoryError } = await supabase
+      // 2. Loại bỏ category trùng
+      const uniqueCategoryIds = [...new Set(selectedCategories)];
+  
+      // 3. Lấy các category hiện tại của bài
+      const { data: existingLinks, error: fetchLinkError } = await supabase
         .from("activity_categories")
-        .insert(categoryRows);
+        .select("category_id")
+        .eq("activity_id", activityId);
   
-      if (categoryError) throw categoryError;
+      if (fetchLinkError) {
+        throw fetchLinkError;
+      }
   
-      toast.success("Thành công!");
+      const existingCategoryIds = (existingLinks ?? []).map(
+        (item) => item.category_id
+      );
+  
+      // 4. Chỉ cập nhật category nếu danh sách thực sự thay đổi
+      const categoriesChanged =
+        existingCategoryIds.length !== uniqueCategoryIds.length ||
+        existingCategoryIds.some(
+          (id) => !uniqueCategoryIds.includes(id)
+        );
+  
+      if (categoriesChanged) {
+        // Xóa liên kết cũ
+        const { error: deleteError } = await supabase
+          .from("activity_categories")
+          .delete()
+          .eq("activity_id", activityId);
+  
+        if (deleteError) {
+          throw deleteError;
+        }
+  
+        // Thêm liên kết mới
+        const categoryRows = uniqueCategoryIds.map((categoryId) => ({
+          activity_id: activityId,
+          category_id: categoryId,
+        }));
+  
+        const { error: categoryError } = await supabase
+          .from("activity_categories")
+          .insert(categoryRows);
+  
+        if (categoryError) {
+          throw categoryError;
+        }
+      }
+  
+      toast.success(editingId ? "Đã cập nhật bài viết!" : "Đã đăng bài thành công!");
   
       setIsOpen(false);
+      setEditingId(null);
       setSelectedCategories([]);
   
       setFormData({
@@ -184,8 +228,9 @@ function AdminManageActivitiesPage() {
       });
   
       fetchActs();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (error: any) {
+      console.error("Lỗi lưu bài viết:", error);
+      toast.error(error.message || "Không thể lưu bài viết.");
     } finally {
       setIsSubmitting(false);
     }
