@@ -95,6 +95,53 @@ function ActivitiesPage() {
     return matchesSearch && matchesTag && matchesPeriod;
   });
 
+  {filteredActivities.length === 0 ? (
+    <div className="py-20 text-center">
+      <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+        Không tìm thấy hoạt động phù hợp.
+      </p>
+    </div>
+  ) : (
+    // timeline
+  )}
+
+  const timelineGroups = filteredActivities.reduce<
+    Record<
+      string,
+      Record<
+        string,
+        Record<string, any[]>
+      >
+    >
+  >((groups, activity) => {
+    if (!activity.event_date) return groups;
+  
+    const date = new Date(`${activity.event_date}T00:00:00`);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const quarter = Math.ceil(month / 3);
+  
+    const yearKey = `${year}`;
+    const quarterKey = `Q${quarter}`;
+    const monthKey = `Tháng ${month}`;
+  
+    if (!groups[yearKey]) {
+      groups[yearKey] = {};
+    }
+  
+    if (!groups[yearKey][quarterKey]) {
+      groups[yearKey][quarterKey] = {};
+    }
+  
+    if (!groups[yearKey][quarterKey][monthKey]) {
+      groups[yearKey][quarterKey][monthKey] = [];
+    }
+  
+    groups[yearKey][quarterKey][monthKey].push(activity);
+  
+    return groups;
+  }, {});
+
   return (
     <PublicLayout>
       {/* 1. BANNER - TỰ ĐỘNG ĐỔI MÀU NỀN VÀ CHỮ */}
@@ -163,38 +210,130 @@ function ActivitiesPage() {
           {loading ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin size-8 text-primary" /></div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {filteredActivities.map((act) => (
-                <div key={act.id} onClick={() => setSelectedAct(act)} className="group cursor-pointer">
-                  {/* THÊM 'flex flex-col' vào Card */}
-                  <Card className="flex flex-col h-full border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800">
-                    
-                    {/* THÊM 'shrink-0' để đảm bảo vùng chứa ảnh không bị co lại */}
-                    <div className="aspect-[16/10] overflow-hidden m-1.5 rounded-[1.5rem] shrink-0">
-                      <img src={act.imageUrl} className="size-full object-cover transition-transform duration-700 group-hover:scale-105" alt="" />
-                    </div>
-                    
-                    {/* THÊM 'flex flex-col grow' vào CardContent */}
-                    <CardContent className="flex flex-col grow p-6 pt-2">
-                      <div className="mb-3 flex items-center">
-                        <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">
-                          {act.event_date
-                            ? new Date(`${act.event_date}T00:00:00`).toLocaleDateString("vi-VN")
-                            : "—"}
-                        </span>
+            <div className="space-y-14">
+              {Object.entries(timelineGroups).map(([year, quarters]) => (
+                <section key={year}>
+                  {/* =========================
+                      NĂM
+                  ========================= */}
+                  <div className="mb-8 flex items-center gap-4">
+                    <h2 className="text-3xl font-black tracking-tight text-[#0f3d3e] dark:text-white">
+                      {year}
+                    </h2>
+            
+                    <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+                  </div>
+            
+                  {/* =========================
+                      CÁC QUÝ
+                  ========================= */}
+                  <div className="space-y-10">
+                    {Object.entries(quarters).map(([quarter, months]) => (
+                      <div key={quarter}>
+                        {/* QUÝ */}
+                        <div className="mb-5 flex items-center gap-3">
+                          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-black uppercase tracking-widest text-primary">
+                            {quarter}
+                          </span>
+                        </div>
+            
+                        {/* =========================
+                            CÁC THÁNG
+                        ========================= */}
+                        <div className="space-y-8">
+                          {Object.entries(months).map(
+                            ([month, monthActivities]) => (
+                              <div key={month}>
+                                {/* THÁNG */}
+                                <h3 className="mb-4 text-sm font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
+                                  {month}
+                                </h3>
+            
+                                {/* =========================
+                                    GRID CARD
+                                ========================= */}
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                                  {monthActivities.map((act) => (
+                                    <div
+                                      key={act.id}
+                                      onClick={() => setSelectedAct(act)}
+                                      className="group cursor-pointer"
+                                    >
+                                      {/* THẺ BÀI VIẾT - GIỮ NGUYÊN */}
+                                      <Card className="flex flex-col h-full border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800">
+            
+                                        {/* ẢNH */}
+                                        <div className="aspect-[16/10] overflow-hidden m-1.5 rounded-[1.5rem] shrink-0">
+                                          <img
+                                            src={act.imageUrl}
+                                            className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                            alt=""
+                                          />
+                                        </div>
+            
+                                        {/* NỘI DUNG */}
+                                        <CardContent className="flex flex-col grow p-6 pt-2">
+            
+                                          {/* NGÀY */}
+                                          <div className="mb-3 flex items-center">
+                                            <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">
+                                              {act.event_date
+                                                ? new Date(
+                                                    `${act.event_date}T00:00:00`,
+                                                  ).toLocaleDateString("vi-VN")
+                                                : "—"}
+                                            </span>
+                                          </div>
+            
+                                          {/* TAG */}
+                                          <div className="mb-3 flex flex-wrap gap-1">
+                                            {(act.tags ?? []).map((tag: string) => (
+                                              <Badge
+                                                key={tag}
+                                                variant="secondary"
+                                                className="text-[9px]"
+                                              >
+                                                {tag}
+                                              </Badge>
+                                            ))}
+                                          </div>
+            
+                                          {/* TIÊU ĐỀ */}
+                                          <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
+                                            {act.title}
+                                          </h3>
+            
+                                          {/* MÔ TẢ */}
+                                          <p className="text-slate-600 dark:text-slate-400 text-[11px] line-clamp-2 font-medium mb-5">
+                                            {act.excerpt}
+                                          </p>
+            
+                                          {/* CHI TIẾT */}
+                                          <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-50 dark:border-slate-800">
+                                            <span className="text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase group-hover:text-primary transition-colors">
+                                              Chi tiết
+                                            </span>
+            
+                                            <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                                              <ArrowRight className="size-3.5" />
+                                            </div>
+                                          </div>
+            
+                                        </CardContent>
+                                      </Card>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ),
+                          )}
+                        </div>
                       </div>
-
-                      <div className="mb-3 flex flex-wrap gap-1">
-                        {(act.tags ?? []).map((tag: string) => (
-                          <Badge
-                            key={tag}
-                            variant="secondary"
-                            className="text-[9px]"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
                       
                       {/* TIÊU ĐỀ CARD: Sáng đen - Tối trắng */}
                       <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
