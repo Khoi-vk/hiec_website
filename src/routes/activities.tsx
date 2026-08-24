@@ -279,7 +279,7 @@ function ActivitiesPage() {
             
                                           {/* NGÀY */}
                                           <div className="mb-3 flex items-center">
-                                            <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">
+                                            <span className="text-[10px] font-bold text-slate-900 bg-white dark:bg-primary/10 dark:text-primary px-2 py-0.5 rounded">
                                               {act.event_date
                                                 ? new Date(
                                                     `${act.event_date}T00:00:00`,
