@@ -19,6 +19,7 @@ function ActivitiesPage() {
   const [loading, setLoading] = React.useState(true);
   const [selectedAct, setSelectedAct] = React.useState<any>(null);
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedTag, setSelectedTag] = React.useState("Tất cả");
 
   React.useEffect(() => {
     async function fetchActivities() {
@@ -38,15 +39,25 @@ function ActivitiesPage() {
     fetchActivities();
   }, []);
 
+  const allTags = Array.from(
+    new Set(
+      activities.flatMap((activity) => activity.tags ?? [])
+    )
+  );
+
   const filteredActivities = activities.filter((activity) => {
     const keyword = searchTerm.trim().toLowerCase();
   
-    if (!keyword) return true;
-  
-    return (
+    const matchesSearch =
+      !keyword ||
       activity.title?.toLowerCase().includes(keyword) ||
-      activity.excerpt?.toLowerCase().includes(keyword)
-    );
+      activity.excerpt?.toLowerCase().includes(keyword);
+  
+    const matchesTag =
+      selectedTag === "Tất cả" ||
+      activity.tags?.includes(selectedTag);
+  
+    return matchesSearch && matchesTag;
   });
 
   return (
@@ -73,13 +84,29 @@ function ActivitiesPage() {
       {/* 2. DANH SÁCH CARD */}
       <section className="py-12 bg-slate-50/30 dark:bg-slate-900/20 min-h-[600px] transition-colors duration-300">
         <div className="max-w-[1300px] mx-auto px-6 md:px-12">
-          <div className="mb-8">
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row">
             <Input
               placeholder="Tìm kiếm hoạt động..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-12 w-full rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 sm:max-w-md"
             />
+          
+            <select
+              value={selectedTag}
+              onChange={(e) => setSelectedTag(e.target.value)}
+              className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+            >
+              <option value="Tất cả">
+                Tất cả chuyên mục
+              </option>
+          
+              {allTags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+            </select>
           </div>
           {loading ? (
             <div className="flex justify-center py-20"><Loader2 className="animate-spin size-8 text-primary" /></div>
@@ -98,7 +125,23 @@ function ActivitiesPage() {
                     {/* THÊM 'flex flex-col grow' vào CardContent */}
                     <CardContent className="flex flex-col grow p-6 pt-2">
                       <div className="mb-3 flex items-center">
-                        <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">{act.date}</span>
+                        <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">
+                          {act.event_date
+                            ? new Date(`${act.event_date}T00:00:00`).toLocaleDateString("vi-VN")
+                            : "—"}
+                        </span>
+                      </div>
+
+                      <div className="mb-3 flex flex-wrap gap-1">
+                        {(act.tags ?? []).map((tag: string) => (
+                          <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="text-[9px]"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
                       </div>
                       
                       {/* TIÊU ĐỀ CARD: Sáng đen - Tối trắng */}
