@@ -39,7 +39,16 @@ function ActivitiesPage() {
           `)
           .eq("status", "published")
           .order("event_date", { ascending: false });
-        if (data) setActivities(data);
+        if (data) {
+          const normalizedActivities = data.map((activity) => ({
+            ...activity,
+            tags: (activity.activity_categories ?? [])
+              .map((item: any) => item.categories?.name)
+              .filter(Boolean),
+          }));
+        
+          setActivities(normalizedActivities);
+        }
       } catch (err) {
         console.error("Lỗi:", err);
       } finally {
