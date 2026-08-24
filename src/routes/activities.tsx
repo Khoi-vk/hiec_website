@@ -95,16 +95,6 @@ function ActivitiesPage() {
     return matchesSearch && matchesTag && matchesPeriod;
   });
 
-  {filteredActivities.length === 0 ? (
-    <div className="py-20 text-center">
-      <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-        Không tìm thấy hoạt động phù hợp.
-      </p>
-    </div>
-  ) : (
-    // timeline
-  )}
-
   const timelineGroups = filteredActivities.reduce<
     Record<
       string,
