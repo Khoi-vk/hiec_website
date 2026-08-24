@@ -222,7 +222,17 @@ function AdminManageActivitiesPage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => {
-                        setFormData(a);
+                        setFormData({
+                          title: a.title ?? "",
+                          event_date: a.event_date ?? "",
+                          excerpt: a.excerpt ?? "",
+                          content: a.content ?? "",
+                          imageUrl: a.imageUrl ?? "",
+                          tags: Array.isArray(a.tags) ? a.tags : [],
+                          status: a.status ?? "draft",
+                          is_featured: Boolean(a.is_featured),
+                        });
+                      
                         setEditingId(a.id);
                         setIsOpen(true);
                       }}
