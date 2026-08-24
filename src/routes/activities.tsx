@@ -20,6 +20,7 @@ function ActivitiesPage() {
   const [selectedAct, setSelectedAct] = React.useState<any>(null);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedTag, setSelectedTag] = React.useState("Tất cả");
+  const [selectedPeriod, setSelectedPeriod] = React.useState("Tất cả");
 
   React.useEffect(() => {
     async function fetchActivities() {
@@ -45,6 +46,24 @@ function ActivitiesPage() {
     )
   );
 
+  const allPeriods = Array.from(
+    new Set(
+      activities
+        .filter((activity) => activity.event_date)
+        .flatMap((activity) => {
+          const date = new Date(`${activity.event_date}T00:00:00`);
+          const year = date.getFullYear();
+          const month = date.getMonth() + 1;
+          const quarter = Math.ceil(month / 3);
+  
+          return [
+            `T${month}/${year}`,
+            `Q${quarter}/${year}`,
+          ];
+        })
+    )
+  );
+
   const filteredActivities = activities.filter((activity) => {
     const keyword = searchTerm.trim().toLowerCase();
   
@@ -57,7 +76,23 @@ function ActivitiesPage() {
       selectedTag === "Tất cả" ||
       activity.tags?.includes(selectedTag);
   
-    return matchesSearch && matchesTag;
+    const matchesPeriod =
+      selectedPeriod === "Tất cả" ||
+      (() => {
+        if (!activity.event_date) return false;
+    
+        const date = new Date(`${activity.event_date}T00:00:00`);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const quarter = Math.ceil(month / 3);
+    
+        return (
+          selectedPeriod === `T${month}/${year}` ||
+          selectedPeriod === `Q${quarter}/${year}`
+        );
+      })();
+    
+    return matchesSearch && matchesTag && matchesPeriod;
   });
 
   return (
@@ -97,6 +132,7 @@ function ActivitiesPage() {
               onChange={(e) => setSelectedTag(e.target.value)}
               className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
             >
+
               <option value="Tất cả">
                 Tất cả chuyên mục
               </option>
@@ -143,6 +179,22 @@ function ActivitiesPage() {
                           </Badge>
                         ))}
                       </div>
+                      
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+            >
+              <option value="Tất cả">
+                Tất cả thời gian
+              </option>
+            
+              {allPeriods.map((period) => (
+                <option key={period} value={period}>
+                  {period}
+                </option>
+              ))}
+            </select>
                       
                       {/* TIÊU ĐỀ CARD: Sáng đen - Tối trắng */}
                       <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
