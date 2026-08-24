@@ -450,26 +450,81 @@ function AdminManageActivitiesPage() {
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => {
                 const checked = selectedCategories.includes(category.id);
-          
+            
                 return (
-                  <button
+                  <div
                     key={category.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedCategories((prev) =>
-                        checked
-                          ? prev.filter((id) => id !== category.id)
-                          : [...prev, category.id]
-                      );
-                    }}
-                    className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1 rounded-full border px-2 py-1 transition-all ${
                       checked
-                        ? "bg-cyan-600 text-white"
-                        : "bg-slate-100 text-slate-500 hover:bg-cyan-50"
+                        ? "border-cyan-600 bg-cyan-600 text-white"
+                        : "border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                     }`}
                   >
-                    {category.name}
-                  </button>
+                    {/* Nút chọn chuyên mục */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCategories((prev) =>
+                          checked
+                            ? prev.filter((id) => id !== category.id)
+                            : [...prev, category.id]
+                        );
+                      }}
+                      className="px-1 py-0.5 text-xs font-bold"
+                    >
+                      {category.name}
+                    </button>
+            
+                    {/* Nút xóa chuyên mục */}
+                    <button
+                      type="button"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+            
+                        const confirmed = window.confirm(
+                          `Bạn có chắc muốn xóa chuyên mục "${category.name}" không?`
+                        );
+            
+                        if (!confirmed) return;
+            
+                        try {
+                          const { error } = await supabase
+                            .from("categories")
+                            .delete()
+                            .eq("id", category.id);
+            
+                          if (error) {
+                            throw error;
+                          }
+            
+                          // Bỏ category khỏi danh sách hiện tại
+                          setCategories((prev) =>
+                            prev.filter((item) => item.id !== category.id)
+                          );
+            
+                          // Nếu category đang được chọn trong bài hiện tại
+                          setSelectedCategories((prev) =>
+                            prev.filter((id) => id !== category.id)
+                          );
+            
+                          toast.success(`Đã xóa chuyên mục "${category.name}".`);
+                        } catch (error: any) {
+                          console.error("Lỗi xóa chuyên mục:", error);
+                          toast.error(
+                            error.message || "Không thể xóa chuyên mục."
+                          );
+                        }
+                      }}
+                      className={`flex size-5 items-center justify-center rounded-full transition-colors ${
+                        checked
+                          ? "text-white/80 hover:bg-white/20 hover:text-white"
+                          : "text-slate-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30"
+                      }`}
+                      title={`Xóa chuyên mục ${category.name}`}
+                    >
+                      <Trash2 className="size-3" />
+                    </button>
+                  </div>
                 );
               })}
             </div>
