@@ -27,7 +27,16 @@ function ActivitiesPage() {
       try {
         const { data, error } = await supabase
           .from("activities")
-          .select("*")
+          .select(`
+            *,
+            activity_categories (
+              category_id,
+              categories (
+                id,
+                name
+              )
+            )
+          `)
           .eq("status", "published")
           .order("event_date", { ascending: false });
         if (data) setActivities(data);
