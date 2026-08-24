@@ -188,8 +188,14 @@ function ActivitiesPage() {
 
             <div className="space-y-6">
                <div className="flex items-center gap-3 text-cyan-600 dark:text-cyan-400 font-black text-[11px] uppercase tracking-[0.3em] bg-slate-50 dark:bg-white/5 w-fit px-4 py-2 rounded-full border border-slate-100 dark:border-white/10">
-                  <Calendar className="size-4" /> Thời gian: {selectedAct.date}
-               </div>
+                <Calendar className="size-4" />
+                Thời gian:{" "}
+                {selectedAct.event_date
+                  ? new Date(`${selectedAct.event_date}T00:00:00`).toLocaleDateString(
+                      "vi-VN"
+                    )
+                  : "Chưa cập nhật"}
+              </div>
                
                {/* NỘI DUNG CHÍNH: Tự động đảo màu đen/trắng */}
                <div className="text-slate-800 dark:text-slate-100 text-lg md:text-xl leading-loose whitespace-pre-wrap font-medium">
