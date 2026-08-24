@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   Calendar,
   ChevronLeft,
+  ChevronRight,
   Loader2,
   Rocket,
 } from "lucide-react";
@@ -86,6 +87,8 @@ export function ActionShowcase() {
   const [items, setItems] = React.useState<ActionItem[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [selectedItem, setSelectedItem] = React.useState<ActionItem | null>(null);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     async function fetchData() {
@@ -159,8 +162,37 @@ export function ActionShowcase() {
     [items],
   );
 
+  const handleScroll = (direction: "left" | "right") => {
+    scrollContainerRef.current?.scrollBy({
+      left: direction === "left" ? -324 : 324,
+      behavior: "smooth",
+    });
+  };
+
+  React.useEffect(() => {
+    if (isHovered || loading || orderedItems.length < 2) return;
+
+    const interval = window.setInterval(() => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+
+      if (container.scrollLeft >= container.scrollWidth - container.clientWidth - 10) {
+        container.scrollTo({ left: 0, behavior: "smooth" });
+        return;
+      }
+
+      container.scrollBy({ left: 324, behavior: "smooth" });
+    }, 3500);
+
+    return () => window.clearInterval(interval);
+  }, [isHovered, loading, orderedItems.length]);
+
   return (
-    <div className="mt-8">
+    <div
+      className="mt-8"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {loading ? (
         <div className="flex h-72 items-center justify-center">
           <Loader2 className="size-8 animate-spin text-primary" />
@@ -170,7 +202,10 @@ export function ActionShowcase() {
           Chưa có mục nào được công bố.
         </div>
       ) : (
-        <div className="-mx-5 overflow-x-auto px-5 pb-5 scrollbar-none sm:mx-0 sm:px-0">
+        <div
+          ref={scrollContainerRef}
+          className="-mx-5 overflow-x-auto scroll-smooth px-5 pb-5 scrollbar-none sm:mx-0 sm:px-0"
+        >
           <div className="flex w-max gap-6">
             {orderedItems.map((item) => (
               <div
@@ -226,6 +261,30 @@ export function ActionShowcase() {
         </div>
       )}
 
+      {!loading && orderedItems.length > 1 ? (
+        <div className="mt-4 flex items-center justify-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => handleScroll("left")}
+            className="rounded-full"
+            aria-label="Cuộn sang trái"
+          >
+            <ChevronLeft className="size-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => handleScroll("right")}
+            className="rounded-full"
+            aria-label="Cuộn sang phải"
+          >
+            <ChevronRight className="size-4" />
+          </Button>
+        </div>
+      ) : null}
 
       {/* Detail Modal */}
       <Modal
