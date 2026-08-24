@@ -135,13 +135,20 @@ function AdminManageActivitiesPage() {
   
       // 1. Tạo mới hoặc cập nhật bài viết
       if (editingId) {
-        const { error: activityError } = await supabase
+        const { data: updatedActivities, error: activityError } = await supabase
           .from("activities")
           .update(formData)
-          .eq("id", editingId);
-  
+          .eq("id", editingId)
+          .select("id, status, title");
+        
         if (activityError) {
           throw activityError;
+        }
+        
+        if (!updatedActivities || updatedActivities.length === 0) {
+          throw new Error(
+            "Không thể cập nhật bài viết. Có thể tài khoản hiện tại không có quyền UPDATE hoặc bài viết không tồn tại."
+          );
         }
       } else {
         const { data, error: activityError } = await supabase
