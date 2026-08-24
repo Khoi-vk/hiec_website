@@ -29,15 +29,6 @@ export const Route = createFileRoute("/admin/manage-activities")({
       label: "Đã huỷ",
     },
   ] as const;
-  
-  const activityTags = [
-    "HIEC News",
-    "Workshop",
-    "Training",
-    "Event",
-    "Startup",
-    "Community",
-  ]; // Đây là các tag hoạt động ví dụ thôi nha ae, sau có hoạt động cụ thể như nào thì sửa ở đây nha
 
 function AdminManageActivitiesPage() {
   const [acts, setActs] = React.useState<any[]>([]);
@@ -53,10 +44,14 @@ function AdminManageActivitiesPage() {
     excerpt: "",
     content: "",
     imageUrl: "",
-    tags: [] as string[],
     status: "draft",
     is_featured: false,
   });
+
+  const [categories, setCategories] = React.useState<any[]>([]);
+  const [selectedCategories, setSelectedCategories] = React.useState<string[]>([]);
+  const [newCategory, setNewCategory] = React.useState("");
+  const [isAddingCategory, setIsAddingCategory] = React.useState(false);  
 
   const fetchActs = async () => {
     setLoading(true);
@@ -148,10 +143,28 @@ function AdminManageActivitiesPage() {
                                   excerpt: "",
                                   content: "",
                                   imageUrl: "",
-                                  tags: [],
                                   status: "draft",
                                   is_featured: false,
                                 });
+                                
+                                setSelectedCategories([]);
+                                const fetchCategories = async () => {
+                                  const { data, error } = await supabase
+                                    .from("categories")
+                                    .select("id, name")
+                                    .order("name", { ascending: true });
+                                
+                                  if (error) {
+                                    console.error("Lỗi lấy chuyên mục:", error);
+                                    return;
+                                  }
+                                
+                                  setCategories(data ?? []);
+                                };
+                                React.useEffect(() => {
+                                  fetchActs();
+                                  fetchCategories();
+                                }, []);
                                 setIsOpen(true); }} className="rounded-xl font-bold bg-cyan-600 dark:bg-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-600 text-white transition-colors">
           <Plus className="mr-2 h-4 w-4" /> ĐĂNG BÀI MỚI
         </Button>
