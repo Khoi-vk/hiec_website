@@ -324,25 +324,6 @@ function ActivitiesPage() {
                 </section>
               ))}
             </div>
-                      
-                      {/* TIÊU ĐỀ CARD: Sáng đen - Tối trắng */}
-                      <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
-                        {act.title}
-                      </h3>
-                      <p className="text-slate-600 dark:text-slate-400 text-[11px] line-clamp-2 font-medium mb-5">{act.excerpt}</p>
-                      
-                      {/* Thuộc tính mt-auto giờ sẽ hoạt động hoàn hảo */}
-                      <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-50 dark:border-slate-800">
-                          <span className="text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase group-hover:text-primary transition-colors">Chi tiết</span>
-                          <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-                            <ArrowRight className="size-3.5" />
-                          </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
-            </div>
           )}
         </div>
       </section>
