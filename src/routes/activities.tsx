@@ -201,7 +201,9 @@ function ActivitiesPage() {
             <div className="flex justify-center py-20"><Loader2 className="animate-spin size-8 text-primary" /></div>
           ) : (
             <div className="space-y-14">
-              {Object.entries(timelineGroups).map(([year, quarters]) => (
+              {Object.entries(timelineGroups)
+                .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
+                .map(([year, quarters]) => (
                 <section key={year}>
                   {/* =========================
                       NĂM
@@ -218,11 +220,17 @@ function ActivitiesPage() {
                       CÁC QUÝ
                   ========================= */}
                   <div className="space-y-10">
-                    {Object.entries(quarters).map(([quarter, months]) => (
+                    {Object.entries(quarters)
+                      .sort(
+                        ([quarterA], [quarterB]) =>
+                          Number(quarterB.replace("Q", "")) -
+                          Number(quarterA.replace("Q", ""))
+                      )
+                      .map(([quarter, months]) => (
                       <div key={quarter}>
                         {/* QUÝ */}
                         <div className="mb-5 flex items-center gap-3">
-                          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-black uppercase tracking-widest text-primary">
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-900 dark:bg-primary/10 dark:text-primary">
                             {quarter}
                           </span>
                         </div>
@@ -231,8 +239,13 @@ function ActivitiesPage() {
                             CÁC THÁNG
                         ========================= */}
                         <div className="space-y-8">
-                          {Object.entries(months).map(
-                            ([month, monthActivities]) => (
+                          {Object.entries(months)
+                            .sort(
+                              ([monthA], [monthB]) =>
+                                Number(monthB.replace("Tháng ", "")) -
+                                Number(monthA.replace("Tháng ", ""))
+                            )
+                            .map(([month, monthActivities]) => (
                               <div key={month}>
                                 {/* THÁNG */}
                                 <h3 className="mb-4 text-sm font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">
