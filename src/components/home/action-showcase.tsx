@@ -8,12 +8,14 @@ import {
   ChevronRight,
   Loader2,
   Rocket,
+  Sparkles,
+  ExternalLink,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { HiecLogo } from "@/components/ui/hiec-logo";
 import { supabase } from "@/utils/supabase";
+import { cn } from "@/lib/utils";
 
 export interface ActionItem {
   id: string;
@@ -28,68 +30,60 @@ export interface ActionItem {
   is_featured?: boolean;
 }
 
-const FALLBACK_ITEMS: ActionItem[] = [
+const FALLBACK_FEATURED_ITEMS: ActionItem[] = [
   {
-    id: "act-fb-1",
-    type: "activity",
-    title: "HIEC Startup Bootcamp 2025",
-    badge: "2025",
-    date: "2025",
-    excerpt:
-      "Chương trình huấn luyện chuyên sâu 6 tuần biến ý tưởng thô thành mô hình kinh doanh gọi vốn.",
-    content:
-      "HIEC Startup Bootcamp là chương trình ươm mầm sáng tạo thường niên dành cho sinh viên có đam mê khởi nghiệp. Trải qua 6 tuần đào tạo, cố vấn và thực chiến, các đội thi hoàn thiện sản phẩm và thuyết trình trước hội đồng đầu tư.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: "proj-fb-1",
+    id: "proj-featured-1",
     type: "project",
-    title: "Nền tảng Kết nối Mentor Sinh viên",
-    badge: "Năm 2025",
-    year: "2025",
-    excerpt:
-      "Mạng lưới kết nối sinh viên khởi nghiệp với hơn 45+ cố vấn doanh nghiệp và cựu sinh viên thành công.",
+    title: "ParkWave – Hệ thống chuyển đổi số quản lý xe cộ",
+    badge: "2024",
+    year: "2024",
+    excerpt: "Ngô Thị Thùy Duyên, Nguyễn Đức Dũng, Tô Lê Quang, Tống Diệu Linh, Nguyễn Hoàng Quân",
     content:
-      "Dự án số hóa quy trình kết nối cố vấn (Mentor Connect), giúp sinh viên nhận được phản hồi trực tiếp về ý tưởng kinh doanh, xây dựng kỹ năng lãnh đạo và mở rộng quan hệ đối tác.",
+      "ParkWave là giải pháp thông minh ứng dụng AI và thị giác máy tính vào tối ưu hóa bãi đỗ xe trong các trường đại học và khu đô thị, giúp giảm thiểu tắc nghẽn và tự động hóa quy trình quản lý.",
     imageUrl:
-      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+    is_featured: true,
   },
   {
-    id: "act-fb-2",
+    id: "act-featured-1",
     type: "activity",
-    title: "HIEC Talk: Đối thoại cùng Nhà sáng lập",
+    title: "Lễ Ra Mắt Ban Chủ Nhiệm CLB Sáng Tạo & Khởi Nghiệp HUST - HIEC",
     badge: "2024",
     date: "2024",
     excerpt:
-      "Chuỗi tọa đàm hàng tháng chia sẻ bài học thực chiến từ các Founder và chuyên gia công nghệ.",
+      "Phạm Thùy An (Chủ nhiệm), Ngô Thị Thùy Duyên (Phó Chủ nhiệm), Bùi Đức Hải, Bùi Kim Ngân",
     content:
-      "HIEC Talk mang đến không gian trò chuyện cởi mở giữa các diễn giả khách mời uy tín và cộng đồng sinh viên, giải đáp những thách thức thực tế trong quá trình xây dựng startup.",
+      "Sự kiện chuyển giao và công bố cơ cấu nhân sự nhiệm kỳ mới của HIEC, mở ra giai đoạn phát triển bứt phá với các chương trình ươm tạo sáng tạo đổi mới.",
     imageUrl:
-      "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1200&q=80",
+    is_featured: true,
   },
   {
-    id: "proj-fb-2",
-    type: "project",
-    title: "Green Impact Challenge 2024",
-    badge: "Năm 2024",
-    year: "2024",
-    excerpt:
-      "Thử thách phát triển giải pháp kinh doanh tuần hoàn và phát triển bền vững trong môi trường đại học.",
+    id: "act-featured-2",
+    type: "activity",
+    title: "Vinh danh Quán quân Cuộc thi Khởi nghiệp Sinh viên Toàn quốc",
+    badge: "2024",
+    date: "2024",
+    excerpt: "Đội thi HIEC HUST xuất sắc giành giải Nhất với giải pháp công nghệ y tế",
     content:
-      "Dự án tập trung vào các sáng kiến giải quyết vấn đề rác thải nhựa, tiết kiệm năng lượng và thúc đẩy lối sống xanh trong khuôn viên trường học.",
+      "Đại diện HIEC HUST đã vượt qua hơn 200 dự án trên khắp cả nước để bước lên bục vinh quang, khẳng định vị thế và tinh thần đổi mới sáng tạo của sinh viên Bách Khoa.",
     imageUrl:
-      "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
+    is_featured: true,
   },
 ];
+
+type FilterCategory = "all" | "activity" | "project";
 
 export function ActionShowcase() {
   const [items, setItems] = React.useState<ActionItem[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [selectedFilter, setSelectedFilter] = React.useState<FilterCategory>("all");
+  const [currentIndex, setCurrentIndex] = React.useState(0);
   const [selectedItem, setSelectedItem] = React.useState<ActionItem | null>(null);
   const [isHovered, setIsHovered] = React.useState(false);
-  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
+  // Fetch data from Supabase (chỉ lấy các mục is_featured = true)
   React.useEffect(() => {
     async function fetchData() {
       try {
@@ -99,11 +93,13 @@ export function ActionShowcase() {
             .from("activities")
             .select("*")
             .eq("status", "published")
+            .eq("is_featured", true)
             .order("event_date", { ascending: false }),
           supabase
             .from("projects")
             .select("*")
-            .order("displayOrder", { ascending: true }),
+            .eq("is_featured", true)
+            .order("created_at", { ascending: false }),
         ]);
 
         const fetchedItems: ActionItem[] = [];
@@ -113,14 +109,15 @@ export function ActionShowcase() {
             fetchedItems.push({
               id: `act-${act.id}`,
               type: "activity",
-              title: act.title || "Hoạt động HIEC",
-              badge: act.date || act.event_date || "Hoạt động",
+              title: act.title || "Hoạt động nổi bật",
+              badge: act.date || act.event_date || "2024",
               date: act.date || act.event_date || "",
               excerpt: act.excerpt || "",
               content: act.content || "",
               imageUrl:
                 act.imageUrl ||
-                "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+                "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+              is_featured: true,
             });
           });
         }
@@ -130,161 +127,347 @@ export function ActionShowcase() {
             fetchedItems.push({
               id: `proj-${proj.id}`,
               type: "project",
-              title: proj.title || "Dự án HIEC",
-              badge: proj.year ? `Năm ${proj.year}` : "Dự án",
-              year: proj.year || "",
+              title: proj.title || "Dự án nổi bật",
+              badge: proj.year ? String(proj.year) : "2024",
+              year: proj.year || "2024",
               excerpt: proj.excerpt || "",
               content: proj.content || "",
               imageUrl:
-                proj.imageUrl || "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80",
+                proj.imageUrl ||
+                "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80",
+              is_featured: true,
             });
           });
+        }
+
+        // Nếu database chưa có bản ghi is_featured, fallback sang lấy toàn bộ hoặc dùng demo
+        if (fetchedItems.length === 0) {
+          const [allActRes, allProjRes] = await Promise.allSettled([
+            supabase
+              .from("activities")
+              .select("*")
+              .eq("status", "published")
+              .order("event_date", { ascending: false })
+              .limit(5),
+            supabase
+              .from("projects")
+              .select("*")
+              .order("created_at", { ascending: false })
+              .limit(5),
+          ]);
+
+          if (
+            allActRes.status === "fulfilled" &&
+            allActRes.value.data &&
+            allActRes.value.data.length > 0
+          ) {
+            allActRes.value.data.forEach((act: any) => {
+              fetchedItems.push({
+                id: `act-${act.id}`,
+                type: "activity",
+                title: act.title || "Hoạt động HIEC",
+                badge: act.date || act.event_date || "2024",
+                date: act.date || act.event_date || "",
+                excerpt: act.excerpt || "",
+                content: act.content || "",
+                imageUrl:
+                  act.imageUrl ||
+                  "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+                is_featured: true,
+              });
+            });
+          }
+
+          if (
+            allProjRes.status === "fulfilled" &&
+            allProjRes.value.data &&
+            allProjRes.value.data.length > 0
+          ) {
+            allProjRes.value.data.forEach((proj: any) => {
+              fetchedItems.push({
+                id: `proj-${proj.id}`,
+                type: "project",
+                title: proj.title || "Dự án HIEC",
+                badge: proj.year ? String(proj.year) : "2024",
+                year: proj.year || "2024",
+                excerpt: proj.excerpt || "",
+                content: proj.content || "",
+                imageUrl:
+                  proj.imageUrl ||
+                  "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80",
+                is_featured: true,
+              });
+            });
+          }
         }
 
         if (fetchedItems.length > 0) {
           setItems(fetchedItems);
         } else {
-          setItems(FALLBACK_ITEMS);
+          setItems(FALLBACK_FEATURED_ITEMS);
         }
       } catch (err) {
-        console.error("Lỗi tải hoạt động & dự án:", err);
-        setItems(FALLBACK_ITEMS);
+        console.error("Lỗi tải hoạt động & dự án nổi bật:", err);
+        setItems(FALLBACK_FEATURED_ITEMS);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchData();
+    void fetchData();
   }, []);
 
-  const orderedItems = React.useMemo(
-    () => [...items].sort((a, b) => Number(b.type === "activity") - Number(a.type === "activity")),
+  // Filter items based on active filter
+  const filteredItems = React.useMemo(() => {
+    if (selectedFilter === "all") return items;
+    return items.filter((item) => item.type === selectedFilter);
+  }, [items, selectedFilter]);
+
+  const activityCount = React.useMemo(
+    () => items.filter((i) => i.type === "activity").length,
+    [items],
+  );
+  const projectCount = React.useMemo(
+    () => items.filter((i) => i.type === "project").length,
     [items],
   );
 
-  const handleScroll = (direction: "left" | "right") => {
-    scrollContainerRef.current?.scrollBy({
-      left: direction === "left" ? -324 : 324,
-      behavior: "smooth",
-    });
+  // Reset index when filter changes
+  React.useEffect(() => {
+    setCurrentIndex(0);
+  }, [selectedFilter]);
+
+  // Handle Carousel navigation
+  const handlePrev = () => {
+    if (filteredItems.length === 0) return;
+    setCurrentIndex((prev) => (prev === 0 ? filteredItems.length - 1 : prev - 1));
   };
 
+  const handleNext = React.useCallback(() => {
+    if (filteredItems.length === 0) return;
+    setCurrentIndex((prev) => (prev === filteredItems.length - 1 ? 0 : prev + 1));
+  }, [filteredItems.length]);
+
+  // Auto-play timer
   React.useEffect(() => {
-    if (isHovered || loading || orderedItems.length < 2) return;
+    if (isHovered || loading || filteredItems.length <= 1) return;
 
     const interval = window.setInterval(() => {
-      const container = scrollContainerRef.current;
-      if (!container) return;
-
-      if (container.scrollLeft >= container.scrollWidth - container.clientWidth - 10) {
-        container.scrollTo({ left: 0, behavior: "smooth" });
-        return;
-      }
-
-      container.scrollBy({ left: 324, behavior: "smooth" });
-    }, 3500);
+      handleNext();
+    }, 4500);
 
     return () => window.clearInterval(interval);
-  }, [isHovered, loading, orderedItems.length]);
+  }, [isHovered, loading, filteredItems.length, handleNext]);
+
+  // Active items for 3-card presentation
+  const currentItem = filteredItems[currentIndex] || null;
+
+  const getPrevItem = () => {
+    if (filteredItems.length <= 1) return null;
+    const prevIdx = (currentIndex - 1 + filteredItems.length) % filteredItems.length;
+    return filteredItems[prevIdx];
+  };
+
+  const getNextItem = () => {
+    if (filteredItems.length <= 1) return null;
+    const nextIdx = (currentIndex + 1) % filteredItems.length;
+    return filteredItems[nextIdx];
+  };
+
+  const prevItem = getPrevItem();
+  const nextItem = getNextItem();
 
   return (
     <div
-      className="mt-8"
+      className="mt-8 space-y-8"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Top Controls Bar: Filter Pills (Left) & Arrow Nav (Right) */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* Filter Pills */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSelectedFilter("all")}
+            className={cn(
+              "px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all border",
+              selectedFilter === "all"
+                ? "bg-[#B5E9FB] text-slate-900 border-[#B5E9FB] shadow-xs"
+                : "border-border/80 bg-card/60 text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+            )}
+          >
+            Tất cả ({items.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedFilter("activity")}
+            className={cn(
+              "px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all border",
+              selectedFilter === "activity"
+                ? "bg-[#B5E9FB] text-slate-900 border-[#B5E9FB] shadow-xs"
+                : "border-border/80 bg-card/60 text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+            )}
+          >
+            Hoạt động ({activityCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedFilter("project")}
+            className={cn(
+              "px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all border",
+              selectedFilter === "project"
+                ? "bg-[#B5E9FB] text-slate-900 border-[#B5E9FB] shadow-xs"
+                : "border-border/80 bg-card/60 text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+            )}
+          >
+            Dự án ({projectCount})
+          </button>
+        </div>
+
+        {/* Prev / Next Circular Navigation Buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handlePrev}
+            aria-label="Previous slide"
+            className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95"
+          >
+            <ChevronLeft className="size-4 sm:size-5" />
+          </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label="Next slide"
+            className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95"
+          >
+            <ChevronRight className="size-4 sm:size-5" />
+          </button>
+        </div>
+      </div>
+
       {loading ? (
-        <div className="flex h-72 items-center justify-center">
+        <div className="flex h-80 items-center justify-center">
           <Loader2 className="size-8 animate-spin text-primary" />
         </div>
-      ) : orderedItems.length === 0 ? (
-        <div className="rounded-[2rem] border border-border bg-background p-12 text-center text-muted-foreground">
-          Chưa có mục nào được công bố.
+      ) : filteredItems.length === 0 ? (
+        <div className="rounded-3xl border border-border bg-background p-12 text-center text-muted-foreground">
+          Chưa có mục nổi bật nào thuộc danh mục này.
         </div>
       ) : (
-        <div
-          ref={scrollContainerRef}
-          className="-mx-5 overflow-x-auto scroll-smooth px-5 pb-5 scrollbar-none sm:mx-0 sm:px-0"
-        >
-          <div className="flex w-max gap-6">
-            {orderedItems.map((item) => (
+        <div className="relative overflow-hidden py-4">
+          {/* 3D Coverflow Slider Layout */}
+          <div className="relative flex items-center justify-center min-h-[300px] sm:min-h-[380px] md:min-h-[440px] px-2 sm:px-8">
+            {/* Left Card (Prev) */}
+            {prevItem && (
               <div
-                key={item.id}
-                onClick={() => setSelectedItem(item)}
-                className="group w-[280px] shrink-0 cursor-pointer sm:w-[300px]"
+                onClick={handlePrev}
+                aria-label="Xem mục trước"
+                className="hidden md:block absolute left-0 lg:left-4 z-10 w-[42%] lg:w-[45%] max-w-lg aspect-[16/10] -translate-x-[20%] scale-80 opacity-40 hover:opacity-75 transition-all duration-700 cursor-pointer rounded-[2rem] overflow-hidden shadow-md select-none"
               >
-                <Card className="flex flex-col h-full border-none shadow-sm hover:shadow-xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800">
-                  <div className="aspect-[16/10] overflow-hidden m-1.5 rounded-[1.5rem] shrink-0">
-                    <img
-                      src={item.imageUrl}
-                      className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      alt={item.title}
-                    />
-                  </div>
-
-                  <CardContent className="flex grow flex-col p-6 pt-2">
-                    {item.type === "activity" ? (
-                      <div className="mb-3 flex items-center">
-                        <span className="rounded bg-primary/5 px-2 py-0.5 text-[10px] font-bold text-primary dark:bg-primary/10">
-                          {item.badge}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="mb-3 flex items-center justify-between">
-                        <span className="rounded bg-primary/5 px-2 py-0.5 text-[10px] font-bold text-primary dark:bg-primary/10">
-                          {item.badge}
-                        </span>
-                        <Rocket className="size-3 text-primary/20" />
-                      </div>
-                    )}
-
-                    <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
-                      {item.title}
-                    </h3>
-                    <p className={`text-slate-600 dark:text-slate-400 text-[11px] line-clamp-2 font-medium mb-5 ${item.type === "project" ? "leading-relaxed" : ""}`}>
-                      {item.excerpt}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-50 dark:border-slate-800">
-                      <span className="text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase group-hover:text-primary transition-colors">
-                        {item.type === "project" ? "Chi tiết dự án" : "Chi tiết"}
-                      </span>
-                      <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-                        <ArrowRight className="size-3.5" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <img
+                  src={prevItem.imageUrl}
+                  alt={prevItem.title}
+                  className="size-full object-cover rounded-[2rem]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-background/40 to-transparent pointer-events-none" />
               </div>
-            ))}
+            )}
+
+            {/* Center Active Card */}
+            {currentItem && (
+              <div
+                onClick={() => setSelectedItem(currentItem)}
+                className="relative z-20 w-full md:w-[68%] lg:w-[62%] max-w-3xl aspect-[16/10] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-700 cursor-pointer group select-none border-2 border-white/20 dark:border-white/10"
+              >
+                <img
+                  src={currentItem.imageUrl}
+                  alt={currentItem.title}
+                  className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+
+                {/* Badge on Top-Left (e.g. 🚀 DỰ ÁN / 🎯 HOẠT ĐỘNG) */}
+                <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-30">
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-lg backdrop-blur-md",
+                      currentItem.type === "project"
+                        ? "bg-[#10b981]" // Green badge as in image
+                        : "bg-[#06b6d4]",
+                    )}
+                  >
+                    {currentItem.type === "project" ? (
+                      <>
+                        <Rocket className="size-3.5" /> DỰ ÁN
+                      </>
+                    ) : (
+                      <>
+                        <Calendar className="size-3.5" /> HOẠT ĐỘNG
+                      </>
+                    )}
+                  </span>
+                </div>
+
+                {/* Gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+              </div>
+            )}
+
+            {/* Right Card (Next) */}
+            {nextItem && (
+              <div
+                onClick={handleNext}
+                aria-label="Xem mục tiếp"
+                className="hidden md:block absolute right-0 lg:right-4 z-10 w-[42%] lg:w-[45%] max-w-lg aspect-[16/10] translate-x-[20%] scale-80 opacity-40 hover:opacity-75 transition-all duration-700 cursor-pointer rounded-[2rem] overflow-hidden shadow-md select-none"
+              >
+                <img
+                  src={nextItem.imageUrl}
+                  alt={nextItem.title}
+                  className="size-full object-cover rounded-[2rem]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-l from-background/40 to-transparent pointer-events-none" />
+              </div>
+            )}
           </div>
+
+          {/* Underneath Content Block */}
+          {currentItem && (
+            <div className="mt-6 text-center space-y-2 max-w-3xl mx-auto px-4 animate-fade-up">
+              {/* Meta: [Dự án] • 2024 */}
+              <p className="text-xs sm:text-sm font-bold text-[#38bdf8] dark:text-[#7dd3fc] tracking-wide">
+                [{currentItem.type === "project" ? "Dự án" : "Hoạt động"}] •{" "}
+                {currentItem.year || currentItem.date || currentItem.badge}
+              </p>
+
+              {/* Title */}
+              <h3
+                onClick={() => setSelectedItem(currentItem)}
+                className="text-lg sm:text-2xl md:text-3xl font-extrabold text-foreground tracking-tight hover:text-primary transition-colors cursor-pointer"
+              >
+                {currentItem.title}
+              </h3>
+
+              {/* Excerpt / Authors */}
+              {currentItem.excerpt && (
+                <p className="text-xs sm:text-sm text-muted-foreground font-medium leading-relaxed max-w-2xl mx-auto line-clamp-2">
+                  {currentItem.excerpt}
+                </p>
+              )}
+
+              {/* View Details Link */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedItem(currentItem)}
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#38bdf8] dark:text-[#7dd3fc] hover:underline"
+                >
+                  Xem chi tiết <ArrowUpRight className="size-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
-
-      {!loading && orderedItems.length > 1 ? (
-        <div className="mt-4 flex items-center justify-center gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => handleScroll("left")}
-            className="rounded-full"
-            aria-label="Cuộn sang trái"
-          >
-            <ChevronLeft className="size-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => handleScroll("right")}
-            className="rounded-full"
-            aria-label="Cuộn sang phải"
-          >
-            <ChevronRight className="size-4" />
-          </Button>
-        </div>
-      ) : null}
 
       {/* Detail Modal */}
       <Modal
@@ -300,8 +483,8 @@ export function ActionShowcase() {
         }
         description={
           selectedItem?.type === "activity"
-            ? `Hoạt động HIEC - ${selectedItem?.badge}`
-            : `Dự án HIEC - ${selectedItem?.badge}`
+            ? `Hoạt động nổi bật HIEC - ${selectedItem?.badge}`
+            : `Dự án nổi bật HIEC - ${selectedItem?.badge}`
         }
       >
         {selectedItem && (
@@ -317,11 +500,12 @@ export function ActionShowcase() {
             <div className="space-y-6">
               <div className="flex flex-wrap items-center gap-3">
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.2em] ${
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.2em]",
                     selectedItem.type === "activity"
                       ? "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
-                      : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                  }`}
+                      : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+                  )}
                 >
                   {selectedItem.type === "activity" ? (
                     <>
@@ -335,6 +519,10 @@ export function ActionShowcase() {
                     </>
                   )}
                 </span>
+
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 text-[11px] font-bold">
+                  <Sparkles className="size-3" /> Nổi bật
+                </span>
               </div>
 
               {selectedItem.excerpt && (
@@ -343,7 +531,7 @@ export function ActionShowcase() {
                 </p>
               )}
 
-              <div className="whitespace-pre-wrap text-lg font-medium leading-loose text-slate-800 dark:text-slate-100 md:text-xl">
+              <div className="whitespace-pre-wrap text-base sm:text-lg font-medium leading-loose text-slate-800 dark:text-slate-100">
                 {selectedItem.content || selectedItem.excerpt}
               </div>
             </div>
@@ -357,8 +545,8 @@ export function ActionShowcase() {
                 <ArrowUpRight className="size-4" />
               </Link>
               <Button
-                variant="shimmer"
-                className="rounded-2xl bg-slate-900 px-10 py-6 text-xs font-black uppercase tracking-widest text-white transition-all hover:scale-105 active:scale-95 dark:bg-white dark:text-slate-900"
+                variant="default"
+                className="rounded-2xl bg-slate-900 px-8 py-4 text-xs font-bold uppercase tracking-wider text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900"
                 onClick={() => setSelectedItem(null)}
               >
                 <ChevronLeft className="mr-2 size-4" /> Đóng
@@ -370,4 +558,3 @@ export function ActionShowcase() {
     </div>
   );
 }
-
