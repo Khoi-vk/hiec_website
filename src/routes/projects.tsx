@@ -8,6 +8,7 @@ import { Modal } from "@/components/ui/modal";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { HiecLogo } from "@/components/ui/hiec-logo";
 import { supabase } from "@/utils/supabase";
+import { Input } from "@/components/ui/input";
 
 // Sử dụng 'as any' để tránh lỗi treo Crawling hệ thống
 export const Route = createFileRoute("/projects")({
@@ -135,13 +136,53 @@ function ProjectsPage() {
       {/* 2. DANH SÁCH DỰ ÁN - CARD TỰ ĐẢO MÀU CHỮ */}
       <section className="py-12 bg-slate-50/30 dark:bg-slate-900/20 min-h-[600px] transition-colors duration-300">
         <div className="max-w-[1300px] mx-auto px-6 md:px-12">
+          <div className="mb-8 flex flex-col gap-3 md:flex-row">
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm kiếm dự án..."
+              className="h-11 rounded-xl bg-white dark:bg-slate-900"
+            />
+          
+            <select
+              value={selectedGeneration}
+              onChange={(e) =>
+                setSelectedGeneration(e.target.value)
+              }
+              className="h-11 rounded-xl bg-white dark:bg-slate-900 px-3 text-sm font-bold text-slate-900 dark:text-slate-100 outline-none"
+            >
+              <option value="Tất cả">Tất cả Gen</option>
+          
+              {allGenerations.map((generation) => (
+                <option key={generation} value={generation}>
+                  {generation}
+                </option>
+              ))}
+            </select>
+          
+            <select
+              value={selectedField}
+              onChange={(e) =>
+                setSelectedField(e.target.value)
+              }
+              className="h-11 rounded-xl bg-white dark:bg-slate-900 px-3 text-sm font-bold text-slate-900 dark:text-slate-100 outline-none"
+            >
+              <option value="Tất cả">Tất cả lĩnh vực</option>
+          
+              {allFields.map((field) => (
+                <option key={field} value={field}>
+                  {field}
+                </option>
+              ))}
+            </select>
+          </div>
           {loading ? (
             <div className="flex justify-center py-20 text-cyan-600">
               <Loader2 className="animate-spin size-8" />
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 text-left">
-              {projects.map((project) => (
+              {filteredProjects.map((project) => (
                 <div
                   key={project.id}
                   onClick={() => setSelectedProject(project)}
@@ -193,9 +234,9 @@ function ProjectsPage() {
             </div>
           )}
 
-          {!loading && projects.length === 0 && (
+          {!loading && filteredProjects.length === 0 && (
             <div className="text-center py-20 text-slate-400 text-sm font-medium uppercase tracking-widest">
-              Chưa có dự án nào được công bố.
+              Không tìm thấy dự án phù hợp.
             </div>
           )}
         </div>
