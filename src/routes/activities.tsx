@@ -155,18 +155,26 @@ function ActivitiesPage() {
       {/* 1. BANNER - TỰ ĐỘNG ĐỔI MÀU NỀN VÀ CHỮ */}
       <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-16 pb-10 border-b border-slate-100 dark:border-slate-800 transition-colors duration-300">
         <div className="max-w-[1300px] mx-auto px-6 md:px-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="flex-shrink-0 animate-fade-up">
-              
-              {/* CHỮ LỚN: Sáng đen (slate-900) - Tối trắng (white) */}
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_28rem] items-center">
+        
+            {/* VÙNG TRÁI: TIÊU ĐỀ CĂN GIỮA */}
+            <div className="text-center animate-fade-up">
               <h1 className="font-sans text-5xl md:text-6xl font-bold text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.9] transition-colors">
                 Hoạt động
               </h1>
             </div>
-            <div className="max-w-md md:border-l-2 border-slate-200 dark:border-slate-800 md:pl-10 pb-2 animate-fade-up [animation-delay:200ms]">
-              <h2 className="text-slate-800 dark:text-slate-200 text-lg font-black uppercase tracking-tight mb-3">Nhịp đập sáng tạo</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Ghi lại những khoảnh khắc bùng nổ của cộng đồng HIEC.</p>
+        
+            {/* VÙNG PHẢI */}
+            <div className="max-w-md border-l-2 border-slate-200 dark:border-slate-800 pl-10 pb-2 animate-fade-up [animation-delay:200ms]">
+              <h2 className="text-slate-800 dark:text-slate-200 text-lg font-black uppercase tracking-tight mb-3 leading-tight">
+                Nhịp đập sáng tạo
+              </h2>
+        
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">
+                Ghi lại những khoảnh khắc bùng nổ của cộng đồng HIEC.
+              </p>
             </div>
+        
           </div>
         </div>
       </section>
