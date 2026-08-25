@@ -1,3 +1,4 @@
+import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDownRight, ArrowUpRight, Mail } from "lucide-react";
 
@@ -6,6 +7,7 @@ import { MovementGallery } from "@/components/home/movement-gallery";
 import { NewsletterCard } from "@/components/home/newsletter-card";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { getHomeContent, type HomeContent } from "@/services/hiec-service";
 
 export const Route = createFileRoute("/")({
@@ -26,6 +28,7 @@ export const Route = createFileRoute("/")({
 export function HomePage() {
   const data = Route.useLoaderData();
   const titleParts = data.hero.title.split(",");
+  const [followOpen, setFollowOpen] = React.useState(false);
 
   return (
     <PublicLayout>
@@ -108,10 +111,12 @@ export function HomePage() {
                   {data.hero.description}
                 </p>
                 <div className="mt-9 flex flex-wrap gap-3">
-                  <Button asChild size="lg" className="rounded-full px-7">
-                    <Link to="/signup">
-                      {data.hero.primaryBtnText} <ArrowUpRight className="ml-2 size-4" />
-                    </Link>
+                  <Button
+                    size="lg"
+                    className="rounded-full px-7"
+                    onClick={() => setFollowOpen(true)}
+                  >
+                    {data.hero.primaryBtnText} <ArrowUpRight className="ml-2 size-4" />
                   </Button>
                   <Button asChild size="lg" variant="outline" className="rounded-full px-7">
                     <a href="#lich-su">
@@ -314,6 +319,13 @@ export function HomePage() {
           <NewsletterCard />
         </div>
       </main>
+
+      <Dialog open={followOpen} onOpenChange={setFollowOpen}>
+        <DialogContent className="max-h-[calc(100vh-2rem)] max-w-lg overflow-y-auto border-none bg-transparent p-0 shadow-none">
+          <DialogTitle className="sr-only">Đăng ký nhận thông tin</DialogTitle>
+          <NewsletterCard popup />
+        </DialogContent>
+      </Dialog>
     </PublicLayout>
   );
 }
