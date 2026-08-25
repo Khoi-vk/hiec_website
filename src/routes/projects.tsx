@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, ArrowRight, ChevronLeft, Rocket } from "lucide-react";
+import { Loader2, ArrowRight, ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -214,8 +214,6 @@ function ProjectsPage() {
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
                           {project.year}
                         </span>
-                      
-                        <Rocket className="ml-auto size-3 text-slate-900 dark:text-primary" />
                       </div>
 
                       <div className="mb-3 flex flex-wrap gap-1">
@@ -291,7 +289,6 @@ function ProjectsPage() {
             <div className="space-y-6">
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center gap-2 bg-slate-50 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-100 dark:border-white/10 text-cyan-600 dark:text-cyan-400 font-black text-[11px] uppercase tracking-[0.3em]">
-                  <Rocket className="size-4" />
                   {selectedProject.generation || "—"}
                 </div>
               
