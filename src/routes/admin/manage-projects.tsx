@@ -229,26 +229,6 @@ function ProjectsManagementPage() {
     }
   };
 
-    setIsSubmitting(true);
-    try {
-      if (editingId) {
-        const { error } = await supabase.from("projects").update(formData).eq("id", editingId);
-        if (error) throw error;
-        toast.success("Cập nhật dự án thành công!");
-      } else {
-        const { error } = await supabase.from("projects").insert([formData]);
-        if (error) throw error;
-        toast.success("Đã đăng dự án mới!");
-      }
-      setIsOpen(false);
-      fetchProjects();
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleDelete = async (id: string) => {
     if (!confirm("Xác nhận xóa dự án này?")) return;
     try {
