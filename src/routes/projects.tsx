@@ -25,6 +25,7 @@ function ProjectsPage() {
         const { data, error } = await supabase
           .from("projects")
           .select("*")
+          .eq("status", "published")
           .order("displayOrder", { ascending: true });
 
         if (error) throw error;
