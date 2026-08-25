@@ -100,10 +100,134 @@ function ProjectsManagementPage() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.title || !formData.content) {
+    if (!formData.title.trim() || !formData.content.trim()) {
       toast.error("Vui lòng điền đầy đủ tên và nội dung dự án.");
       return;
     }
+  
+    if (!formData.generation.trim()) {
+      toast.error("Vui lòng nhập Gen.");
+      return;
+    }
+  
+    if (selectedFields.length === 0) {
+      toast.error("Vui lòng chọn ít nhất một lĩnh vực.");
+      return;
+    }
+  
+    setIsSubmitting(true);
+  
+    try {
+      let projectId = editingId;
+  
+      // 1. Tạo mới hoặc cập nhật dự án
+      if (editingId) {
+        const { error: projectError } = await supabase
+          .from("projects")
+          .update(formData)
+          .eq("id", editingId);
+  
+        if (projectError) {
+          throw projectError;
+        }
+      } else {
+        const { data, error: projectError } = await supabase
+          .from("projects")
+          .insert([formData])
+          .select("id")
+          .single();
+  
+        if (projectError) {
+          throw projectError;
+        }
+  
+        projectId = data.id;
+      }
+  
+      if (!projectId) {
+        throw new Error("Không xác định được ID dự án.");
+      }
+  
+      // 2. Loại bỏ lĩnh vực trùng
+      const uniqueFieldIds = [...new Set(selectedFields)];
+  
+      // 3. Lấy các lĩnh vực hiện tại của dự án
+      const { data: existingLinks, error: fetchLinkError } =
+        await supabase
+          .from("project_categories")
+          .select("field_id")
+          .eq("project_id", projectId);
+  
+      if (fetchLinkError) {
+        throw fetchLinkError;
+      }
+  
+      const existingFieldIds = (existingLinks ?? []).map(
+        (item) => item.field_id
+      );
+  
+      // 4. Kiểm tra lĩnh vực có thay đổi không
+      const fieldsChanged =
+        existingFieldIds.length !== uniqueFieldIds.length ||
+        existingFieldIds.some(
+          (id) => !uniqueFieldIds.includes(id)
+        );
+  
+      if (fieldsChanged) {
+        // Xóa liên kết cũ
+        const { error: deleteError } = await supabase
+          .from("project_categories")
+          .delete()
+          .eq("project_id", projectId);
+  
+        if (deleteError) {
+          throw deleteError;
+        }
+  
+        // Thêm liên kết mới
+        const fieldRows = uniqueFieldIds.map((fieldId) => ({
+          project_id: projectId,
+          field_id: fieldId,
+        }));
+  
+        const { error: fieldError } = await supabase
+          .from("project_categories")
+          .insert(fieldRows);
+  
+        if (fieldError) {
+          throw fieldError;
+        }
+      }
+  
+      toast.success(
+        editingId
+          ? "Cập nhật dự án thành công!"
+          : "Đã đăng dự án mới!"
+      );
+  
+      setIsOpen(false);
+      setEditingId(null);
+      setSelectedFields([]);
+  
+      setFormData({
+        title: "",
+        year: "2025",
+        excerpt: "",
+        content: "",
+        imageUrl: "",
+        status: "draft",
+        generation: "",
+        is_featured: false,
+      });
+  
+      fetchProjects();
+    } catch (error: any) {
+      console.error("Lỗi lưu dự án:", error);
+      toast.error(error.message || "Không thể lưu dự án.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
     setIsSubmitting(true);
     try {
@@ -149,7 +273,23 @@ function ProjectsManagementPage() {
         
         {/* NÚT THÊM */}
         <Button 
-          onClick={() => { setEditingId(null); setFormData({title:"", year:"2025", excerpt:"", content:"", imageUrl:"", is_featured: false}); setIsOpen(true); }}
+          onClick={() => {
+            setEditingId(null);
+          
+            setFormData({
+              title: "",
+              year: "2025",
+              excerpt: "",
+              content: "",
+              imageUrl: "",
+              status: "draft",
+              generation: "",
+              is_featured: false,
+            });
+          
+            setSelectedFields([]);
+            setIsOpen(true);
+          }}
           className="rounded-full font-black uppercase tracking-widest px-8 py-6 bg-[#0f3d3e] dark:bg-cyan-700 text-white hover:bg-[#1a4d4f] dark:hover:bg-cyan-600 shadow-lg shadow-blue-900/20 dark:shadow-cyan-900/40 transition-all active:scale-95"
         >
           <Plus className="mr-2 h-5 w-5 text-cyan-400 dark:text-cyan-200" /> 
@@ -165,12 +305,14 @@ function ProjectsManagementPage() {
                 <TableHead className="font-bold pl-8 py-4 text-[#0f3d3e] dark:text-slate-300">Ảnh bìa</TableHead>
                 <TableHead className="font-bold text-[#0f3d3e] dark:text-slate-300">Tên dự án</TableHead>
                 <TableHead className="font-bold text-center text-[#0f3d3e] dark:text-slate-300">Năm</TableHead>
+                <TableHead className="font-bold text-[#0f3d3e] dark:text-slate-300">Gen</TableHead>
+                <TableHead className="font-bold text-center text-[#0f3d3e] dark:text-slate-300">Trạng thái</TableHead>
                 <TableHead className="text-right pr-8 font-bold text-[#0f3d3e] dark:text-slate-300">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow><TableCell colSpan={4} className="text-center py-20"><Loader2 className="animate-spin mx-auto text-blue-600 dark:text-blue-400" /></TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center py-20"><Loader2 className="animate-spin mx-auto text-blue-600 dark:text-blue-400" /></TableCell></TableRow>
               ) : projects.map((p) => (
                 <TableRow key={p.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-50 dark:border-slate-800/50">
                   <TableCell className="pl-8">
@@ -182,12 +324,60 @@ function ProjectsManagementPage() {
                   <TableCell className="text-center">
                     <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-[10px] font-black uppercase transition-colors">{p.year}</span>
                   </TableCell>
+                  <TableCell className="text-center">
+                    <span className="bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 px-3 py-1 rounded-full text-[10px] font-black uppercase">
+                      {p.generation || "—"}
+                    </span>
+                  </TableCell>
+                  
+                  <TableCell className="text-center">
+                    <span
+                      className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                        p.status === "published"
+                          ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                          : p.status === "cancelled"
+                            ? "bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400"
+                            : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300"
+                      }`}
+                    >
+                      {p.status === "published"
+                        ? "Công khai"
+                        : p.status === "cancelled"
+                          ? "Đã huỷ"
+                          : "Bản nháp"}
+                    </span>
+                  </TableCell>
                   <TableCell className="text-right pr-8">
                     <div className="flex justify-end gap-2">
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        onClick={() => { setFormData(p); setEditingId(p.id); setIsOpen(true); }} 
+                        onClick={async () => {
+                          setFormData({
+                            title: p.title ?? "",
+                            year: p.year ?? "2025",
+                            excerpt: p.excerpt ?? "",
+                            content: p.content ?? "",
+                            imageUrl: p.imageUrl ?? "",
+                            status: p.status ?? "draft",
+                            generation: p.generation ?? "",
+                            is_featured: Boolean(p.is_featured),
+                          });
+                        
+                          const { data: fieldLinks, error } = await supabase
+                            .from("project_categories")
+                            .select("field_id")
+                            .eq("project_id", p.id);
+                        
+                          if (!error) {
+                            setSelectedFields(
+                              (fieldLinks ?? []).map((item) => item.field_id)
+                            );
+                          }
+                        
+                          setEditingId(p.id);
+                          setIsOpen(true);
+                        }} 
                         className="rounded-xl text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
                       >
                         <Pencil className="size-4" />
@@ -269,6 +459,27 @@ function ProjectsManagementPage() {
                 className="rounded-xl bg-slate-50 dark:bg-slate-900 border-none h-12"
               />
             </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-slate-400">
+                Trạng thái
+              </label>
+            
+              <select
+                value={formData.status}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    status: e.target.value,
+                  })
+                }
+                className="w-full h-12 rounded-xl bg-slate-50 dark:bg-slate-900 px-3 text-sm font-bold text-slate-900 dark:text-slate-100 border-none outline-none"
+              >
+                <option value="draft">Bản nháp</option>
+                <option value="published">Công khai</option>
+                <option value="cancelled">Đã huỷ</option>
+              </select>
+            </div>
             
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest pl-1 transition-colors">Tải ảnh dự án</label>
@@ -279,6 +490,116 @@ function ProjectsManagementPage() {
                 className="rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-none h-12 text-xs pt-3 cursor-pointer transition-colors" 
               />
             </div>
+          </div>
+
+          <div className="space-y-2 text-left">
+            <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest pl-1">
+              Lĩnh vực
+            </label>
+          
+            <div className="flex flex-wrap gap-2">
+              {fields.map((field) => {
+                const checked = selectedFields.includes(field.id);
+          
+                return (
+                  <button
+                    key={field.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedFields((prev) =>
+                        checked
+                          ? prev.filter((id) => id !== field.id)
+                          : [...prev, field.id]
+                      );
+                    }}
+                    className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all ${
+                      checked
+                        ? "bg-cyan-600 text-white"
+                        : "bg-slate-100 text-slate-500 hover:bg-cyan-50 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {field.name}
+                  </button>
+                );
+              })}
+            </div>
+          
+            <p className="text-[10px] text-slate-400 dark:text-slate-500">
+              Có thể chọn nhiều lĩnh vực.
+            </p>
+
+            {isAddingField ? (
+              <div className="mt-3 flex gap-2">
+                <Input
+                  value={newField}
+                  onChange={(e) => setNewField(e.target.value)}
+                  placeholder="Tên lĩnh vực mới"
+                  className="rounded-xl bg-slate-50 dark:bg-slate-900"
+                />
+            
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    const name = newField.trim();
+            
+                    if (!name) {
+                      toast.error("Vui lòng nhập tên lĩnh vực.");
+                      return;
+                    }
+            
+                    const { data, error } = await supabase
+                      .from("project_fields")
+                      .insert({ name })
+                      .select("id, name")
+                      .single();
+            
+                    if (error) {
+                      if (error.code === "23505") {
+                        toast.error("Lĩnh vực này đã tồn tại.");
+                      } else {
+                        toast.error(error.message);
+                      }
+                      return;
+                    }
+            
+                    setFields((prev) =>
+                      [...prev, data].sort((a, b) =>
+                        a.name.localeCompare(b.name)
+                      )
+                    );
+            
+                    setSelectedFields((prev) => [...prev, data.id]);
+            
+                    setNewField("");
+                    setIsAddingField(false);
+            
+                    toast.success("Đã thêm lĩnh vực.");
+                  }}
+                >
+                  Thêm
+                </Button>
+            
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setNewField("");
+                    setIsAddingField(false);
+                  }}
+                >
+                  Huỷ
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-3 rounded-full"
+                onClick={() => setIsAddingField(true)}
+              >
+                + Thêm lĩnh vực
+              </Button>
+            )}
           </div>
 
           {formData.imageUrl && (
