@@ -56,11 +56,27 @@ function ProjectsManagementPage() {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from("projects") // Gọi bảng projects
-        .select("*")
+        .from("projects")
+        .select(`
+          *,
+          project_categories (
+            field_id,
+            project_fields (
+              id,
+              name
+            )
+          )
+        `)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      setProjects(data || []);
+      const normalizedProjects = (data ?? []).map((project) => ({
+        ...project,
+        fields: (project.project_categories ?? [])
+          .map((item: any) => item.project_fields?.name)
+          .filter(Boolean),
+      }));
+      
+      setProjects(normalizedProjects);
     } catch (err: any) {
       toast.error("Lỗi tải danh sách: " + err.message);
     } finally {
@@ -286,13 +302,14 @@ function ProjectsManagementPage() {
                 <TableHead className="font-bold text-[#0f3d3e] dark:text-slate-300">Tên dự án</TableHead>
                 <TableHead className="font-bold text-center text-[#0f3d3e] dark:text-slate-300">Năm</TableHead>
                 <TableHead className="font-bold text-[#0f3d3e] dark:text-slate-300">Gen</TableHead>
+                <TableHead className="font-bold text-[#0f3d3e] dark:text-slate-300">Lĩnh vực</TableHead>
                 <TableHead className="font-bold text-center text-[#0f3d3e] dark:text-slate-300">Trạng thái</TableHead>
                 <TableHead className="text-right pr-8 font-bold text-[#0f3d3e] dark:text-slate-300">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow><TableCell colSpan={6} className="text-center py-20"><Loader2 className="animate-spin mx-auto text-blue-600 dark:text-blue-400" /></TableCell></TableRow>
+                <TableRow><TableCell colSpan={7} className="text-center py-20"><Loader2 className="animate-spin mx-auto text-blue-600 dark:text-blue-400" /></TableCell></TableRow>
               ) : projects.map((p) => (
                 <TableRow key={p.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-50 dark:border-slate-800/50">
                   <TableCell className="pl-8">
@@ -301,13 +318,28 @@ function ProjectsManagementPage() {
                     </div>
                   </TableCell>
                   <TableCell className="font-bold text-[#1a2e35] dark:text-slate-100 uppercase tracking-tight text-sm transition-colors">{p.title}</TableCell>
+                
                   <TableCell className="text-center">
                     <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full text-[10px] font-black uppercase transition-colors">{p.year}</span>
                   </TableCell>
+
                   <TableCell className="text-center">
                     <span className="bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 px-3 py-1 rounded-full text-[10px] font-black uppercase">
                       {p.generation || "—"}
                     </span>
+                  </TableCell>
+                 
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {(p.fields ?? []).map((field: string) => (
+                        <span
+                          key={field}
+                          className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[9px] font-bold text-slate-500 dark:text-slate-300"
+                        >
+                          {field}
+                        </span>
+                      ))}
+                    </div>
                   </TableCell>
                   
                   <TableCell className="text-center">
@@ -480,26 +512,93 @@ function ProjectsManagementPage() {
             <div className="flex flex-wrap gap-2">
               {fields.map((field) => {
                 const checked = selectedFields.includes(field.id);
-          
+              
                 return (
-                  <button
+                  <div
                     key={field.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedFields((prev) =>
-                        checked
-                          ? prev.filter((id) => id !== field.id)
-                          : [...prev, field.id]
-                      );
-                    }}
-                    className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1 rounded-full border px-2 py-1 transition-all ${
                       checked
-                        ? "bg-cyan-600 text-white"
-                        : "bg-slate-100 text-slate-500 hover:bg-cyan-50 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                        ? "border-cyan-600 bg-cyan-600 text-white"
+                        : "border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                     }`}
                   >
-                    {field.name}
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedFields((prev) =>
+                          checked
+                            ? prev.filter((id) => id !== field.id)
+                            : [...prev, field.id]
+                        );
+                      }}
+                      className="px-1 py-0.5 text-xs font-bold"
+                    >
+                      {field.name}
+                    </button>
+              
+                    <button
+                      type="button"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+              
+                        const confirmed = window.confirm(
+                          `Bạn có chắc muốn xóa lĩnh vực "${field.name}" không?`
+                        );
+              
+                        if (!confirmed) return;
+              
+                        try {
+                          const { count, error: countError } = await supabase
+                            .from("project_categories")
+                            .select("*", { count: "exact", head: true })
+                            .eq("field_id", field.id);
+              
+                          if (countError) {
+                            throw countError;
+                          }
+              
+                          if ((count ?? 0) > 0) {
+                            toast.error(
+                              `Không thể xóa "${field.name}" vì đang được sử dụng bởi ${count} dự án.`
+                            );
+                            return;
+                          }
+              
+                          const { error } = await supabase
+                            .from("project_fields")
+                            .delete()
+                            .eq("id", field.id);
+              
+                          if (error) {
+                            throw error;
+                          }
+              
+                          setFields((prev) =>
+                            prev.filter((item) => item.id !== field.id)
+                          );
+              
+                          setSelectedFields((prev) =>
+                            prev.filter((id) => id !== field.id)
+                          );
+              
+                          toast.success(`Đã xóa lĩnh vực "${field.name}".`);
+                        } catch (error: any) {
+                          console.error("Lỗi xóa lĩnh vực:", error);
+                          toast.error(
+                            error.message || "Không thể xóa lĩnh vực."
+                          );
+                        }
+                      }}
+                      className={`flex size-5 items-center justify-center rounded-full transition-colors ${
+                        checked
+                          ? "text-white/80 hover:bg-white/20 hover:text-white"
+                          : "text-slate-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30"
+                      }`}
+                      title={`Xóa lĩnh vực ${field.name}`}
+                    >
+                      ×
+                    </button>
+                  </div>
                 );
               })}
             </div>
