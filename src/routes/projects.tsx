@@ -85,7 +85,8 @@ function ProjectsPage() {
     const matchesSearch =
       !keyword ||
       project.title?.toLowerCase().includes(keyword) ||
-      project.excerpt?.toLowerCase().includes(keyword);
+      project.excerpt?.toLowerCase().includes(keyword) ||
+      project.content?.toLowerCase().includes(keyword);
   
     const matchesGeneration =
       selectedGeneration === "Tất cả" ||
@@ -285,25 +286,21 @@ function ProjectsPage() {
             </div>
 
             <div className="space-y-6">
-              <div className="flex items-center gap-3 text-cyan-600 dark:text-cyan-400 font-black text-[11px] uppercase tracking-[0.3em] bg-slate-50 dark:bg-white/5 w-fit px-4 py-2 rounded-full border border-slate-100 dark:border-white/10">
-                <div className="flex flex-wrap items-center gap-2 text-cyan-600 dark:text-cyan-400 font-black text-[11px] uppercase tracking-[0.3em]">
-                  <div className="flex items-center gap-2 bg-slate-50 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-100 dark:border-white/10">
-                    <Rocket className="size-4" />
-                    {selectedProject.generation || "—"}
-                  </div>
-                
-                  <div className="flex flex-wrap gap-2">
-                    {(selectedProject.fields ?? []).map((field: string) => (
-                      <Badge
-                        key={field}
-                        variant="secondary"
-                        className="text-[9px]"
-                      >
-                        {field}
-                      </Badge>
-                    ))}
-                  </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-100 dark:border-white/10 text-cyan-600 dark:text-cyan-400 font-black text-[11px] uppercase tracking-[0.3em]">
+                  <Rocket className="size-4" />
+                  {selectedProject.generation || "—"}
                 </div>
+              
+                {(selectedProject.fields ?? []).map((field: string) => (
+                  <Badge
+                    key={field}
+                    variant="secondary"
+                    className="text-[9px]"
+                  >
+                    {field}
+                  </Badge>
+                ))}
               </div>
 
               {/* PHẦN GIỚI THIỆU NGẮN (EXCERPT) */}
