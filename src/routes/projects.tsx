@@ -79,6 +79,7 @@ function ProjectsPage() {
     )
   );
 
+  
   const filteredProjects = projects.filter((project) => {
     const keyword = searchTerm.trim().toLowerCase();
   
