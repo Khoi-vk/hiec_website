@@ -28,8 +28,29 @@ function ProjectsManagementPage() {
     excerpt: "",
     content: "",
     imageUrl: "",
+    status: "draft",
+    generation: "",
     is_featured: false,
   });
+
+  const [fields, setFields] = React.useState<any[]>([]);
+  const [selectedFields, setSelectedFields] = React.useState<string[]>([]);
+  const [newField, setNewField] = React.useState("");
+  const [isAddingField, setIsAddingField] = React.useState(false);
+
+  const fetchFields = async () => {
+    const { data, error } = await supabase
+      .from("project_fields")
+      .select("id, name")
+      .order("name", { ascending: true });
+  
+    if (error) {
+      console.error("Lỗi lấy lĩnh vực:", error);
+      return;
+    }
+  
+    setFields(data ?? []);
+  };
 
   const fetchProjects = async () => {
     try {
@@ -47,7 +68,10 @@ function ProjectsManagementPage() {
     }
   };
 
-  React.useEffect(() => { fetchProjects(); }, []);
+  React.useEffect(() => {
+    fetchProjects();
+    fetchFields();
+  }, []);
 
   // --- HÀM TẢI ẢNH LÊN BUCKET PROJECT-IMAGES ---
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -227,6 +251,25 @@ function ProjectsManagementPage() {
                 className="rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-none h-12 placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-colors" 
               />
             </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-slate-400">
+                Gen
+              </label>
+            
+              <Input
+                value={formData.generation}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    generation: e.target.value,
+                  })
+                }
+                placeholder="VD: Gen 6"
+                className="rounded-xl bg-slate-50 dark:bg-slate-900 border-none h-12"
+              />
+            </div>
+            
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest pl-1 transition-colors">Tải ảnh dự án</label>
               <Input 
