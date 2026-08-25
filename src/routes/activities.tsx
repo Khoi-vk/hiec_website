@@ -335,7 +335,7 @@ function ActivitiesPage() {
                                               Chi tiết
                                             </span>
             
-                                            <div className="size-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                                            <div className="size-8 rounded-lg bg-primary/10 text-slate-900 dark:text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                                               <ArrowRight className="size-3.5" />
                                             </div>
                                           </div>
