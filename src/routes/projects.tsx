@@ -137,12 +137,12 @@ function ProjectsPage() {
       {/* 2. DANH SÁCH DỰ ÁN - CARD TỰ ĐẢO MÀU CHỮ */}
       <section className="py-12 bg-slate-50/30 dark:bg-slate-900/20 min-h-[600px] transition-colors duration-300">
         <div className="max-w-[1300px] mx-auto px-6 md:px-12">
-          <div className="mb-8 flex flex-col gap-3 md:flex-row">
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row">
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm kiếm dự án..."
-              className="h-11 rounded-xl bg-white dark:bg-slate-900"
+              className="h-12 w-full rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 sm:max-w-md"
             />
           
             <select
@@ -206,7 +206,7 @@ function ProjectsPage() {
                     {/* THÊM 'flex flex-col grow' vào CardContent để nó chiếm hết phần không gian còn lại */}
                     <CardContent className="flex flex-col grow p-6 pt-2">
                       <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-primary/10 px-2 py-0.5 rounded">
                           {project.generation || "—"}
                         </span>
                       
@@ -214,18 +214,20 @@ function ProjectsPage() {
                           {project.year}
                         </span>
                       
-                        <Rocket className="ml-auto size-3 text-primary/20" />
+                        <Rocket className="ml-auto size-3 text-slate-900 dark:text-primary" />
                       </div>
 
-                      {(project.fields ?? []).map((field: string) => (
-                        <Badge
-                          key={field}
-                          variant="secondary"
-                          className="text-[9px]"
-                        >
-                          {field}
-                        </Badge>
-                      ))}
+                      <div className="mb-3 flex flex-wrap gap-1">
+                        {(project.fields ?? []).map((field: string) => (
+                          <Badge
+                            key={field}
+                            variant="secondary"
+                            className="text-[9px]"
+                          >
+                            {field}
+                          </Badge>
+                        ))}
+                      </div>
 
                       <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
                         {project.title}
