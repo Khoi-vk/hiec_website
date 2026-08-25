@@ -18,18 +18,43 @@ function ProjectsPage() {
   const [projects, setProjects] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [selectedProject, setSelectedProject] = React.useState<any>(null);
+  
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedGeneration, setSelectedGeneration] =
+    React.useState("Tất cả");
+  const [selectedField, setSelectedField] =
+    React.useState("Tất cả");
 
   React.useEffect(() => {
     async function fetchProjects() {
       try {
         const { data, error } = await supabase
           .from("projects")
-          .select("*")
+          .select(`
+            *,
+            project_categories (
+              field_id,
+              project_fields (
+                id,
+                name
+              )
+            )
+          `)
           .eq("status", "published")
-          .order("displayOrder", { ascending: true });
+          .order("year", { ascending: false });
 
         if (error) throw error;
-        if (data) setProjects(data);
+        
+        if (data) {
+          const normalizedProjects = data.map((project) => ({
+            ...project,
+            fields: (project.project_categories ?? [])
+              .map((item: any) => item.project_fields?.name)
+              .filter(Boolean),
+          }));
+        
+          setProjects(normalizedProjects);
+        }
       } catch (err) {
         console.error("Lỗi lấy dữ liệu dự án:", err);
       } finally {
@@ -38,6 +63,43 @@ function ProjectsPage() {
     }
     fetchProjects();
   }, []);
+
+  const allGenerations = Array.from(
+    new Set(
+      projects
+        .map((project) => project.generation)
+        .filter(Boolean)
+    )
+  );
+  
+  const allFields = Array.from(
+    new Set(
+      projects.flatMap((project) => project.fields ?? [])
+    )
+  );
+
+  const filteredProjects = projects.filter((project) => {
+    const keyword = searchTerm.trim().toLowerCase();
+  
+    const matchesSearch =
+      !keyword ||
+      project.title?.toLowerCase().includes(keyword) ||
+      project.excerpt?.toLowerCase().includes(keyword);
+  
+    const matchesGeneration =
+      selectedGeneration === "Tất cả" ||
+      project.generation === selectedGeneration;
+  
+    const matchesField =
+      selectedField === "Tất cả" ||
+      project.fields?.includes(selectedField);
+  
+    return (
+      matchesSearch &&
+      matchesGeneration &&
+      matchesField
+    );
+  });
 
   return (
     <PublicLayout>
