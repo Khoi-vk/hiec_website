@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, ArrowRight, ChevronLeft, Calendar, Rocket } from "lucide-react";
+import { Loader2, ArrowRight, ChevronLeft, Rocket } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -204,12 +204,27 @@ function ProjectsPage() {
 
                     {/* THÊM 'flex flex-col grow' vào CardContent để nó chiếm hết phần không gian còn lại */}
                     <CardContent className="flex flex-col grow p-6 pt-2">
-                      <div className="flex justify-between items-center mb-3">
+                      <div className="mb-3 flex flex-wrap items-center gap-2">
                         <span className="text-[10px] font-bold text-primary bg-primary/5 dark:bg-primary/10 px-2 py-0.5 rounded">
-                          Năm {project.year}
+                          {project.generation || "—"}
                         </span>
-                        <Rocket className="size-3 text-primary/20" />
+                      
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                          {project.year}
+                        </span>
+                      
+                        <Rocket className="ml-auto size-3 text-primary/20" />
                       </div>
+
+                      {(project.fields ?? []).map((field: string) => (
+                        <Badge
+                          key={field}
+                          variant="secondary"
+                          className="text-[9px]"
+                        >
+                          {field}
+                        </Badge>
+                      ))}
 
                       <h3 className="font-display text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter mb-2 line-clamp-2 min-h-[2.5rem]">
                         {project.title}
@@ -271,7 +286,24 @@ function ProjectsPage() {
 
             <div className="space-y-6">
               <div className="flex items-center gap-3 text-cyan-600 dark:text-cyan-400 font-black text-[11px] uppercase tracking-[0.3em] bg-slate-50 dark:bg-white/5 w-fit px-4 py-2 rounded-full border border-slate-100 dark:border-white/10">
-                <Rocket className="size-4" /> TRIỂN KHAI: {selectedProject.year}
+                <div className="flex flex-wrap items-center gap-2 text-cyan-600 dark:text-cyan-400 font-black text-[11px] uppercase tracking-[0.3em]">
+                  <div className="flex items-center gap-2 bg-slate-50 dark:bg-white/5 px-4 py-2 rounded-full border border-slate-100 dark:border-white/10">
+                    <Rocket className="size-4" />
+                    {selectedProject.generation || "—"}
+                  </div>
+                
+                  <div className="flex flex-wrap gap-2">
+                    {(selectedProject.fields ?? []).map((field: string) => (
+                      <Badge
+                        key={field}
+                        variant="secondary"
+                        className="text-[9px]"
+                      >
+                        {field}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* PHẦN GIỚI THIỆU NGẮN (EXCERPT) */}
