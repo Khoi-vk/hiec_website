@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { BookOpen, FileUp, Loader2, Pencil, Plus, Presentation, Trash2 } from "lucide-react";
+import { BookOpen, FileUp, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -236,7 +236,10 @@ function AdminLearningResourcesPage() {
             Tạo chương học và quản lý các bài giảng dạng slide.
           </p>
         </div>
-        <Button onClick={openCreateChapter} className="rounded-xl bg-cyan-600 font-bold text-white hover:bg-cyan-700">
+        <Button
+          onClick={openCreateChapter}
+          className="rounded-xl bg-cyan-600 font-bold text-white hover:bg-cyan-700"
+        >
           <Plus className="mr-2 size-4" /> Thêm chương
         </Button>
       </div>
@@ -250,7 +253,9 @@ function AdminLearningResourcesPage() {
           <CardContent className="flex flex-col items-center py-16 text-center">
             <BookOpen className="mb-4 size-10 text-muted-foreground" />
             <p className="font-semibold text-foreground">Chưa có chương học nào.</p>
-            <p className="mt-1 text-sm text-muted-foreground">Bắt đầu bằng cách thêm chương đầu tiên.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Bắt đầu bằng cách thêm chương đầu tiên.
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -258,7 +263,10 @@ function AdminLearningResourcesPage() {
           {chapters.map((chapter, index) => {
             const chapterLessons = lessonsByChapter.get(chapter.id) ?? [];
             return (
-              <Card key={chapter.id} className="overflow-hidden rounded-[1.5rem] border-border bg-card shadow-sm">
+              <Card
+                key={chapter.id}
+                className="overflow-hidden rounded-[1.5rem] border-border bg-card shadow-sm"
+              >
                 <CardContent className="p-0">
                   <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border bg-muted/30 p-5">
                     <div className="flex items-center gap-3">
@@ -269,7 +277,9 @@ function AdminLearningResourcesPage() {
                         <h2 className="font-bold text-foreground">{chapter.title}</h2>
                         <p className="mt-0.5 text-xs text-muted-foreground">
                           {chapter.chapter_date
-                            ? new Date(`${chapter.chapter_date}T00:00:00`).toLocaleDateString("vi-VN")
+                            ? new Date(`${chapter.chapter_date}T00:00:00`).toLocaleDateString(
+                                "vi-VN",
+                              )
                             : "Chưa đặt ngày"}
                           {` · ${chapterLessons.length} bài giảng`}
                         </p>
@@ -279,35 +289,60 @@ function AdminLearningResourcesPage() {
                       <Button variant="outline" size="sm" onClick={() => openCreateLesson(chapter)}>
                         <Plus className="mr-1.5 size-4" /> Bài giảng
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => openEditChapter(chapter)} aria-label="Sửa chương">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openEditChapter(chapter)}
+                        aria-label="Sửa chương"
+                      >
                         <Pencil className="size-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteChapter(chapter)} aria-label="Xóa chương">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteChapter(chapter)}
+                        aria-label="Xóa chương"
+                      >
                         <Trash2 className="size-4 text-destructive" />
                       </Button>
                     </div>
                   </div>
 
                   {chapterLessons.length === 0 ? (
-                    <p className="px-5 py-6 text-sm text-muted-foreground">Chương này chưa có bài giảng.</p>
+                    <p className="px-5 py-6 text-sm text-muted-foreground">
+                      Chương này chưa có bài giảng.
+                    </p>
                   ) : (
                     <div className="divide-y divide-border">
                       {chapterLessons.map((lesson) => (
-                        <div key={lesson.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+                        <div
+                          key={lesson.id}
+                          className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"
+                        >
                           <a
                             href={lesson.slide_url}
                             target="_blank"
                             rel="noreferrer"
                             className="flex min-w-0 items-center gap-3 text-sm font-semibold text-foreground hover:text-primary"
                           >
-                            <Presentation className="size-5 shrink-0 text-primary" />
+                            <BookOpen className="size-5 shrink-0 text-primary" />
                             <span className="truncate">{lesson.title}</span>
                           </a>
                           <div className="flex shrink-0 gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => openEditLesson(chapter, lesson)} aria-label="Sửa bài giảng">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openEditLesson(chapter, lesson)}
+                              aria-label="Sửa bài giảng"
+                            >
                               <Pencil className="size-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => deleteLesson(lesson)} aria-label="Xóa bài giảng">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteLesson(lesson)}
+                              aria-label="Xóa bài giảng"
+                            >
                               <Trash2 className="size-4 text-destructive" />
                             </Button>
                           </div>
@@ -329,12 +364,28 @@ function AdminLearningResourcesPage() {
       >
         <div className="space-y-4 py-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Tên chương</label>
-            <Input value={chapterForm.title} onChange={(event) => setChapterForm((current) => ({ ...current, title: event.target.value }))} placeholder="Ví dụ: Chương 1 - Khởi nghiệp căn bản" />
+            <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Tên chương
+            </label>
+            <Input
+              value={chapterForm.title}
+              onChange={(event) =>
+                setChapterForm((current) => ({ ...current, title: event.target.value }))
+              }
+              placeholder="Ví dụ: Chương 1 - Khởi nghiệp căn bản"
+            />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Ngày</label>
-            <Input type="date" value={chapterForm.chapter_date} onChange={(event) => setChapterForm((current) => ({ ...current, chapter_date: event.target.value }))} />
+            <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Ngày
+            </label>
+            <Input
+              type="date"
+              value={chapterForm.chapter_date}
+              onChange={(event) =>
+                setChapterForm((current) => ({ ...current, chapter_date: event.target.value }))
+              }
+            />
           </div>
           <Button className="w-full" onClick={saveChapter} disabled={saving}>
             {saving ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
@@ -351,16 +402,39 @@ function AdminLearningResourcesPage() {
       >
         <div className="space-y-4 py-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Tên bài giảng</label>
-            <Input value={lessonForm.title} onChange={(event) => setLessonForm((current) => ({ ...current, title: event.target.value }))} placeholder="Ví dụ: Bài 1 - Tìm vấn đề" />
+            <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Tên bài giảng
+            </label>
+            <Input
+              value={lessonForm.title}
+              onChange={(event) =>
+                setLessonForm((current) => ({ ...current, title: event.target.value }))
+              }
+              placeholder="Ví dụ: Bài 1 - Tìm vấn đề"
+            />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">File slide</label>
-            <Input type="file" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" onChange={uploadSlide} disabled={saving} />
-            {lessonForm.slide_url ? <p className="text-xs font-medium text-primary">Đã có file slide.</p> : <p className="text-xs text-muted-foreground">Hỗ trợ PDF, PPT và PPTX.</p>}
+            <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              File slide
+            </label>
+            <Input
+              type="file"
+              accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+              onChange={uploadSlide}
+              disabled={saving}
+            />
+            {lessonForm.slide_url ? (
+              <p className="text-xs font-medium text-primary">Đã có file slide.</p>
+            ) : (
+              <p className="text-xs text-muted-foreground">Hỗ trợ PDF, PPT và PPTX.</p>
+            )}
           </div>
           <Button className="w-full" onClick={saveLesson} disabled={saving}>
-            {saving ? <Loader2 className="mr-2 size-4 animate-spin" /> : <FileUp className="mr-2 size-4" />}
+            {saving ? (
+              <Loader2 className="mr-2 size-4 animate-spin" />
+            ) : (
+              <FileUp className="mr-2 size-4" />
+            )}
             Lưu bài giảng
           </Button>
         </div>

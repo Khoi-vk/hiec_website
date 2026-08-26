@@ -12,7 +12,6 @@ import {
   Loader2,
   Maximize2,
   Minimize2,
-  Presentation,
   Search,
   Sparkles,
   ArrowLeft,
@@ -519,7 +518,7 @@ function LearningResourcesPage() {
                                           : "text-foreground/80 hover:bg-accent hover:text-foreground",
                                       )}
                                     >
-                                      <Presentation
+                                      <BookOpen
                                         className={cn(
                                           "size-3.5 shrink-0",
                                           isActive ? "text-primary-foreground" : "text-primary",
@@ -673,7 +672,7 @@ function LearningResourcesPage() {
                           {/* Floating quick download helper at bottom */}
                           <div className="border-t border-zinc-800 bg-zinc-900/90 backdrop-blur-sm px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400">
                             <div className="flex items-center gap-2">
-                              <Presentation className="size-4 text-primary" />
+                              <BookOpen className="size-4 text-primary" />
                               <span className="truncate max-w-xs sm:max-w-md text-zinc-200">
                                 {activeLesson.title}
                               </span>
@@ -708,7 +707,7 @@ function LearningResourcesPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-32 px-4 text-center">
-                    <Presentation className="size-12 text-muted-foreground/50 mb-3" />
+                    <BookOpen className="size-12 text-muted-foreground/50 mb-3" />
                     <h3 className="text-base font-semibold text-foreground">
                       Chọn bài giảng từ mục lục
                     </h3>
