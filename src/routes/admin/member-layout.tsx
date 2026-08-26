@@ -17,6 +17,8 @@ import {
   X,
   ArrowRight,
   Columns2,
+  ArrowDown,
+  LayoutGrid,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -25,6 +27,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Modal } from "@/components/ui/modal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   getAllMembers,
   getMemberLayoutConfig,
@@ -78,6 +87,24 @@ function MemberLayoutAdminPage() {
 
   // Quick picker modal state
   const [pickerTarget, setPickerTarget] = React.useState<PickerTarget | null>(null);
+
+  // Preview quick scroll state
+  const [previewSelectedBoardId, setPreviewSelectedBoardId] = React.useState<string>("");
+  const [previewHighlightedBoardId, setPreviewHighlightedBoardId] = React.useState<string | null>(
+    null,
+  );
+
+  const handleScrollToPreviewBoard = (boardId: string) => {
+    setPreviewSelectedBoardId(boardId);
+    const targetElement = document.getElementById(`preview-board-${boardId}`);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      setPreviewHighlightedBoardId(boardId);
+      setTimeout(() => {
+        setPreviewHighlightedBoardId((curr) => (curr === boardId ? null : curr));
+      }, 2200);
+    }
+  };
 
   // Load initial data
   const loadData = React.useCallback(async () => {
@@ -293,7 +320,10 @@ function MemberLayoutAdminPage() {
       prev.map((b) => {
         if (b.id !== boardId) return b;
         if (slot === "featured") {
-          return { ...b, featuredMemberId: b.featuredMemberId === memberId ? null : b.featuredMemberId };
+          return {
+            ...b,
+            featuredMemberId: b.featuredMemberId === memberId ? null : b.featuredMemberId,
+          };
         }
         return { ...b, memberIds: b.memberIds.filter((id) => id !== memberId) };
       }),
@@ -360,11 +390,7 @@ function MemberLayoutAdminPage() {
     toast.success("Đã thêm thành viên vào tầng");
   };
 
-  const handleDropOnBoard = (
-    e: React.DragEvent,
-    boardId: string,
-    slot: "featured" | "members",
-  ) => {
+  const handleDropOnBoard = (e: React.DragEvent, boardId: string, slot: "featured" | "members") => {
     e.preventDefault();
     setDragOverBoardSlot(null);
     const memberId = e.dataTransfer.getData("text/plain") || draggedMemberId;
@@ -428,10 +454,12 @@ function MemberLayoutAdminPage() {
       {/* Header Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Giao diện thành viên</h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+            Giao diện thành viên
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-                Tùy chỉnh các tầng (tối đa 4 card/tầng) và các bảng hai cột cho trang{" "}
-                <span className="font-semibold text-cyan-600 dark:text-cyan-400">Cơ cấu CLB</span>.
+            Tùy chỉnh các tầng (tối đa 4 card/tầng) và các bảng hai cột cho trang{" "}
+            <span className="font-semibold text-cyan-600 dark:text-cyan-400">Cơ cấu CLB</span>.
           </p>
         </div>
 
@@ -490,45 +518,43 @@ function MemberLayoutAdminPage() {
             {tiers
               .map((tier) => ({
                 tier,
-                members: tier.memberIds
-                  .map((id) => memberMap.get(id))
-                  .filter(Boolean) as Member[],
+                members: tier.memberIds.map((id) => memberMap.get(id)).filter(Boolean) as Member[],
               }))
               .filter((row) => row.members.length > 0)
               .map(({ tier, members: tierMembers }, tIndex) => {
-              const name = tier.name?.trim() ?? "";
-              const subtitle = tier.subtitle?.trim() ?? "";
-              const hasHeader = Boolean(name || subtitle);
+                const name = tier.name?.trim() ?? "";
+                const subtitle = tier.subtitle?.trim() ?? "";
+                const hasHeader = Boolean(name || subtitle);
 
-              return (
-                <div
-                  key={tier.id}
-                  className={[
-                    "text-center",
-                    hasHeader ? "space-y-4" : "",
-                    tIndex > 0 ? (hasHeader ? "mt-12" : "mt-6") : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                >
-                  {hasHeader ? (
-                    <div className="inline-flex flex-col items-center">
-                      {name ? (
-                        <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                          {name}
-                        </h3>
-                      ) : null}
-                      {subtitle ? (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-md">
-                          {subtitle}
-                        </p>
-                      ) : null}
-                    </div>
-                  ) : null}
+                return (
+                  <div
+                    key={tier.id}
+                    className={[
+                      "text-center",
+                      hasHeader ? "space-y-4" : "",
+                      tIndex > 0 ? (hasHeader ? "mt-12" : "mt-6") : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    {hasHeader ? (
+                      <div className="inline-flex flex-col items-center">
+                        {name ? (
+                          <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                            {name}
+                          </h3>
+                        ) : null}
+                        {subtitle ? (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-md">
+                            {subtitle}
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : null}
 
-                  {/* Centered Row with evenly distributed cards (Max 4 per row) */}
-                  <div className="w-full flex justify-center items-stretch gap-6 md:gap-8 max-w-6xl mx-auto px-4">
-                    {tierMembers.map((member) => (
+                    {/* Centered Row with evenly distributed cards (Max 4 per row) */}
+                    <div className="w-full flex justify-center items-stretch gap-6 md:gap-8 max-w-6xl mx-auto px-4">
+                      {tierMembers.map((member) => (
                         <div
                           key={member.id}
                           className="w-full max-w-[240px] sm:max-w-[260px] md:w-64 shrink-0 transition-all duration-300 hover:-translate-y-1"
@@ -568,26 +594,119 @@ function MemberLayoutAdminPage() {
                             </CardContent>
                           </Card>
                         </div>
-                    ))}
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+
+            {/* THANH DROPDOWN CHUYỂN NHANH ĐẾN CÁC BẢNG (Giữa Tầng và Bảng) */}
+            {boards.filter((b) => b.featuredMemberId || b.memberIds.length > 0).length > 0 && (
+              <div className="sticky top-2 z-20 my-8 transition-all">
+                <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white/95 p-3.5 shadow-md backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-300">
+                        <LayoutGrid className="size-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 sm:text-sm">
+                            Danh sách các Bảng
+                          </h4>
+                          <Badge
+                            variant="outline"
+                            className="border-cyan-200 bg-cyan-50 px-1.5 py-0 text-[10px] font-semibold text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300"
+                          >
+                            {
+                              boards.filter((b) => b.featuredMemberId || b.memberIds.length > 0)
+                                .length
+                            }{" "}
+                            bảng
+                          </Badge>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                          Chọn bảng để cuộn nhanh đến vị trí trong bảng
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="w-full sm:w-64 sm:shrink-0">
+                      <Select
+                        value={previewSelectedBoardId}
+                        onValueChange={(val) => {
+                          handleScrollToPreviewBoard(val);
+                        }}
+                      >
+                        <SelectTrigger className="h-9 w-full rounded-xl border-cyan-200 bg-cyan-50/50 text-xs font-semibold text-slate-800 hover:border-cyan-400 focus:ring-cyan-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                          <div className="flex items-center gap-2 truncate">
+                            <ArrowDown className="size-3 text-cyan-600 dark:text-cyan-400" />
+                            <SelectValue placeholder="-- Chọn bảng --" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60 rounded-xl border border-slate-200 shadow-lg dark:border-slate-800">
+                          {boards
+                            .filter((b) => b.featuredMemberId || b.memberIds.length > 0)
+                            .map((board, idx) => {
+                              const totalCount =
+                                (board.featuredMemberId ? 1 : 0) + board.memberIds.length;
+                              return (
+                                <SelectItem
+                                  key={board.id}
+                                  value={board.id}
+                                  className="cursor-pointer py-2 text-xs font-medium focus:bg-cyan-50 focus:text-cyan-900 dark:focus:bg-cyan-950/60 dark:focus:text-cyan-200"
+                                >
+                                  <div className="flex w-full items-center justify-between gap-3">
+                                    <span className="font-semibold truncate">
+                                      {idx + 1}. {board.name.trim() || `Bảng ${idx + 1}`}
+                                    </span>
+                                    <span className="rounded bg-slate-100 px-1 py-0.2 text-[9px] text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                                      {totalCount} TV
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              );
+                            })}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            )}
 
             {boards.some((b) => b.featuredMemberId || b.memberIds.length > 0) ? (
-              <div className="mt-12 space-y-10 pt-8 border-t border-slate-200 dark:border-slate-800">
-                {boards.map((board) => (
-                  <MemberOrgBoard
-                    key={board.id}
-                    name={board.name}
-                    featured={
-                      board.featuredMemberId ? memberMap.get(board.featuredMemberId) ?? null : null
-                    }
-                    members={board.memberIds
-                      .map((id) => memberMap.get(id))
-                      .filter(Boolean) as Member[]}
-                  />
-                ))}
+              <div className="mt-8 space-y-10 pt-4 border-t border-slate-200 dark:border-slate-800">
+                {boards
+                  .filter((b) => b.featuredMemberId || b.memberIds.length > 0)
+                  .map((board) => {
+                    const isHighlighted = previewHighlightedBoardId === board.id;
+                    return (
+                      <div
+                        key={board.id}
+                        className={cn(
+                          "rounded-2xl transition-all duration-700",
+                          isHighlighted &&
+                            "p-2 bg-cyan-100/40 ring-2 ring-cyan-400/40 dark:bg-cyan-950/40 dark:ring-cyan-500/40",
+                        )}
+                      >
+                        <MemberOrgBoard
+                          id={`preview-board-${board.id}`}
+                          name={board.name}
+                          featured={
+                            board.featuredMemberId
+                              ? (memberMap.get(board.featuredMemberId) ?? null)
+                              : null
+                          }
+                          members={
+                            board.memberIds
+                              .map((id) => memberMap.get(id))
+                              .filter(Boolean) as Member[]
+                          }
+                        />
+                      </div>
+                    );
+                  })}
               </div>
             ) : null}
 
@@ -634,8 +753,14 @@ function MemberLayoutAdminPage() {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Danh sách các tầng ({tiers.filter((t) => t.memberIds.some((id) => memberMap.has(id)) || t.memberIds.length === 0).length} tầng)
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                Danh sách các tầng (
+                {
+                  tiers.filter(
+                    (t) => t.memberIds.some((id) => memberMap.has(id)) || t.memberIds.length === 0,
+                  ).length
+                }{" "}
+                tầng)
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Mỗi tầng chứa <strong>tối đa 4 card</strong> và tự động căn đều chính giữa. Nhấn vào
@@ -995,7 +1120,9 @@ function MemberLayoutAdminPage() {
                               <p className="text-xs font-semibold text-slate-900 dark:text-white mt-0.5">
                                 {featured.position}
                               </p>
-                              <p className="text-[11px] text-slate-500 mt-0.5">{featured.department}</p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">
+                                {featured.department}
+                              </p>
                             </div>
                           ) : (
                             <button
@@ -1129,7 +1256,8 @@ function MemberLayoutAdminPage() {
                 pickerTarget?.kind === "board-featured" && targetBoard?.featuredMemberId === m.id;
               const isAlreadyInBoardMembers =
                 pickerTarget?.kind === "board-members" && targetBoard?.memberIds.includes(m.id);
-              const isDisabled = isAlreadyInThisTier || isAlreadyFeatured || isAlreadyInBoardMembers;
+              const isDisabled =
+                isAlreadyInThisTier || isAlreadyFeatured || isAlreadyInBoardMembers;
 
               return (
                 <button

@@ -84,17 +84,19 @@ export function MemberOrgBoard({
   members,
   onSelectMember,
   className,
+  id,
 }: {
   name: string;
   featured: Member | null;
   members: Member[];
   onSelectMember?: (member: Member) => void;
   className?: string;
+  id?: string;
 }) {
   if (!featured && members.length === 0) return null;
 
   return (
-    <section className={cn("w-full text-left", className)}>
+    <section id={id} className={cn("w-full text-left scroll-mt-28", className)}>
       {name.trim() ? (
         <h3 className="mb-4 text-xl font-bold tracking-tight text-red-600 dark:text-red-400 md:text-2xl">
           {name.trim()}
