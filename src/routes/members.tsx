@@ -1,10 +1,17 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, User, ChevronLeft, ArrowRight } from "lucide-react";
+import { Loader2, User, ChevronLeft, ArrowRight, Layers, ArrowDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { MemberOrgBoard } from "@/components/members/member-org-board";
 import {
@@ -36,6 +43,7 @@ function MembersPage() {
   const [layoutConfig, setLayoutConfig] = React.useState<MemberLayoutConfig>(DEFAULT_MEMBER_LAYOUT);
   const [loading, setLoading] = React.useState(true);
   const [selectedMember, setSelectedMember] = React.useState<Member | null>(null);
+  const [selectedBoardId, setSelectedBoardId] = React.useState<string>("");
 
   React.useEffect(() => {
     async function loadData() {
@@ -67,6 +75,20 @@ function MembersPage() {
     [layoutConfig.boards, members],
   );
 
+  const visibleBoards = React.useMemo(
+    () =>
+      displayBoards.filter((b) => b.name?.trim() && (b.featuredMemberId || b.memberIds.length > 0)),
+    [displayBoards],
+  );
+
+  const handleScrollToBoard = (boardId: string) => {
+    setSelectedBoardId(boardId);
+    const element = document.getElementById(`board-${boardId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <PublicLayout>
       {/* 1. HERO BANNER */}
@@ -82,7 +104,6 @@ function MembersPage() {
               </Badge>
               <h1 className="font-sans text-4xl sm:text-5xl md:text-6xl font-black text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.95] transition-colors">
                 Cơ cấu Câu Lạc Bộ <br className="hidden sm:block" />
-              
               </h1>
             </div>
 
@@ -209,11 +230,59 @@ function MembersPage() {
                   );
                 })}
 
+              {/* 3. THANH DROPDOWN ĐIỀU HƯỚNG NHANH CÁC BẢNG / BAN */}
+              {visibleBoards.length > 0 ? (
+                <div className="mt-14 mb-4 md:mt-20 md:mb-8 animate-fade-up">
+                  <div className="mx-auto max-w-xl rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-950/90 p-4 md:p-5 shadow-sm backdrop-blur-md transition-all">
+                    <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-4">
+                      <div className="flex items-center gap-2.5 shrink-0 text-slate-800 dark:text-slate-200 w-full sm:w-auto">
+                        <div className="flex size-9 items-center justify-center rounded-xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-400">
+                          <Layers className="size-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+                            Chọn ban / bảng
+                          </p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Chuyển nhanh xuống danh sách
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="w-full sm:flex-1">
+                        <Select value={selectedBoardId} onValueChange={handleScrollToBoard}>
+                          <SelectTrigger className="w-full h-10 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium focus:ring-cyan-500">
+                            <SelectValue placeholder="-- Chọn ban để cuộn xuống --" />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xl z-50">
+                            {visibleBoards.map((board) => (
+                              <SelectItem
+                                key={board.id}
+                                value={board.id}
+                                className="cursor-pointer py-2 text-sm font-medium hover:bg-cyan-50 dark:hover:bg-cyan-950/50 hover:text-cyan-700 dark:hover:text-cyan-300"
+                              >
+                                <div className="flex items-center justify-between gap-3 w-full">
+                                  <span>{board.name}</span>
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-normal">
+                                    {(board.featuredMemberId ? 1 : 0) + board.memberIds.length} TV
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
               {displayBoards.some((b) => b.featuredMemberId || b.memberIds.length > 0) ? (
-                <div className="mt-16 space-y-12 md:mt-24">
+                <div className="mt-6 space-y-12 md:mt-10 md:space-y-16">
                   {displayBoards.map((board) => (
                     <MemberOrgBoard
                       key={board.id}
+                      id={`board-${board.id}`}
                       name={board.name}
                       featured={
                         board.featuredMemberId
