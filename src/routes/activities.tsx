@@ -157,8 +157,8 @@ function ActivitiesPage() {
         <div className="max-w-[1300px] mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 md:grid-cols-[1fr_28rem] items-center">
         
-            {/* VÙNG TRÁI: TIÊU ĐỀ CĂN GIỮA */}
-            <div className="text-center animate-fade-up">
+            {/* VÙNG TRÁI: TIÊU ĐỀ CĂN TRÁI */}
+            <div className="text-left animate-fade-up">
               <h1 className="font-sans text-5xl md:text-6xl font-bold text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.9] transition-colors">
                 Hoạt động
               </h1>
