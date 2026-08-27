@@ -123,7 +123,7 @@ function ProjectsPage() {
         
             {/* VÙNG PHẢI */}
             <div className="max-w-md border-l-2 border-slate-200 dark:border-slate-800 pl-10 pb-2 animate-fade-up [animation-delay:200ms]">
-              <h2 className="text-slate-800 dark:text-slate-200 text-lg font-black uppercase tracking-tight mb-3 leading-tight">
+              <h2 className="text-slate-800 dark:text-slate-200 text-lg font-black uppercase tracking-tight mb-3 leading-snug">
                 Hiện thực hóa <br /> những ý tưởng đột phá
               </h2>
         
