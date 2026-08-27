@@ -115,7 +115,7 @@ function ProjectsPage() {
           <div className="grid grid-cols-1 md:grid-cols-[1fr_28rem] items-center">
         
             {/* VÙNG TRÁI: TIÊU ĐỀ CĂN GIỮA TRONG PHẦN CÒN LẠI */}
-            <div className="text-center animate-fade-up">
+            <div className="text-left animate-fade-up">
               <h1 className="font-sans text-5xl md:text-6xl font-bold text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.9] transition-colors">
                 Dự án
               </h1>
