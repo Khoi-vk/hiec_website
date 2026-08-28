@@ -234,9 +234,7 @@ function MembersPage() {
                   <div className="mx-auto max-w-xl rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-950/90 p-4 md:p-5 shadow-sm backdrop-blur-md transition-all">
                     <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-4">
                       <div className="flex items-center gap-2.5 shrink-0 text-slate-800 dark:text-slate-200 w-full sm:w-auto">
-                        <div className="flex size-9 items-center justify-center rounded-xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-400">
-                          <Layers className="size-4" />
-                        </div>
+                        
                         <div>
                           <p className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
                             Chọn ban 
