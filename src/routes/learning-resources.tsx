@@ -667,7 +667,6 @@ function LearningResourcesPage() {
                             className="w-full h-full min-h-[550px] lg:min-h-[calc(100vh-14rem)] flex-1 border-0 bg-zinc-900 rounded-b-xl"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowFullScreen
-                            sandbox="allow-scripts allow-same-origin allow-forms"
                           />
 
                           {/* Floating quick download helper at bottom */}
