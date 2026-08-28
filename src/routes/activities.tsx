@@ -160,7 +160,7 @@ function ActivitiesPage() {
             {/* VÙNG TRÁI: TIÊU ĐỀ CĂN TRÁI */}
             <div className="text-left animate-fade-up">
               <h1 className="font-sans text-5xl md:text-6xl font-bold text-[#0f3d3e] dark:text-white uppercase tracking-[-0.04em] leading-[0.9] transition-colors">
-                Hoạt động
+                Hoạt  động
               </h1>
             </div>
         
