@@ -5,8 +5,6 @@ import {
   Calendar,
   ChevronDown,
   ChevronRight,
-  Download,
-  ExternalLink,
   FileText,
   Layers,
   Loader2,
@@ -155,30 +153,63 @@ function getFileExtension(url: string) {
 
 function getViewerUrl(slideUrl: string): { url: string; isOffice: boolean; isPdf: boolean } {
   if (!slideUrl) return { url: "", isOffice: false, isPdf: false };
-  const ext = getFileExtension(slideUrl);
+  const cleanUrl = slideUrl.trim();
+  const ext = getFileExtension(cleanUrl);
 
-  if (ext === "pdf") {
-    return { url: slideUrl, isOffice: false, isPdf: true };
+  const gDriveMatch = cleanUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (gDriveMatch?.[1]) {
+    return {
+      url: `https://drive.google.com/file/d/${gDriveMatch[1]}/preview`,
+      isOffice: false,
+      isPdf: false,
+    };
+  }
+
+  const gSlidesMatch = cleanUrl.match(/docs\.google\.com\/presentation\/d\/([a-zA-Z0-9_-]+)/);
+  if (gSlidesMatch?.[1]) {
+    return {
+      url: `https://docs.google.com/presentation/d/${gSlidesMatch[1]}/embed?start=false&loop=false&delayms=3000&rm=minimal`,
+      isOffice: false,
+      isPdf: false,
+    };
+  }
+
+  const gDocsMatch = cleanUrl.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
+  if (gDocsMatch?.[1]) {
+    return {
+      url: `https://docs.google.com/document/d/${gDocsMatch[1]}/preview?rm=minimal`,
+      isOffice: false,
+      isPdf: false,
+    };
+  }
+
+  // Hide the native PDF toolbar, which contains the download control.
+  if (ext === "pdf" || cleanUrl.toLowerCase().includes(".pdf")) {
+    return {
+      url: `${cleanUrl.split("#")[0]}#toolbar=0&navpanes=0&scrollbar=1`,
+      isOffice: false,
+      isPdf: true,
+    };
   }
 
   if (["ppt", "pptx", "doc", "docx", "xls", "xlsx"].includes(ext)) {
     return {
-      url: `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(slideUrl)}`,
+      url: `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cleanUrl)}`,
       isOffice: true,
       isPdf: false,
     };
   }
 
   // Fallback to Google Docs Viewer if unspecified format
-  if (slideUrl.startsWith("http")) {
+  if (cleanUrl.startsWith("http")) {
     return {
-      url: `https://docs.google.com/viewer?url=${encodeURIComponent(slideUrl)}&embedded=true`,
+      url: `https://docs.google.com/viewer?url=${encodeURIComponent(cleanUrl)}&embedded=true`,
       isOffice: false,
       isPdf: false,
     };
   }
 
-  return { url: slideUrl, isOffice: false, isPdf: false };
+  return { url: cleanUrl, isOffice: false, isPdf: false };
 }
 
 function LearningResourcesPage() {
@@ -601,37 +632,6 @@ function LearningResourcesPage() {
                             </Button>
                           )}
 
-                          <a
-                            href={activeLesson.slide_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex"
-                          >
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-2.5 text-xs rounded-lg"
-                            >
-                              <ExternalLink className="mr-1.5 size-3.5" /> Mở tab mới
-                            </Button>
-                          </a>
-
-                          <a
-                            href={activeLesson.slide_url}
-                            download
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex"
-                          >
-                            <Button
-                              variant="default"
-                              size="sm"
-                              className="h-8 px-2.5 text-xs rounded-lg font-semibold"
-                            >
-                              <Download className="mr-1.5 size-3.5" /> Tải về
-                            </Button>
-                          </a>
-
                           <Button
                             variant="ghost"
                             size="icon"
@@ -667,6 +667,7 @@ function LearningResourcesPage() {
                             className="w-full h-full min-h-[550px] lg:min-h-[calc(100vh-14rem)] flex-1 border-0 bg-zinc-900 rounded-b-xl"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowFullScreen
+                            sandbox="allow-scripts allow-same-origin allow-forms"
                           />
 
                           {/* Floating quick download helper at bottom */}
@@ -678,19 +679,9 @@ function LearningResourcesPage() {
                               </span>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                              <span className="text-[11px] text-zinc-400 hidden sm:inline">
-                                Cuộn trang hoặc dùng phím điều hướng để xem bài giảng
-                              </span>
-                              <a
-                                href={activeLesson.slide_url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-primary hover:underline font-semibold inline-flex items-center gap-1"
-                              >
-                                Link trực tiếp <ExternalLink className="size-3" />
-                              </a>
-                            </div>
+                            <span className="text-[11px] text-zinc-400 hidden sm:inline">
+                              Cuộn trang hoặc dùng phím điều hướng để xem bài giảng
+                            </span>
                           </div>
                         </div>
                       ) : (

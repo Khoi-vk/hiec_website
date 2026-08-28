@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/utils/supabase";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/learning-resources")({
+export const Route = createFileRoute("/admin/learning-resources")({
   head: () => ({
     meta: [
       { title: "Học liệu & Bài giảng — HIEC HUST" },
