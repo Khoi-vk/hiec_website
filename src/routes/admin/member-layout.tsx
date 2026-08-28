@@ -43,6 +43,7 @@ import {
   type MemberBoard,
   type MemberLayoutConfig,
   DEFAULT_MEMBER_LAYOUT,
+  DEFAULT_MEMBERS,
   sanitizeTiersForDisplay,
   sanitizeBoards,
 } from "@/services/member-layout-service";
@@ -75,7 +76,9 @@ function MemberLayoutAdminPage() {
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [isPreviewMode, setIsPreviewMode] = React.useState(true);
+  // Start on the editing screen. The preview can be opened explicitly after the
+  // layout data has been reviewed, instead of rendering it during initial load.
+  const [isPreviewMode, setIsPreviewMode] = React.useState(false);
 
   // Drag & drop state
   const [draggedMemberId, setDraggedMemberId] = React.useState<string | null>(null);
@@ -116,11 +119,24 @@ function MemberLayoutAdminPage() {
       ]);
       setMembers(fetchedMembers);
       const validIds = new Set(fetchedMembers.map((m) => m.id));
+      const rawTiers = Array.isArray(config.tiers) ? config.tiers : DEFAULT_MEMBER_LAYOUT.tiers;
       setTiers(
-        (config.tiers || DEFAULT_MEMBER_LAYOUT.tiers).map((t) => ({
-          ...t,
-          memberIds: (t.memberIds || []).filter((id) => validIds.has(id)).slice(0, 4),
-        })),
+        rawTiers.flatMap((tier, index) => {
+          if (!tier || typeof tier !== "object") return [];
+          const candidate = tier as Partial<MemberTier>;
+          const memberIds = Array.isArray(candidate.memberIds) ? candidate.memberIds : [];
+          return [
+            {
+              id:
+                typeof candidate.id === "string" && candidate.id
+                  ? candidate.id
+                  : `tier-${index + 1}`,
+              name: typeof candidate.name === "string" ? candidate.name : "",
+              subtitle: typeof candidate.subtitle === "string" ? candidate.subtitle : "",
+              memberIds: memberIds.filter((id) => typeof id === "string" && validIds.has(id)).slice(0, 4),
+            },
+          ];
+        }),
       );
       setBoards(sanitizeBoards(config.boards, fetchedMembers));
       setShowUnassigned(config.showUnassigned ?? true);
@@ -128,6 +144,12 @@ function MemberLayoutAdminPage() {
     } catch (err) {
       console.error("Lỗi tải dữ liệu giao diện:", err);
       toast.error("Không thể tải cấu hình thành viên");
+      // Keep the editor usable if a saved Supabase/localStorage value is malformed.
+      setMembers(DEFAULT_MEMBERS);
+      setTiers(DEFAULT_MEMBER_LAYOUT.tiers);
+      setBoards(DEFAULT_MEMBER_LAYOUT.boards);
+      setShowUnassigned(DEFAULT_MEMBER_LAYOUT.showUnassigned);
+      setUnassignedTitle(DEFAULT_MEMBER_LAYOUT.unassignedTitle);
     } finally {
       setLoading(false);
     }

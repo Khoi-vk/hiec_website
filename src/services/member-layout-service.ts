@@ -195,18 +195,25 @@ export function sanitizeTiersForDisplay(tiers: MemberTier[], members: Member[]):
 
 export function sanitizeBoards(boards: MemberBoard[] | undefined, members: Member[]): MemberBoard[] {
   const validIds = new Set(members.map((m) => m.id));
-  return (boards || []).map((b) => {
+  if (!Array.isArray(boards)) return [];
+
+  return boards.flatMap((board, index) => {
+    if (!board || typeof board !== "object") return [];
+    const b = board as Partial<MemberBoard>;
     const featured =
       b.featuredMemberId && validIds.has(b.featuredMemberId) ? b.featuredMemberId : null;
+    const sourceMemberIds = Array.isArray(b.memberIds) ? b.memberIds : [];
     const memberIds = Array.from(
-      new Set((b.memberIds || []).filter((id) => validIds.has(id) && id !== featured)),
+      new Set(sourceMemberIds.filter((id) => typeof id === "string" && validIds.has(id) && id !== featured)),
     );
-    return {
-      id: b.id,
-      name: b.name || "",
-      featuredMemberId: featured,
-      memberIds,
-    };
+    return [
+      {
+        id: typeof b.id === "string" && b.id ? b.id : `board-${index + 1}`,
+        name: typeof b.name === "string" ? b.name : "",
+        featuredMemberId: featured,
+        memberIds,
+      },
+    ];
   });
 }
 
@@ -251,11 +258,11 @@ export async function getAllMembers(): Promise<Member[]> {
 
     return data.map((item: any) => ({
       id: String(item.id),
-      fullName: item.fullName || "Thành viên",
-      position: item.position || "Thành viên HIEC",
-      department: item.department || "HIEC",
-      bio: item.bio || "",
-      avatarUrl: item.avatarUrl || "",
+      fullName: typeof item.fullName === "string" ? item.fullName : "Thành viên",
+      position: typeof item.position === "string" ? item.position : "Thành viên HIEC",
+      department: typeof item.department === "string" ? item.department : "HIEC",
+      bio: typeof item.bio === "string" ? item.bio : "",
+      avatarUrl: typeof item.avatarUrl === "string" ? item.avatarUrl : "",
       displayOrder: item.displayOrder ?? 0,
     }));
   } catch (err) {

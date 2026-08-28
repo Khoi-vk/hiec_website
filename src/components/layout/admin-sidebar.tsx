@@ -75,16 +75,34 @@ export function AdminSidebar() {
           
           {navItems.map((item) => {
             const active = pathname === item.url;
+            const itemClassName = cn(
+              "flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold transition-all duration-300 group cursor-pointer",
+              active
+                ? "bg-cyan-500 text-[#020817] shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                : "text-slate-400 hover:bg-white/5 hover:text-white",
+            );
+
+            // This route reads a saved layout on load. Use a normal navigation so it is
+            // always mounted from a fresh route state after an admin session is restored.
+            if (item.url === "/admin/member-layout") {
+              return (
+                <a key={item.url} href={item.url} className={itemClassName}>
+                  <item.icon
+                    className={cn(
+                      "size-5 shrink-0 transition-transform duration-300 group-hover:scale-110",
+                      active ? "text-[#020817]" : "text-cyan-500/60 group-hover:text-cyan-400",
+                    )}
+                  />
+                  {!collapsed && <span className="tracking-tight">{item.title}</span>}
+                </a>
+              );
+            }
+
             return (
               <Link
                 key={item.url}
                 to={item.url as any}
-                className={cn(
-                  "flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold transition-all duration-300 group cursor-pointer",
-                  active
-                    ? "bg-cyan-500 text-[#020817] shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-                    : "text-slate-400 hover:bg-white/5 hover:text-white"
-                )}
+                className={itemClassName}
               >
                 <item.icon className={cn(
                   "size-5 shrink-0 transition-transform duration-300 group-hover:scale-110",
