@@ -239,11 +239,9 @@ function MembersPage() {
                         </div>
                         <div>
                           <p className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
-                            Chọn ban / bảng
+                            Chọn ban 
                           </p>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                            Chuyển nhanh xuống danh sách
-                          </p>
+                          
                         </div>
                       </div>
 
