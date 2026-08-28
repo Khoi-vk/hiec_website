@@ -233,7 +233,7 @@ function MembersPage() {
                 <div className="mt-14 mb-4 md:mt-20 md:mb-8 animate-fade-up">
                   <div className="mx-auto max-w-xl rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-950/90 p-4 md:p-5 shadow-sm backdrop-blur-md transition-all">
                     <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-4">
-                      <div className="flex items-center gap-2.5 shrink-0 text-slate-800 dark:text-slate-200 w-full sm:w-auto">
+                      <div className="shrink-0 text-slate-800 dark:text-slate-200 w-full sm:w-auto">
                         
                         <div>
                           <p className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
