@@ -391,7 +391,7 @@ function LearningResourcesPage() {
                   >
                     <BookOpen className="mr-1.5 size-3.5" /> Thư viện tài liệu
                   </Badge>
-                  <span className="text-xs text-muted-foreground">HIEC Knowledge Hub</span>
+                  <span className="text-xs text-muted-foreground">Mọi hành động sử dụng tài liệu cho mục đích thương mại dưới bất kỳ hình thức nào khi chưa được sự cho phép của HIEC đều là vi phạm pháp luật.</span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
                   Kho Học Liệu & Slide Bài Giảng
