@@ -584,25 +584,7 @@ function LearningResourcesPage() {
                     <div className="border-b border-border bg-card p-4 sm:p-5">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="space-y-1.5 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            {activeChapter && (
-                              <Badge
-                                variant="secondary"
-                                className="text-[11px] font-medium bg-muted text-muted-foreground"
-                              >
-                                {activeChapter.title}
-                              </Badge>
-                            )}
-                            {activeChapter?.chapter_date && (
-                              <Badge
-                                variant="outline"
-                                className="text-[11px] font-normal text-muted-foreground gap-1"
-                              >
-                                <Calendar className="size-3" />
-                                {formatDate(activeChapter.chapter_date)}
-                              </Badge>
-                            )}
-                          </div>
+                          
                           <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-tight break-words">
                             {activeLesson.title}
                           </h2>
