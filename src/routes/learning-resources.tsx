@@ -245,12 +245,8 @@ function LearningResourcesPage() {
         setChapters(fetchedChapters);
         setLessons(fetchedLessons);
 
-        // Open all chapters by default
-        const initialOpen: Record<string, boolean> = {};
-        fetchedChapters.forEach((ch) => {
-          initialOpen[ch.id] = true;
-        });
-        setOpenChapters(initialOpen);
+        // Default state: all chapters are collapsed
+        setOpenChapters({});
 
         // Select first lesson by default
         if (fetchedLessons.length > 0) {
@@ -261,11 +257,7 @@ function LearningResourcesPage() {
         // Use demo items if database is empty
         setChapters(DEMO_CHAPTERS);
         setLessons(DEMO_LESSONS);
-        const initialOpen: Record<string, boolean> = {};
-        DEMO_CHAPTERS.forEach((ch) => {
-          initialOpen[ch.id] = true;
-        });
-        setOpenChapters(initialOpen);
+        setOpenChapters({});
         const firstDemoLesson = DEMO_LESSONS[0];
         if (firstDemoLesson) setActiveLessonId(firstDemoLesson.id);
       }
@@ -274,6 +266,7 @@ function LearningResourcesPage() {
       // Fallback
       setChapters(DEMO_CHAPTERS);
       setLessons(DEMO_LESSONS);
+      setOpenChapters({});
       const firstDemoLesson = DEMO_LESSONS[0];
       if (firstDemoLesson) setActiveLessonId(firstDemoLesson.id);
     } finally {
@@ -385,10 +378,11 @@ function LearningResourcesPage() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  
-                  <span className="text-xs text-muted-foreground">Mọi hành động sử dụng tài liệu cho mục đích thương mại dưới bất kỳ hình thức nào khi chưa được sự cho phép của HIEC đều là vi phạm pháp luật.</span>
+                  <span className="text-xs text-muted-foreground">
+                    Mọi hành động sử dụng tài liệu cho mục đích thương mại dưới bất kỳ hình thức nào
+                    khi chưa được sự cho phép của HIEC đều là vi phạm pháp luật.
+                  </span>
                 </div>
-                
               </div>
 
               <div className="flex items-center gap-3">
@@ -460,7 +454,7 @@ function LearningResourcesPage() {
                 </div>
 
                 {/* Chapter list with Dropdowns */}
-                <div className="flex-1 overflow-y-auto p-3 space-y-2.5 scrollbar-thin">
+                <div className="flex-1 overflow-y-auto divide-y divide-border/70 scrollbar-thin">
                   {filteredChapters.length === 0 ? (
                     <div className="py-8 text-center text-xs text-muted-foreground">
                       Không tìm thấy bài giảng phù hợp.
@@ -468,7 +462,7 @@ function LearningResourcesPage() {
                   ) : (
                     filteredChapters.map((chapter, index) => {
                       const chapterLessons = lessonsByChapter.get(chapter.id) ?? [];
-                      const isOpen = openChapters[chapter.id] ?? true;
+                      const isOpen = searchQuery.trim() ? true : Boolean(openChapters[chapter.id]);
                       const hasActiveLesson = chapterLessons.some((l) => l.id === activeLessonId);
                       const formattedDate = formatDate(chapter.chapter_date);
 
@@ -476,39 +470,48 @@ function LearningResourcesPage() {
                         <div
                           key={chapter.id}
                           className={cn(
-                            "rounded-xl border transition-colors overflow-hidden",
-                            hasActiveLesson
-                              ? "border-primary/40 bg-primary/5"
-                              : "border-border/80 bg-card hover:border-border",
+                            "w-full transition-colors",
+                            hasActiveLesson ? "bg-primary/5" : "bg-card",
                           )}
                         >
-                          {/* Chapter Dropdown Trigger */}
+                          {/* Chapter Dropdown Trigger: hình chữ nhật ngang lấp đầy cột */}
                           <button
                             type="button"
                             onClick={() => toggleChapter(chapter.id)}
-                            className="w-full flex items-start gap-2.5 p-3 text-left transition-colors hover:bg-accent/50 focus:outline-hidden"
+                            className={cn(
+                              "w-full flex items-start justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-muted/60 focus:outline-hidden",
+                              isOpen && "bg-muted/30",
+                            )}
                           >
-                            <span
-                              className={cn(
-                                "grid size-5 shrink-0 place-items-center rounded text-[11px] font-black mt-0.5",
-                                hasActiveLesson
-                                  ? "bg-primary text-primary-foreground"
-                                  : "bg-muted text-muted-foreground",
-                              )}
-                            >
-                              {index + 1}
-                            </span>
+                            <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                              <span
+                                className={cn(
+                                  "grid size-5 shrink-0 place-items-center rounded text-[11px] font-black mt-0.5",
+                                  hasActiveLesson
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-muted text-muted-foreground",
+                                )}
+                              >
+                                {index + 1}
+                              </span>
 
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-foreground leading-snug break-words">
-                                {chapter.title}
-                              </p>
-                              {formattedDate && (
-                                <div className="flex items-center gap-1 mt-1 text-[11px] text-muted-foreground">
-                                  <Calendar className="size-3 shrink-0 text-muted-foreground/80" />
-                                  <span>{formattedDate}</span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-foreground leading-snug break-words">
+                                  {chapter.title}
+                                </p>
+                                <div className="flex items-center gap-1.5 mt-1 text-[11px] text-muted-foreground">
+                                  {formattedDate && (
+                                    <>
+                                      <div className="flex items-center gap-1">
+                                        <Calendar className="size-3 shrink-0 text-muted-foreground/80" />
+                                        <span>{formattedDate}</span>
+                                      </div>
+                                      <span>•</span>
+                                    </>
+                                  )}
+                                  <span>{chapterLessons.length} bài</span>
                                 </div>
-                              )}
+                              </div>
                             </div>
 
                             <span className="shrink-0 text-muted-foreground mt-0.5">
@@ -522,7 +525,7 @@ function LearningResourcesPage() {
 
                           {/* Chapter Lessons List (Dropdown content) */}
                           {isOpen && (
-                            <div className="border-t border-border/50 bg-background/50 p-1.5 space-y-1">
+                            <div className="border-t border-border/50 bg-muted/20 px-2.5 py-1.5 space-y-0.5">
                               {chapterLessons.length === 0 ? (
                                 <p className="px-3 py-2 text-[11px] text-muted-foreground italic">
                                   Chưa có bài giảng trong chương này.
@@ -534,7 +537,13 @@ function LearningResourcesPage() {
                                     <button
                                       key={lesson.id}
                                       type="button"
-                                      onClick={() => setActiveLessonId(lesson.id)}
+                                      onClick={() => {
+                                        setActiveLessonId(lesson.id);
+                                        setOpenChapters((prev) => ({
+                                          ...prev,
+                                          [chapter.id]: true,
+                                        }));
+                                      }}
                                       className={cn(
                                         "w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs transition-all",
                                         isActive
@@ -605,7 +614,13 @@ function LearningResourcesPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => setActiveLessonId(prevLesson.id)}
+                              onClick={() => {
+                                setActiveLessonId(prevLesson.id);
+                                setOpenChapters((prev) => ({
+                                  ...prev,
+                                  [prevLesson.chapter_id]: true,
+                                }));
+                              }}
                               className="h-8 px-2.5 text-xs rounded-lg"
                               title={`Bài trước: ${prevLesson.title}`}
                             >
@@ -617,7 +632,13 @@ function LearningResourcesPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => setActiveLessonId(nextLesson.id)}
+                              onClick={() => {
+                                setActiveLessonId(nextLesson.id);
+                                setOpenChapters((prev) => ({
+                                  ...prev,
+                                  [nextLesson.chapter_id]: true,
+                                }));
+                              }}
                               className="h-8 px-2.5 text-xs rounded-lg"
                               title={`Bài tiếp: ${nextLesson.title}`}
                             >
