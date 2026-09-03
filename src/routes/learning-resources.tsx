@@ -385,17 +385,10 @@ function LearningResourcesPage() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className="border-primary/40 bg-primary/10 text-xs font-semibold text-primary"
-                  >
-                    <BookOpen className="mr-1.5 size-3.5" /> Thư viện tài liệu
-                  </Badge>
+                  
                   <span className="text-xs text-muted-foreground">Mọi hành động sử dụng tài liệu cho mục đích thương mại dưới bất kỳ hình thức nào khi chưa được sự cho phép của HIEC đều là vi phạm pháp luật.</span>
                 </div>
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                  Kho Học Liệu & Slide Bài Giảng
-                </h1>
+                
               </div>
 
               <div className="flex items-center gap-3">
