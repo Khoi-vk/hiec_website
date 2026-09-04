@@ -328,9 +328,8 @@ export function ActionShowcase() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Top Controls Bar: Filter Pills (Left) & Arrow Nav (Right) */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* Filter Pills */}
+      {/* FILTER */}
+      <div className="flex justify-center">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -344,6 +343,7 @@ export function ActionShowcase() {
           >
             Tất cả ({items.length})
           </button>
+      
           <button
             type="button"
             onClick={() => setSelectedFilter("activity")}
@@ -356,6 +356,7 @@ export function ActionShowcase() {
           >
             Hoạt động ({activityCount})
           </button>
+      
           <button
             type="button"
             onClick={() => setSelectedFilter("project")}
@@ -369,26 +370,27 @@ export function ActionShowcase() {
             Dự án ({projectCount})
           </button>
         </div>
-
-        {/* Prev / Next Circular Navigation Buttons */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handlePrev}
-            aria-label="Previous slide"
-            className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95 cursor-pointer"
-          >
-            <ChevronLeft className="size-4 sm:size-5" />
-          </button>
-          <button
-            type="button"
-            onClick={handleNext}
-            aria-label="Next slide"
-            className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95 cursor-pointer"
-          >
-            <ChevronRight className="size-4 sm:size-5" />
-          </button>
-        </div>
+      </div>
+      
+      {/* NÚT CHUYỂN ẢNH - NẰM GIỮA */}
+      <div className="mt-4 flex items-center justify-center gap-2">
+        <button
+          type="button"
+          onClick={handlePrev}
+          aria-label="Previous slide"
+          className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95 cursor-pointer"
+        >
+          <ChevronLeft className="size-4 sm:size-5" />
+        </button>
+      
+        <button
+          type="button"
+          onClick={handleNext}
+          aria-label="Next slide"
+          className="size-9 sm:size-10 rounded-full border border-border bg-card flex items-center justify-center text-foreground hover:bg-accent hover:border-primary/50 transition-all shadow-2xs active:scale-95 cursor-pointer"
+        >
+          <ChevronRight className="size-4 sm:size-5" />
+        </button>
       </div>
 
       {loading ? (
