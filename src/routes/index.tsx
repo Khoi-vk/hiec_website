@@ -146,7 +146,7 @@ export function HomePage() {
             <div className="mx-auto max-w-6xl">
               <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-900 dark:text-white">
+                  <p className="mb-3 text-sm font-black uppercase tracking-[0.22em] text-primary-deep dark:text-primary">
                     {data.historySection.badge}
                   </p>
                   <h2 className="text-3xl font-extrabold leading-[1.15] tracking-tight text-foreground sm:text-4xl md:text-5xl">
@@ -193,7 +193,7 @@ export function HomePage() {
                               </>
                             )}
                           </div>
-                          <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-full border-2 border-primary bg-background text-xs font-mono font-bold text-slate-900 dark:text-primary shadow-[0_0_12px_rgba(6,182,212,0.3)] transition-transform group-hover:scale-110 md:size-14 md:text-sm">
+                          <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-full border-2 border-primary bg-background text-xs font-mono font-bold text-primary-deep dark:text-primary shadow-[0_0_12px_rgba(6,182,212,0.3)] transition-transform group-hover:scale-110 md:size-14 md:text-sm">
                             {item.year}
                           </span>
                           <div className="flex w-full flex-1 flex-col items-center justify-start">
